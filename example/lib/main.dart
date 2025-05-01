@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Network tracker demo'),
     );
   }
 }
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             NetworkRequestsViewer.showPage(context: context);
           },
-          child: const Text('Click Me'),
+          child: const Text('Open tracker'),
         ),
       ),
       floatingActionButton: FloatingActionButton(
