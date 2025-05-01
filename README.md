@@ -42,6 +42,7 @@ dependencies:
 
 ## Grouped summary of all tracked HTTP requests, organized by request path
 
+<img src="screenshots/request_main_screen.png" height="600"/>
 
 ## View grouped and timestamped HTTP requests by path, with detailed status tracking and drill-down into each call.
 
