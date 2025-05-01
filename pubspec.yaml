@@ -1,7 +1,9 @@
 name: network_tracker
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
+homepage: https://github.com/AramSemerjyan/network_tracker
+repository: https://github.com/AramSemerjyan/network_tracker
+issue_tracker: https://github.com/AramSemerjyan/network_tracker/issues
 
 environment:
   sdk: ^3.6.0
