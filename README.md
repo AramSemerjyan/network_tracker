@@ -42,16 +42,16 @@ dependencies:
 
 ## Grouped summary of all tracked HTTP requests, organized by request path
 
-![Viewer Page](screenshots/request_main_screen.png)
+<img src="screenshots/request_main_screen.png" height="600"/>
 
 ## View grouped and timestamped HTTP requests by path, with detailed status tracking and drill-down into each call.
 
-![Viewer Page](screenshots/request_path_screen.png)
+<img src="screenshots/request_path_screen.png" height="600"/>
 
 
 ## Inspect full request details including response data, headers, status, errors, and execution time in a dedicated detail view.
 
-![Viewer Page](screenshots/request_details_screen.png)
+<img src="screenshots/request_details_screen.png" height="600"/>
 
 ---------
 
