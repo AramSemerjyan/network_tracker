@@ -1,5 +1,6 @@
 name: network_tracker
-description: "A new Flutter package project."
+description: "A lightweight and developer-friendly Flutter package for tracking and viewing all your app's HTTP network activity"
+
 version: 0.0.1
 homepage: https://github.com/AramSemerjyan/network_tracker
 repository: https://github.com/AramSemerjyan/network_tracker
