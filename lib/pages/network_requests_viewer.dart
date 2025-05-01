@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_view/json_view.dart';
@@ -217,7 +218,9 @@ class _RequestDataDetailsScreen extends StatelessWidget {
 
                             await Share.shareXFiles([XFile(file.path)]);
                           } catch (e) {
-                            print("Error saving or sharing JSON file: $e");
+                            if (kDebugMode) {
+                              print("Error saving or sharing JSON file: $e");
+                            }
                           }
                         },
                         icon: const Icon(Icons.save_alt),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:network_tracker/network_tracker.dart';
 
@@ -45,10 +46,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void _makeRequest() async {
     try {
       final result = await _dio.get('/posts/1');
-
-      print(result);
+      if (kDebugMode) {
+        print(result);
+      }
     } catch (e) {
-      print('failed to make dummy request $e');
+      if (kDebugMode) {
+        print('failed to make dummy request $e');
+      }
     }
   }
 

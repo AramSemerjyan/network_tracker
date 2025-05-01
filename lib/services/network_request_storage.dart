@@ -26,11 +26,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
 
   static NetworkRequestStorage? _instance;
   static NetworkRequestStorage get instance {
-    if (_instance == null) {
-      _instance = NetworkRequestStorage();
-    }
-
-    return _instance!;
+    return _instance ??= NetworkRequestStorage();
   }
 
   @override

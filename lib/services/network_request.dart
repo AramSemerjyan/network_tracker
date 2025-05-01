@@ -50,5 +50,5 @@ class NetworkRequest {
     };
   }
 
-  String get name => '${path}_${method}_$timestamp';
+  String get name => '${path.replaceAll('/', '')}_${method}_$timestamp';
 }

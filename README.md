@@ -42,6 +42,10 @@ dependencies:
 
 ---------
 
+## 💾 Save or share response bodies as `.json` files
+
+---------
+
 ## 📂 License
 
 MIT License — free for personal or commercial use.
