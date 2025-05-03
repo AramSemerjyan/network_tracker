@@ -5,11 +5,24 @@ import '../services/network_request.dart';
 import '../services/network_request_storage.dart';
 import '../services/request_status.dart';
 
+/// A Dio interceptor that tracks all outgoing requests, responses, and errors.
+///
+/// This interceptor records metadata such as method, path, headers,
+/// status code, response body, and any errors. The data is stored in
+/// [NetworkRequestStorage] and can be visualized using a UI like
+/// `NetworkRequestsViewer`.
+///
+/// To use:
+/// ```dart
+/// dio.interceptors.add(NetworkTrackerInterceptor());
+/// ```
 class NetworkTrackerInterceptor extends Interceptor {
+  /// Internal request storage for tracking all captured requests.
   final storage = NetworkRequestStorage.instance;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    /// Capture and store request data
     if (storage.baseUrl.isEmpty) {
       storage.baseUrl = options.baseUrl;
     }
@@ -26,11 +39,14 @@ class NetworkTrackerInterceptor extends Interceptor {
     );
 
     storage.addRequest(request);
+
+    /// Store request ID to associate with later response or error
     options.extra['network_tracker_id'] = request.id;
 
     super.onRequest(options, handler);
   }
 
+  /// Retrieve stored request ID and update with response details
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final requestId = response.requestOptions.extra['network_tracker_id'];
@@ -45,6 +61,7 @@ class NetworkTrackerInterceptor extends Interceptor {
     super.onResponse(response, handler);
   }
 
+  /// Retrieve stored request ID and update with error details
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final requestId = err.requestOptions.extra['network_tracker_id'];

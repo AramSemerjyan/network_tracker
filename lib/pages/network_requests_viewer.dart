@@ -17,28 +17,37 @@ class NetworkRequestsViewer extends StatefulWidget {
   }) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      backgroundColor: Colors.transparent,
       builder: (c) {
-        return Container(
-          clipBehavior: Clip.hardEdge,
-          padding: const EdgeInsets.fromLTRB(
-            16,
-            4,
-            16,
-            4,
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 90 / 100,
+            minHeight: 200,
           ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(16),
-              topLeft: Radius.circular(16),
+          child: Container(
+            clipBehavior: Clip.hardEdge,
+            padding: const EdgeInsets.fromLTRB(
+              16,
+              4,
+              16,
+              4,
             ),
-          ),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(child: NetworkRequestsViewer()),
-              ],
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(16),
+                topLeft: Radius.circular(16),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Flexible(child: NetworkRequestsViewer()),
+                ],
+              ),
             ),
           ),
         );
@@ -56,6 +65,44 @@ class NetworkRequestsViewer extends StatefulWidget {
 
 class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   late final storage = NetworkRequestStorage.instance;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  bool _showSearchBar = false;
+
+  final _focusNode = FocusNode();
+
+  List<String> get _filteredPaths {
+    final allPaths = storage.getTrackedPaths();
+    if (_searchQuery.isEmpty) return allPaths;
+
+    return allPaths
+        .where(
+            (path) => path.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _search(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
+  void _onSearchTap() {
+    setState(() {
+      _showSearchBar = !_showSearchBar;
+      if (!_showSearchBar) {
+        _searchQuery = '';
+        _searchController.clear();
+      }
+      _focusNode.requestFocus();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,47 +112,74 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         title: const Text('Network requests'),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: Icon(_showSearchBar ? Icons.close : Icons.search),
+            tooltip: _showSearchBar ? 'Hide search' : 'Show search',
+            onPressed: _onSearchTap,
+          ),
+        ],
       ),
       body: Column(
         children: [
-          const Text('Base url:'),
+          const SizedBox(height: 8),
+          const Text('Base URL:'),
           GestureDetector(
             onTap: () {
               Clipboard.setData(ClipboardData(text: storage.baseUrl));
             },
-            child: Text(
-              storage.baseUrl,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                storage.baseUrl,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.separated(
-              itemCount: storage.getTrackedPaths().length,
-              separatorBuilder: (c, i) {
-                return Container(
-                  height: 1,
-                  color: Colors.grey,
-                );
-              },
-              itemBuilder: (context, index) {
-                final path = storage.getTrackedPaths()[index];
-                final request = storage.getRequestsByPath(path);
-                return ListTile(
-                  title: Text(path),
-                  trailing: Text('${request.length} requests'),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => _RequestDetailsScreen(
-                        path: path,
-                        requests: storage.getRequestsByPath(path),
-                      ),
-                    ),
+          if (_showSearchBar) ...[
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _searchController,
+                focusNode: _focusNode,
+                onChanged: _search,
+                decoration: InputDecoration(
+                  hintText: 'Search by path...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
+                  prefixIcon: const Icon(Icons.search),
+                ),
+              ),
             ),
+          ],
+          const SizedBox(height: 10),
+          Expanded(
+            child: _filteredPaths.isEmpty
+                ? const Center(child: Text('No matching requests'))
+                : ListView.separated(
+                    itemCount: _filteredPaths.length,
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final path = _filteredPaths[index];
+                      final requests = storage.getRequestsByPath(path);
+                      return ListTile(
+                        title: Text(path),
+                        trailing: Text('${requests.length} requests'),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => _RequestDetailsScreen(
+                              path: path,
+                              requests: requests,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

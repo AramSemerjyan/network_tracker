@@ -35,6 +35,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final Dio _dio =
       Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
+  String _selectedPath = '/posts/1';
+  final List<String> _paths = [
+    '/posts/1',
+    '/posts/2',
+    '/comments/1',
+    '/todos/1',
+    '/albums/1'
+  ];
 
   @override
   void initState() {
@@ -45,13 +53,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _makeRequest() async {
     try {
-      final result = await _dio.get('/posts/1');
+      final result = await _dio.get(_selectedPath);
       if (kDebugMode) {
-        print(result);
+        print('Request success: $result');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('failed to make dummy request $e');
+        print('Request failed: $e');
+      }
+    }
+  }
+
+  Future<void> _makeErrorRequest() async {
+    try {
+      final result = await _dio.get('/invalid-endpoint-404');
+      if (kDebugMode) {
+        print('Unexpected success: $result');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Expected failure occurred: $e');
       }
     }
   }
@@ -59,23 +80,58 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list_alt),
+            tooltip: 'Open tracker',
+            onPressed: () => NetworkRequestsViewer.showPage(context: context),
+          ),
+        ],
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            NetworkRequestsViewer.showPage(context: context);
-          },
-          child: const Text('Open tracker'),
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Select a test API path:'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: DropdownButtonFormField<String>(
+              value: _selectedPath,
+              onChanged: (value) => setState(() {
+                _selectedPath = value!;
+              }),
+              items: _paths
+                  .map((path) => DropdownMenuItem(
+                        value: path,
+                        child: Text(path),
+                      ))
+                  .toList(),
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Endpoint',
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.greenAccent.withValues(alpha: 0.7),
+            ),
+            onPressed: _makeRequest,
+            child: const Text('Make Request'),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.withValues(alpha: 0.7),
+            ),
+            onPressed: _makeErrorRequest,
+            child: const Text('Make Error Request'),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _makeRequest,
-        tooltip: 'Make dummy request',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
