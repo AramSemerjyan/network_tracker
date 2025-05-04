@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:network_tracker/src/services/network_request_service.dart';
 
 import '../../model/network_request.dart';
 import '../../model/network_request_filter.dart';
@@ -25,6 +26,10 @@ class RequestDetailsScreenVM {
 
   void clearFilter() {
     filterNotifier.value = NetworkRequestFilter();
+  }
+
+  void repeatRequest(NetworkRequest request) {
+    NetworkRequestService.instance.repeatRequestService.repeat(request);
   }
 
   void _updateList() {

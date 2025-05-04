@@ -13,14 +13,14 @@ class NetworkRepeatRequestScreen extends StatefulWidget {
 
 class _NetworkRepeatRequestScreenState
     extends State<NetworkRepeatRequestScreen> {
-  late final vm = NetworkRepeatRequestScreenVM();
+  late final _vm = NetworkRepeatRequestScreenVM();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Repeat Network Request')),
       body: ValueListenableBuilder<List<NetworkRequest>>(
-        valueListenable: vm.availableRequestsNotifier,
+        valueListenable: _vm.availableRequestsNotifier,
         builder: (_, requests, __) {
           if (requests.isEmpty) {
             return const Center(child: Text('No requests available'));
@@ -34,7 +34,7 @@ class _NetworkRepeatRequestScreenState
                 title: Text('${req.method.name} ${req.path}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () => vm.repeatRequest(req),
+                  onPressed: () => _vm.repeatRequest(req),
                 ),
               );
             },

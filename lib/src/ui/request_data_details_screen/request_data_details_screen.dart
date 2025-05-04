@@ -1,67 +1,77 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../model/network_request.dart';
+import '../../model/network_request.dart';
+import 'request_data_details_screen_vm.dart';
 
-class RequestDataDetailsScreen extends StatelessWidget {
+class RequestDataDetailsScreen extends StatefulWidget {
   final NetworkRequest request;
 
   const RequestDataDetailsScreen({super.key, required this.request});
+
+  @override
+  State<RequestDataDetailsScreen> createState() =>
+      _RequestDataDetailsScreenState();
+}
+
+class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
+  late final _vm = RequestDataDetailsScreenVM(widget.request);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${request.method.value} - ${request.startDate}',
+          '${widget.request.method.value} - ${widget.request.startDate}',
           style: const TextStyle(fontSize: 14),
         ),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: () => _vm.repeatRequest(widget.request),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            if (request.requestData != null)
+            if (widget.request.requestData != null)
               ListTile(
                 title: const Text('Request Data:'),
                 subtitle: JsonView(
-                  json: request.requestData,
+                  json: widget.request.requestData,
                   shrinkWrap: true,
                 ),
               ),
-            if (request.queryParameters?.isNotEmpty ?? false)
+            if (widget.request.queryParameters?.isNotEmpty ?? false)
               ListTile(
                 title: const Text('Request Parameters:'),
                 subtitle: JsonView(
-                  json: request.queryParameters,
+                  json: widget.request.queryParameters,
                   shrinkWrap: true,
                 ),
               ),
-            if (request.duration != null)
+            if (widget.request.duration != null)
               ListTile(
                 title: const Text('Duration:'),
                 subtitle: Text(
-                  '${request.duration?.inMilliseconds}ms',
+                  '${widget.request.duration?.inMilliseconds}ms',
                 ),
               ),
-            if (request.dioError?.error != null)
+            if (widget.request.dioError?.error != null)
               ListTile(
                 title: const Text('Error:'),
-                subtitle: Text('${request.dioError?.error}'),
+                subtitle: Text('${widget.request.dioError?.error}'),
               ),
-            if (request.dioError?.message != null)
+            if (widget.request.dioError?.message != null)
               ListTile(
                 title: const Text('Error message:'),
-                subtitle: Text('${request.dioError?.message}'),
+                subtitle: Text('${widget.request.dioError?.message}'),
               ),
-            if (request.responseData != null)
+            if (widget.request.responseData != null)
               Expanded(
                 child: ListTile(
                   title: Row(
@@ -70,19 +80,10 @@ class RequestDataDetailsScreen extends StatelessWidget {
                       const Spacer(),
                       IconButton(
                         onPressed: () async {
-                          try {
-                            final tempDir = await getTemporaryDirectory();
-                            final filePath =
-                                '${tempDir.path}/${request.name}.json';
-                            final jsonString = jsonEncode(request.responseData);
-                            final file = File(filePath);
-                            await file.writeAsString(jsonString);
+                          final path = await _vm.exportResponseData();
 
-                            await Share.shareXFiles([XFile(file.path)]);
-                          } catch (e) {
-                            if (kDebugMode) {
-                              print("Error saving or sharing JSON file: $e");
-                            }
+                          if (path != null) {
+                            await Share.shareXFiles([XFile(path)]);
                           }
                         },
                         icon: const Icon(Icons.save_alt),
@@ -90,7 +91,7 @@ class RequestDataDetailsScreen extends StatelessWidget {
                     ],
                   ),
                   subtitle: JsonView(
-                    json: request.responseData,
+                    json: widget.request.responseData,
                     padding: const EdgeInsets.only(bottom: 40),
                   ),
                 ),

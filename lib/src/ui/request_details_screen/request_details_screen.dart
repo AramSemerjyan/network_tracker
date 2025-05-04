@@ -3,7 +3,7 @@ import 'package:network_tracker/src/ui/request_details_screen/request_details_sc
 
 import '../../model/network_request.dart';
 import '../filter/filter_bar.dart';
-import '../request_data_details_screen.dart';
+import '../request_data_details_screen/request_data_details_screen.dart';
 
 class RequestDetailsScreen extends StatefulWidget {
   final String path;
@@ -40,6 +40,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               if (request.duration != null)
                 Text('Duration: ${request.duration?.inMilliseconds}ms')
             ],
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: () => _vm.repeatRequest(request),
           ),
           onTap: () {
             Navigator.push(
