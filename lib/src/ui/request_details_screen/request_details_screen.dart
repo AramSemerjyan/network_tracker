@@ -57,21 +57,24 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       valueListenable: _showFilterBar,
       builder: (c, v, w) {
         if (v) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              ValueListenableBuilder(
-                valueListenable: _vm.filterNotifier,
-                builder: (c, v, w) {
-                  return FilterBar(
-                    filter: v,
-                    onChange: _vm.onFilterChanged,
-                    onClear: _vm.clearFilter,
-                  );
-                },
-              )
-            ],
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                ValueListenableBuilder(
+                  valueListenable: _vm.filterNotifier,
+                  builder: (c, v, w) {
+                    return FilterBar(
+                      filter: v,
+                      onChange: _vm.onFilterChanged,
+                      onClear: _vm.clearFilter,
+                    );
+                  },
+                )
+              ],
+            ),
           );
         }
 
