@@ -6,6 +6,8 @@ abstract class NetworkRequestStorageInterface {
   /// The base URL used in tracked requests.
   String get baseUrl;
 
+  void setBaseUrl(String baseUrl);
+
   /// Adds a new [NetworkRequest] to the storage.
   void addRequest(NetworkRequest request);
 
@@ -35,13 +37,9 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
   @override
   String baseUrl = '';
 
-  static NetworkRequestStorage? _instance;
-
-  /// Returns the singleton instance of [NetworkRequestStorage].
-  ///
-  /// Lazily initializes the instance on first access.
-  static NetworkRequestStorage get instance {
-    return _instance ??= NetworkRequestStorage();
+  @override
+  void setBaseUrl(String baseUrl) {
+    this.baseUrl = baseUrl;
   }
 
   /// Adds a new [NetworkRequest] to the internal list and organizes it by its path.

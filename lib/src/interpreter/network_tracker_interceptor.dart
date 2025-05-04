@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:uuid/uuid.dart';
 
 import '../services/network_request.dart';
@@ -18,13 +19,13 @@ import '../services/request_status.dart';
 /// ```
 class NetworkTrackerInterceptor extends Interceptor {
   /// Internal request storage for tracking all captured requests.
-  final storage = NetworkRequestStorage.instance;
+  final storage = NetworkRequestService.instance.storage;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     /// Capture and store request data
     if (storage.baseUrl.isEmpty) {
-      storage.baseUrl = options.baseUrl;
+      storage.setBaseUrl(options.baseUrl);
     }
 
     final request = NetworkRequest(

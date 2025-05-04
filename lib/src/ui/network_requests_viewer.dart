@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_view/json_view.dart';
-import 'package:network_tracker/services/network_request_storage.dart';
+import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -64,7 +64,7 @@ class NetworkRequestsViewer extends StatefulWidget {
 }
 
 class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
-  late final storage = NetworkRequestStorage.instance;
+  late final storage = NetworkRequestService.instance.storage;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _showSearchBar = false;

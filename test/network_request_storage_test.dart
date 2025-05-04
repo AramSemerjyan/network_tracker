@@ -1,14 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_tracker/services/network_request.dart';
-import 'package:network_tracker/services/network_request_storage.dart';
-import 'package:network_tracker/services/request_status.dart';
+import 'package:network_tracker/src/services/network_request.dart';
+import 'package:network_tracker/src/services/network_request_service.dart';
+import 'package:network_tracker/src/services/network_request_storage.dart';
+import 'package:network_tracker/src/services/request_status.dart';
 
 void main() {
   group('NetworkRequestStorage', () {
-    late NetworkRequestStorage storage;
+    late NetworkRequestStorageInterface storage;
 
     setUp(() {
-      storage = NetworkRequestStorage.instance;
+      storage = NetworkRequestService.instance.storage;
     });
 
     NetworkRequest buildRequest({
@@ -95,8 +96,8 @@ void main() {
     });
 
     test('singleton instance returns the same object', () {
-      final instance1 = NetworkRequestStorage.instance;
-      final instance2 = NetworkRequestStorage.instance;
+      final instance1 = NetworkRequestService.instance;
+      final instance2 = NetworkRequestService.instance;
 
       expect(identical(instance1, instance2), isTrue);
     });
