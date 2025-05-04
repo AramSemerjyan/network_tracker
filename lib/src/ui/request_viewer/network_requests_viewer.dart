@@ -68,6 +68,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   @override
   void dispose() {
     _searchController.dispose();
+    _vm.dispose();
     super.dispose();
   }
 
@@ -168,8 +169,6 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         final requests = list[index];
         final path = requests.first.path;
 
-        // final path = _filteredPaths[index];
-        // final requests = storage.getRequestsByPath(path);
         return ListTile(
           title: Text(path),
           trailing: Text('${requests.length} requests'),

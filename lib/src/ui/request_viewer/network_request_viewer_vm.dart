@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../model/network_request.dart';
@@ -12,28 +14,41 @@ class NetworkRequestViewerVM {
   final ValueNotifier<List<List<NetworkRequest>>> filteredRequestsNotifier =
       ValueNotifier([]);
 
+  Timer? _debounce;
+
   NetworkRequestViewerVM() {
+    filterNotifier.addListener(_updateList);
     _updateList();
   }
 
+  void dispose() {
+    filterNotifier.dispose();
+    filteredRequestsNotifier.dispose();
+
+    _debounce?.cancel();
+    _debounce = null;
+  }
+
   void search(String query) {
-    filterNotifier.value = filterNotifier.value.copy(searchQuery: query);
-    _updateList();
+    _debounce?.cancel();
+    if (filterNotifier.value.searchQuery != query) {
+      _debounce?.cancel();
+      _debounce = Timer(const Duration(milliseconds: 300), () {
+        filterNotifier.value = filterNotifier.value.copy(searchQuery: query);
+      });
+    }
   }
 
   void onFilterChanged(NetworkRequestFilter filter) {
     filterNotifier.value = filter;
-    _updateList();
   }
 
   void clearFilter() {
     filterNotifier.value = NetworkRequestFilter();
-    _updateList();
   }
 
   void clearSearchText() {
     filterNotifier.value = filterNotifier.value.copy(searchQuery: '');
-    _updateList();
   }
 
   void _updateList() {
