@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:network_tracker/src/model/network_reuqest_filter.dart';
+import 'package:network_tracker/src/model/network_request_filter.dart';
 
 import '../../model/network_request_method.dart';
 import '../../services/request_status.dart';
@@ -34,7 +34,14 @@ class FilterBar extends StatelessWidget {
                   value: filter.method,
                   options: NetworkRequestMethod.values,
                   getLabel: (v) => v.value,
-                  onChanged: (v) => onChange?.call(filter.copy(method: v)),
+                  onChanged: (v) {
+                    final updatedFilter = NetworkRequestFilter(
+                      searchQuery: filter.searchQuery,
+                      method: v,
+                      status: filter.status,
+                    );
+                    onChange?.call(updatedFilter);
+                  },
                 ),
                 const SizedBox(width: 8),
                 FilterCard<RequestStatus>(
@@ -42,7 +49,14 @@ class FilterBar extends StatelessWidget {
                   value: filter.status,
                   options: RequestStatus.values,
                   getLabel: (v) => v.name,
-                  onChanged: (v) => onChange?.call(filter.copy(status: v)),
+                  onChanged: (v) {
+                    final updatedFilter = NetworkRequestFilter(
+                      searchQuery: filter.searchQuery,
+                      method: filter.method,
+                      status: v,
+                    );
+                    onChange?.call(updatedFilter);
+                  },
                 ),
               ],
             ),

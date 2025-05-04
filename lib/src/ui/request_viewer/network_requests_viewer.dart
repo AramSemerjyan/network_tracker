@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/network_request.dart';
-import 'package:network_tracker/src/model/network_reuqest_filter.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
+import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
 
-import '../services/network_request_service.dart';
-import 'request_details_screen.dart';
+import '../request_details_screen.dart';
 
 class NetworkRequestsViewer extends StatefulWidget {
   static showPage({
@@ -58,34 +57,18 @@ class NetworkRequestsViewer extends StatefulWidget {
 }
 
 class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
-  late final storage = NetworkRequestService.instance.storage;
+  final _vm = NetworkRequestViewerVM();
   final TextEditingController _searchController = TextEditingController();
 
-  final ValueNotifier<NetworkRequestFilter> _filter =
-      ValueNotifier(NetworkRequestFilter());
   final ValueNotifier<bool> _showSearchBar = ValueNotifier(false);
   final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
-  final ValueNotifier<List<List<NetworkRequest>>> _filteredRequests =
-      ValueNotifier([]);
 
   final _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _updateList();
-  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _search(String query) {
-    _filter.value = _filter.value.copy(searchQuery: query);
-    _updateList();
   }
 
   void _onSearchTap() {
@@ -97,51 +80,9 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     _showFilterBar.value = !_showFilterBar.value;
   }
 
-  void _onFilterChanged(NetworkRequestFilter filter) {
-    _filter.value = filter;
-    _updateList();
-  }
-
-  void _clearFilter() {
-    _filter.value = NetworkRequestFilter();
-    _updateList();
-  }
-
   void _clearSearchText() {
     _searchController.text = '';
-    _filter.value = _filter.value.copy(searchQuery: '');
-    _updateList();
-  }
-
-  void _updateList() {
-    final List<List<NetworkRequest>> filteredRequests = [];
-    List<String> allPaths = storage.getTrackedPaths();
-    final filter = _filter.value;
-
-    if (filter.searchQuery.isNotEmpty) {
-      allPaths = allPaths
-          .where((path) =>
-              path.toLowerCase().contains(filter.searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    for (var p in allPaths) {
-      List<NetworkRequest> requests = storage.getRequestsByPath(p);
-
-      final method = filter.method;
-      if (method != null) {
-        requests = requests.where((r) => r.method == method).toList();
-      }
-
-      final status = filter.status;
-      if (status != null) {
-        requests = requests.where((r) => r.status == status).toList();
-      }
-
-      filteredRequests.add(requests);
-    }
-
-    _filteredRequests.value = filteredRequests;
+    _vm.clearSearchText();
   }
 
   Widget _buildSearchBar() {
@@ -159,7 +100,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                     child: TextField(
                       controller: _searchController,
                       focusNode: _focusNode,
-                      onChanged: _search,
+                      onChanged: _vm.search,
                       decoration: InputDecoration(
                         hintText: 'Search by path...',
                         border: OutlineInputBorder(
@@ -196,10 +137,15 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 10),
-              FilterBar(
-                filter: _filter.value,
-                onChange: _onFilterChanged,
-                onClear: _clearFilter,
+              ValueListenableBuilder(
+                valueListenable: _vm.filterNotifier,
+                builder: (c, v, w) {
+                  return FilterBar(
+                    filter: v,
+                    onChange: _vm.onFilterChanged,
+                    onClear: _vm.clearFilter,
+                  );
+                },
               )
             ],
           );
@@ -279,12 +225,12 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           const Text('Base URL:'),
           GestureDetector(
             onTap: () {
-              Clipboard.setData(ClipboardData(text: storage.baseUrl));
+              Clipboard.setData(ClipboardData(text: _vm.storage.baseUrl));
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                storage.baseUrl,
+                _vm.storage.baseUrl,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -295,7 +241,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           const SizedBox(height: 10),
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable: _filteredRequests,
+              valueListenable: _vm.filteredRequestsNotifier,
               builder: (c, f, w) {
                 return f.isEmpty ? _buildEmptyState() : _buildList(f);
               },
