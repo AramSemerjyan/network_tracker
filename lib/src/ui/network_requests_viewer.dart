@@ -60,42 +60,21 @@ class NetworkRequestsViewer extends StatefulWidget {
 class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   late final storage = NetworkRequestService.instance.storage;
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  NetworkRequestFilter _filter = NetworkRequestFilter();
 
+  final ValueNotifier<NetworkRequestFilter> _filter =
+      ValueNotifier(NetworkRequestFilter());
   final ValueNotifier<bool> _showSearchBar = ValueNotifier(false);
   final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
+  final ValueNotifier<List<List<NetworkRequest>>> _filteredRequests =
+      ValueNotifier([]);
 
   final _focusNode = FocusNode();
 
-  List<List<NetworkRequest>> get _filteredRequests {
-    final List<List<NetworkRequest>> filteredRequests = [];
-    List<String> allPaths = storage.getTrackedPaths();
+  @override
+  void initState() {
+    super.initState();
 
-    if (_searchQuery.isNotEmpty) {
-      allPaths = allPaths
-          .where(
-              (path) => path.toLowerCase().contains(_searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    for (var p in allPaths) {
-      List<NetworkRequest> requests = storage.getRequestsByPath(p);
-
-      final method = _filter.method;
-      if (method != null) {
-        requests = requests.where((r) => r.method == method).toList();
-      }
-
-      final status = _filter.status;
-      if (status != null) {
-        requests = requests.where((r) => r.status == status).toList();
-      }
-
-      filteredRequests.add(requests);
-    }
-
-    return filteredRequests;
+    _updateList();
   }
 
   @override
@@ -105,20 +84,13 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   }
 
   void _search(String query) {
-    setState(() {
-      _searchQuery = query;
-    });
+    _filter.value = _filter.value.copy(searchQuery: query);
+    _updateList();
   }
 
   void _onSearchTap() {
     _showSearchBar.value = !_showSearchBar.value;
-    setState(() {
-      if (!_showSearchBar.value) {
-        _searchQuery = '';
-        _searchController.clear();
-      }
-      _focusNode.requestFocus();
-    });
+    _focusNode.requestFocus();
   }
 
   void _onFilterTap() {
@@ -126,13 +98,50 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   }
 
   void _onFilterChanged(NetworkRequestFilter filter) {
-    setState(() {
-      _filter = filter;
-    });
+    _filter.value = filter;
+    _updateList();
   }
 
   void _clearFilter() {
-    setState(() => _filter = NetworkRequestFilter());
+    _filter.value = NetworkRequestFilter();
+    _updateList();
+  }
+
+  void _clearSearchText() {
+    _searchController.text = '';
+    _filter.value = _filter.value.copy(searchQuery: '');
+    _updateList();
+  }
+
+  void _updateList() {
+    final List<List<NetworkRequest>> filteredRequests = [];
+    List<String> allPaths = storage.getTrackedPaths();
+    final filter = _filter.value;
+
+    if (filter.searchQuery.isNotEmpty) {
+      allPaths = allPaths
+          .where((path) =>
+              path.toLowerCase().contains(filter.searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    for (var p in allPaths) {
+      List<NetworkRequest> requests = storage.getRequestsByPath(p);
+
+      final method = filter.method;
+      if (method != null) {
+        requests = requests.where((r) => r.method == method).toList();
+      }
+
+      final status = filter.status;
+      if (status != null) {
+        requests = requests.where((r) => r.status == status).toList();
+      }
+
+      filteredRequests.add(requests);
+    }
+
+    _filteredRequests.value = filteredRequests;
   }
 
   Widget _buildSearchBar() {
@@ -144,17 +153,30 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 10),
-              TextField(
-                controller: _searchController,
-                focusNode: _focusNode,
-                onChanged: _search,
-                decoration: InputDecoration(
-                  hintText: 'Search by path...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _focusNode,
+                      onChanged: _search,
+                      decoration: InputDecoration(
+                        hintText: 'Search by path...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        prefixIcon: const Icon(Icons.search),
+                      ),
+                    ),
                   ),
-                  prefixIcon: const Icon(Icons.search),
-                ),
+                  const SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: _clearSearchText,
+                    child: Text(
+                      'Clear',
+                    ),
+                  ),
+                ],
               ),
             ],
           );
@@ -175,7 +197,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
             children: [
               const SizedBox(height: 10),
               FilterBar(
-                filter: _filter,
+                filter: _filter.value,
                 onChange: _onFilterChanged,
                 onClear: _clearFilter,
               )
@@ -184,6 +206,37 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         }
 
         return Container();
+      },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(child: Text('No matching requests'));
+  }
+
+  Widget _buildList(List<List<NetworkRequest>> list) {
+    return ListView.separated(
+      itemCount: list.length,
+      separatorBuilder: (_, __) => const Divider(),
+      itemBuilder: (context, index) {
+        final requests = list[index];
+        final path = requests.first.path;
+
+        // final path = _filteredPaths[index];
+        // final requests = storage.getRequestsByPath(path);
+        return ListTile(
+          title: Text(path),
+          trailing: Text('${requests.length} requests'),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RequestDetailsScreen(
+                path: path,
+                requests: requests,
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -241,32 +294,12 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           _buildFilterBar(),
           const SizedBox(height: 10),
           Expanded(
-            child: _filteredRequests.isEmpty
-                ? const Center(child: Text('No matching requests'))
-                : ListView.separated(
-                    itemCount: _filteredRequests.length,
-                    separatorBuilder: (_, __) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final requests = _filteredRequests[index];
-                      final path = requests.first.path;
-
-                      // final path = _filteredPaths[index];
-                      // final requests = storage.getRequestsByPath(path);
-                      return ListTile(
-                        title: Text(path),
-                        trailing: Text('${requests.length} requests'),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RequestDetailsScreen(
-                              path: path,
-                              requests: requests,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+            child: ValueListenableBuilder(
+              valueListenable: _filteredRequests,
+              builder: (c, f, w) {
+                return f.isEmpty ? _buildEmptyState() : _buildList(f);
+              },
+            ),
           ),
         ],
       ),
