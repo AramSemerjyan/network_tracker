@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
-import 'request_status.dart';
+import '../services/request_status.dart';
+import 'network_request_method.dart';
 
 /// A model representing a tracked network request and its metadata.
 ///
@@ -18,7 +19,7 @@ class NetworkRequest {
   final String path;
 
   /// The HTTP method, e.g. `GET`, `POST`, `PUT`, etc.
-  final String method;
+  final NetworkRequestMethod method;
 
   /// The time when the request was initiated.
   final DateTime timestamp;

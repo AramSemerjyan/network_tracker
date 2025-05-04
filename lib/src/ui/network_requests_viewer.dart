@@ -1,15 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:json_view/json_view.dart';
-import 'package:network_tracker/src/services/network_request_service.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/model/network_reuqest_filter.dart';
+import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 
-import '../services/network_request.dart';
+import '../services/network_request_service.dart';
+import 'request_details_screen.dart';
 
 class NetworkRequestsViewer extends StatefulWidget {
   static showPage({
@@ -28,11 +24,9 @@ class NetworkRequestsViewer extends StatefulWidget {
           ),
           child: Container(
             clipBehavior: Clip.hardEdge,
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              4,
-              16,
-              4,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -67,18 +61,41 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   late final storage = NetworkRequestService.instance.storage;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  bool _showSearchBar = false;
+  NetworkRequestFilter _filter = NetworkRequestFilter();
+
+  final ValueNotifier<bool> _showSearchBar = ValueNotifier(false);
+  final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
 
   final _focusNode = FocusNode();
 
-  List<String> get _filteredPaths {
-    final allPaths = storage.getTrackedPaths();
-    if (_searchQuery.isEmpty) return allPaths;
+  List<List<NetworkRequest>> get _filteredRequests {
+    final List<List<NetworkRequest>> filteredRequests = [];
+    List<String> allPaths = storage.getTrackedPaths();
 
-    return allPaths
-        .where(
-            (path) => path.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+    if (_searchQuery.isNotEmpty) {
+      allPaths = allPaths
+          .where(
+              (path) => path.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    for (var p in allPaths) {
+      List<NetworkRequest> requests = storage.getRequestsByPath(p);
+
+      final method = _filter.method;
+      if (method != null) {
+        requests = requests.where((r) => r.method == method).toList();
+      }
+
+      final status = _filter.status;
+      if (status != null) {
+        requests = requests.where((r) => r.status == status).toList();
+      }
+
+      filteredRequests.add(requests);
+    }
+
+    return filteredRequests;
   }
 
   @override
@@ -94,14 +111,81 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   }
 
   void _onSearchTap() {
+    _showSearchBar.value = !_showSearchBar.value;
     setState(() {
-      _showSearchBar = !_showSearchBar;
-      if (!_showSearchBar) {
+      if (!_showSearchBar.value) {
         _searchQuery = '';
         _searchController.clear();
       }
       _focusNode.requestFocus();
     });
+  }
+
+  void _onFilterTap() {
+    _showFilterBar.value = !_showFilterBar.value;
+  }
+
+  void _onFilterChanged(NetworkRequestFilter filter) {
+    setState(() {
+      _filter = filter;
+    });
+  }
+
+  void _clearFilter() {
+    setState(() => _filter = NetworkRequestFilter());
+  }
+
+  Widget _buildSearchBar() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _showSearchBar,
+      builder: (c, v, w) {
+        if (v) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              TextField(
+                controller: _searchController,
+                focusNode: _focusNode,
+                onChanged: _search,
+                decoration: InputDecoration(
+                  hintText: 'Search by path...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  prefixIcon: const Icon(Icons.search),
+                ),
+              ),
+            ],
+          );
+        }
+
+        return Container();
+      },
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _showFilterBar,
+      builder: (c, v, w) {
+        if (v) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              FilterBar(
+                filter: _filter,
+                onChange: _onFilterChanged,
+                onClear: _clearFilter,
+              )
+            ],
+          );
+        }
+
+        return Container();
+      },
+    );
   }
 
   @override
@@ -113,10 +197,26 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         actions: [
-          IconButton(
-            icon: Icon(_showSearchBar ? Icons.close : Icons.search),
-            tooltip: _showSearchBar ? 'Hide search' : 'Show search',
-            onPressed: _onSearchTap,
+          ValueListenableBuilder(
+            valueListenable: _showSearchBar,
+            builder: (c, v, w) {
+              return IconButton(
+                icon: Icon(v ? Icons.close : Icons.search),
+                tooltip: v ? 'Hide search' : 'Show search',
+                onPressed: _onSearchTap,
+              );
+            },
+          ),
+          ValueListenableBuilder(
+            valueListenable: _showFilterBar,
+            builder: (c, v, w) {
+              return IconButton(
+                onPressed: _onFilterTap,
+                icon: Icon(
+                  v ? Icons.filter_alt_off : Icons.filter_alt,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -137,41 +237,28 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
               ),
             ),
           ),
-          if (_showSearchBar) ...[
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _focusNode,
-                onChanged: _search,
-                decoration: InputDecoration(
-                  hintText: 'Search by path...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  prefixIcon: const Icon(Icons.search),
-                ),
-              ),
-            ),
-          ],
+          _buildSearchBar(),
+          _buildFilterBar(),
           const SizedBox(height: 10),
           Expanded(
-            child: _filteredPaths.isEmpty
+            child: _filteredRequests.isEmpty
                 ? const Center(child: Text('No matching requests'))
                 : ListView.separated(
-                    itemCount: _filteredPaths.length,
+                    itemCount: _filteredRequests.length,
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
-                      final path = _filteredPaths[index];
-                      final requests = storage.getRequestsByPath(path);
+                      final requests = _filteredRequests[index];
+                      final path = requests.first.path;
+
+                      // final path = _filteredPaths[index];
+                      // final requests = storage.getRequestsByPath(path);
                       return ListTile(
                         title: Text(path),
                         trailing: Text('${requests.length} requests'),
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => _RequestDetailsScreen(
+                            builder: (_) => RequestDetailsScreen(
                               path: path,
                               requests: requests,
                             ),
@@ -182,133 +269,6 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                   ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _RequestDetailsScreen extends StatelessWidget {
-  final String path;
-  final List<NetworkRequest> requests;
-
-  const _RequestDetailsScreen({required this.path, required this.requests});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(path),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: ListView.builder(
-        itemCount: requests.length,
-        itemBuilder: (context, index) {
-          final request = requests[index];
-          return ListTile(
-            title: Text('${request.method} - ${request.timestamp}'),
-            subtitle:
-                Text('Status: ${request.status.symbol} ${request.status}'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => _RequestDataDetailsScreen(
-                    request: request,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _RequestDataDetailsScreen extends StatelessWidget {
-  final NetworkRequest request;
-
-  const _RequestDataDetailsScreen({required this.request});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${request.method} - ${request.timestamp}',
-          style: const TextStyle(fontSize: 14),
-        ),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (request.requestData != null)
-              ListTile(
-                title: const Text('Request Data:'),
-                subtitle: JsonView(
-                  json: request.requestData,
-                  shrinkWrap: true,
-                ),
-              ),
-            if (request.queryParameters?.isNotEmpty ?? false)
-              ListTile(
-                title: const Text('Request Parameters:'),
-                subtitle: JsonView(
-                  json: request.queryParameters,
-                  shrinkWrap: true,
-                ),
-              ),
-            if (request.execTime != null)
-              ListTile(
-                title: const Text('Request time:'),
-                subtitle: Text(
-                  '${request.execTime!.millisecondsSinceEpoch / 1000.0}',
-                ),
-              ),
-            if (request.error != null)
-              ListTile(
-                title: const Text('Error:'),
-                subtitle: Text('${request.error}'),
-              ),
-            if (request.responseData != null)
-              Expanded(
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      const Text('Response data:'),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () async {
-                          try {
-                            final tempDir = await getTemporaryDirectory();
-                            final filePath =
-                                '${tempDir.path}/${request.name}.json';
-                            final jsonString = jsonEncode(request.responseData);
-                            final file = File(filePath);
-                            await file.writeAsString(jsonString);
-
-                            await Share.shareXFiles([XFile(file.path)]);
-                          } catch (e) {
-                            if (kDebugMode) {
-                              print("Error saving or sharing JSON file: $e");
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.save_alt),
-                      )
-                    ],
-                  ),
-                  subtitle: JsonView(
-                    json: request.responseData,
-                    padding: const EdgeInsets.only(bottom: 40),
-                  ),
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }

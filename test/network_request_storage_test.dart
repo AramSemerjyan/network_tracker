@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_tracker/src/services/network_request.dart';
+import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/model/network_request_method.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:network_tracker/src/services/network_request_storage.dart';
 import 'package:network_tracker/src/services/request_status.dart';
@@ -20,7 +21,7 @@ void main() {
       return NetworkRequest(
         id: id,
         path: path,
-        method: 'GET',
+        method: NetworkRequestMethod.fromString('GET'),
         timestamp: timestamp ?? DateTime.now(),
         headers: {'Authorization': 'Bearer token'},
         requestData: {'input': 'test'},

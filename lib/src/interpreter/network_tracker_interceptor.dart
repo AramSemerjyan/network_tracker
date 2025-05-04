@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/model/network_request_method.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:uuid/uuid.dart';
 
-import '../services/network_request.dart';
+import '../model/network_request.dart';
 import '../services/network_request_storage.dart';
 import '../services/request_status.dart';
 
@@ -31,7 +32,7 @@ class NetworkTrackerInterceptor extends Interceptor {
     final request = NetworkRequest(
       id: Uuid().v1(),
       path: options.path,
-      method: options.method,
+      method: NetworkRequestMethod.fromString(options.method),
       timestamp: DateTime.now(),
       requestData: options.data,
       headers: options.headers,

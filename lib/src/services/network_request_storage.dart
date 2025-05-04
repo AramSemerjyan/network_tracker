@@ -1,4 +1,4 @@
-import 'network_request.dart';
+import '../model/network_request.dart';
 import 'request_status.dart';
 
 /// An interface that defines the contract for storing and retrieving network requests.
