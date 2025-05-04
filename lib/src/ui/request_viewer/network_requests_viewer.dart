@@ -191,9 +191,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Network requests'),
+        title: Center(child: const Text('Requests')),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        leading: CloseButton(),
         actions: [
           ValueListenableBuilder(
             valueListenable: _showSearchBar,
@@ -221,18 +222,29 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          const Text('Base URL:'),
-          GestureDetector(
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: _vm.storage.baseUrl));
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                _vm.storage.baseUrl,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              const Spacer(),
+              InkWell(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: _vm.storage.baseUrl));
+                },
+                child: Icon(
+                  Icons.copy,
+                  size: 15,
+                ),
               ),
+              const SizedBox(width: 5),
+              const Text('Base URL:'),
+              const Spacer(),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _vm.storage.baseUrl,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           _buildSearchBar(),

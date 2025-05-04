@@ -11,3 +11,11 @@
 
 * Ability to search inside requests
 * Add comments
+
+## 0.2.0
+
+* Ability to filter requests by method and status
+* Code improvements
+* Improves UI to use `ValueListenableBuilder` instead `setState({})`
+* Add `copy` button next to baseUrl to make it more clear url can be copied
+* Replace back button with `CloseButton`
