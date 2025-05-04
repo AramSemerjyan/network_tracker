@@ -1,4 +1,5 @@
-import 'package:network_tracker/src/services/network_request_storage.dart';
+import '../model/network_request_storage_interface.dart';
+import 'network_request_storage.dart';
 
 class NetworkRequestService {
   NetworkRequestStorageInterface storage = NetworkRequestStorage();
