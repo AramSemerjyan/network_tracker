@@ -21,6 +21,7 @@ abstract class NetworkRequestStorageInterface {
     int? statusCode,
     Map<String, dynamic>? responseHeaders,
     String? error,
+    DateTime? endDate,
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.

@@ -19,7 +19,7 @@ class RequestDataDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${request.method} - ${request.timestamp}',
+          '${request.method.value} - ${request.startDate}',
           style: const TextStyle(fontSize: 14),
         ),
         backgroundColor: Colors.transparent,
@@ -44,11 +44,11 @@ class RequestDataDetailsScreen extends StatelessWidget {
                   shrinkWrap: true,
                 ),
               ),
-            if (request.execTime != null)
+            if (request.duration != null)
               ListTile(
-                title: const Text('Request time:'),
+                title: const Text('Duration:'),
                 subtitle: Text(
-                  '${request.execTime!.millisecondsSinceEpoch / 1000.0}',
+                  '${request.duration?.inMilliseconds}ms',
                 ),
               ),
             if (request.error != null)

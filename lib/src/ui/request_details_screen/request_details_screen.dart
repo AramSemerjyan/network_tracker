@@ -31,8 +31,16 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       itemBuilder: (context, index) {
         final request = list[index];
         return ListTile(
-          title: Text('${request.method} - ${request.timestamp}'),
-          subtitle: Text('Status: ${request.status.symbol} ${request.status}'),
+          title: Text('${request.method} - ${request.startDate}'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Status: ${request.status.symbol} ${request.status}'),
+              if (request.duration != null)
+                Text('Duration: ${request.duration?.inMilliseconds}ms')
+            ],
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -110,10 +118,11 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           const SizedBox(height: 10),
           Expanded(
             child: ValueListenableBuilder(
-                valueListenable: _vm.requestsNotifier,
-                builder: (c, v, w) {
-                  return v.isEmpty ? _buildEmptyState() : _buildList(v);
-                }),
+              valueListenable: _vm.requestsNotifier,
+              builder: (c, v, w) {
+                return v.isEmpty ? _buildEmptyState() : _buildList(v);
+              },
+            ),
           ),
         ],
       ),

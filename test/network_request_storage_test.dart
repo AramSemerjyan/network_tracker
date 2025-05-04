@@ -22,7 +22,7 @@ void main() {
         id: id,
         path: path,
         method: NetworkRequestMethod.fromString('GET'),
-        timestamp: timestamp ?? DateTime.now(),
+        startDate: timestamp ?? DateTime.now(),
         headers: {'Authorization': 'Bearer token'},
         requestData: {'input': 'test'},
         queryParameters: {'q': 'query'},
@@ -60,7 +60,7 @@ void main() {
       expect(updated.statusCode, 200);
       expect(updated.responseHeaders, {'Content-Type': 'application/json'});
       expect(updated.error, 'none');
-      expect(updated.execTime, isNotNull);
+      expect(updated.duration, isNotNull);
     });
 
     test('getRequestsByPath returns sorted list by timestamp desc', () {

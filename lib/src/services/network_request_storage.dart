@@ -43,20 +43,19 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
     int? statusCode,
     Map<String, dynamic>? responseHeaders,
     String? error,
+    DateTime? endDate,
   }) {
     for (final list in _requestsByPath.values) {
       final index = list.indexWhere((r) => r.id == id);
       if (index != -1) {
         final request = list[index];
-        final now = DateTime.now();
-        final execTime = now.difference(request.timestamp);
         list[index] = request.copyWith(
           status: status,
           responseData: responseData,
           statusCode: statusCode,
           responseHeaders: responseHeaders,
           error: error,
-          execTime: now.subtract(execTime),
+          endDate: endDate,
         );
         return;
       }
@@ -70,7 +69,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
   /// Returns an empty list if no requests exist for the given path.
   List<NetworkRequest> getRequestsByPath(String path) {
     final requests = List<NetworkRequest>.from(_requestsByPath[path] ?? []);
-    requests.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    requests.sort((a, b) => b.startDate.compareTo(a.startDate));
     return requests;
   }
 
@@ -79,7 +78,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
   /// Returns all tracked request paths sorted by latest request time (descending).
   List<String> getTrackedPaths() {
     final paths = _requestsByPath.entries
-        .map((e) => MapEntry(e.key, e.value.last.timestamp))
+        .map((e) => MapEntry(e.key, e.value.last.startDate))
         .toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 

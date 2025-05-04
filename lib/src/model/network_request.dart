@@ -22,7 +22,10 @@ class NetworkRequest {
   final NetworkRequestMethod method;
 
   /// The time when the request was initiated.
-  final DateTime timestamp;
+  final DateTime startDate;
+
+  /// The time when the request was finished.
+  final DateTime? endDate;
 
   /// The request headers.
   final Map<String, dynamic>? headers;
@@ -48,18 +51,25 @@ class NetworkRequest {
   /// A string describing any error that occurred.
   String? error;
 
-  /// The total execution time of the request, computed as a timestamp delta.
-  DateTime? execTime;
-
   /// The raw [DioException], if available.
   DioException? dioError;
+
+  /// The total execution time of the request, computed as a timestamp delta.
+  Duration? get duration {
+    final endDate = this.endDate;
+
+    if (endDate != null) return endDate.difference(startDate);
+
+    return null;
+  }
 
   /// Creates a new [NetworkRequest] instance.
   NetworkRequest({
     required this.id,
     required this.path,
     required this.method,
-    required this.timestamp,
+    required this.startDate,
+    this.endDate,
     this.headers,
     this.requestData,
     this.queryParameters,
@@ -68,7 +78,6 @@ class NetworkRequest {
     this.statusCode,
     this.responseHeaders,
     this.error,
-    this.execTime,
     this.dioError,
   });
 
@@ -79,11 +88,13 @@ class NetworkRequest {
       'id': id,
       'path': path,
       'method': method,
-      'timestamp': timestamp.toIso8601String(),
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate?.toIso8601String(),
       'status': status.name,
       'statusCode': statusCode,
       'requestData': requestData,
       'responseData': responseData,
+      'duration': duration,
       'error': error,
     };
   }
@@ -91,14 +102,15 @@ class NetworkRequest {
   /// A human-readable name for the request, useful for display in UI or logs.
   ///
   /// Combines sanitized path, method, and timestamp.
-  String get name => '${path.replaceAll('/', '')}_${method}_$timestamp';
+  String get name => '${path.replaceAll('/', '')}_${method}_$startDate';
 
   /// Creates a copy of this [NetworkRequest] with optional overrides.
   NetworkRequest copyWith({
     String? id,
     String? path,
     NetworkRequestMethod? method,
-    DateTime? timestamp,
+    DateTime? startDate,
+    DateTime? endDate,
     Map<String, dynamic>? headers,
     dynamic requestData,
     Map<String, dynamic>? queryParameters,
@@ -114,7 +126,8 @@ class NetworkRequest {
       id: id ?? this.id,
       path: path ?? this.path,
       method: method ?? this.method,
-      timestamp: timestamp ?? this.timestamp,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
       headers: headers ?? this.headers,
       requestData: requestData ?? this.requestData,
       queryParameters: queryParameters ?? this.queryParameters,
@@ -123,7 +136,6 @@ class NetworkRequest {
       statusCode: statusCode ?? this.statusCode,
       responseHeaders: responseHeaders ?? this.responseHeaders,
       error: error ?? this.error,
-      execTime: execTime ?? this.execTime,
       dioError: dioError ?? this.dioError,
     );
   }

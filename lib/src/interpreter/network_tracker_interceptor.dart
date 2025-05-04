@@ -29,11 +29,13 @@ class NetworkTrackerInterceptor extends Interceptor {
       storage.setBaseUrl(options.baseUrl);
     }
 
+    final startDate = DateTime.now();
+
     final request = NetworkRequest(
       id: Uuid().v1(),
       path: options.path,
       method: NetworkRequestMethod.fromString(options.method),
-      timestamp: DateTime.now(),
+      startDate: startDate,
       requestData: options.data,
       headers: options.headers,
       queryParameters: options.queryParameters,
@@ -44,6 +46,7 @@ class NetworkTrackerInterceptor extends Interceptor {
 
     /// Store request ID to associate with later response or error
     options.extra['network_tracker_id'] = request.id;
+    options.extra['network_tracker_start_time'] = startDate;
 
     super.onRequest(options, handler);
   }
@@ -52,13 +55,12 @@ class NetworkTrackerInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final requestId = response.requestOptions.extra['network_tracker_id'];
-    storage.updateRequest(
-      requestId,
-      status: RequestStatus.completed,
-      responseData: response.data,
-      statusCode: response.statusCode,
-      responseHeaders: response.headers.map,
-    );
+    storage.updateRequest(requestId,
+        status: RequestStatus.completed,
+        responseData: response.data,
+        statusCode: response.statusCode,
+        responseHeaders: response.headers.map,
+        endDate: DateTime.now());
 
     super.onResponse(response, handler);
   }
@@ -73,6 +75,7 @@ class NetworkTrackerInterceptor extends Interceptor {
       error: err.message,
       statusCode: err.response?.statusCode,
       responseData: err.response?.data,
+      endDate: DateTime.now(),
     );
 
     super.onError(err, handler);
