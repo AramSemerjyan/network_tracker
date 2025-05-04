@@ -1,4 +1,5 @@
 import '../model/network_request.dart';
+import '../model/network_request_filter.dart';
 import 'request_status.dart';
 
 /// An interface that defines the contract for storing and retrieving network requests.
@@ -6,6 +7,7 @@ abstract class NetworkRequestStorageInterface {
   /// The base URL used in tracked requests.
   String get baseUrl;
 
+  /// Sets the base URL for tracked requests.
   void setBaseUrl(String baseUrl);
 
   /// Adds a new [NetworkRequest] to the storage.
@@ -26,34 +28,44 @@ abstract class NetworkRequestStorageInterface {
 
   /// Returns a list of all tracked paths sorted by most recent activity.
   List<String> getTrackedPaths();
+
+  /// Returns a grouped list of filtered requests by path using [filter].
+  List<List<NetworkRequest>> getFilteredGroups(NetworkRequestFilter filter);
 }
 
-/// Concrete implementation of [NetworkRequestStorageInterface] that stores and organizes
-/// requests in memory by path and tracks their details.
+/// A concrete implementation of [NetworkRequestStorageInterface] that stores
+/// network requests in memory and allows filtering/grouping.
 class NetworkRequestStorage implements NetworkRequestStorageInterface {
-  final List<NetworkRequest> _allRequests = [];
+  /// Internal map storing requests grouped by request path.
   final Map<String, List<NetworkRequest>> _requestsByPath = {};
 
   @override
+
+  /// The base URL used in tracked requests.
   String baseUrl = '';
 
   @override
+
+  /// Sets the [baseUrl] used for tracked network requests.
   void setBaseUrl(String baseUrl) {
     this.baseUrl = baseUrl;
   }
 
-  /// Adds a new [NetworkRequest] to the internal list and organizes it by its path.
   @override
+
+  /// Adds a new [NetworkRequest] to the internal map under its path.
+  ///
+  /// If the path is not already tracked, a new list will be created.
   void addRequest(NetworkRequest request) {
-    _allRequests.add(request);
     _requestsByPath.putIfAbsent(request.path, () => []).add(request);
   }
 
-  /// Updates an existing request identified by [id] with optional fields like [status],
-  /// [responseData], [statusCode], [responseHeaders], and [error].
-  ///
-  /// Also calculates and stores the execution time.
   @override
+
+  /// Updates an existing request identified by [id].
+  ///
+  /// If found, updates the request with the new [status], [responseData],
+  /// [statusCode], [responseHeaders], [error], and calculates its execution time.
   void updateRequest(
     String id, {
     RequestStatus? status,
@@ -62,40 +74,81 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
     Map<String, dynamic>? responseHeaders,
     String? error,
   }) {
-    final request = _allRequests.firstWhere((r) => r.id == id);
-    final now = DateTime.now();
-    final execTime =
-        now.millisecondsSinceEpoch - request.timestamp.millisecondsSinceEpoch;
-
-    request
-      ..status = status ?? request.status
-      ..responseData = responseData ?? request.responseData
-      ..statusCode = statusCode ?? request.statusCode
-      ..responseHeaders = responseHeaders ?? request.responseHeaders
-      ..error = error ?? request.error
-      ..execTime = DateTime.fromMillisecondsSinceEpoch(execTime);
+    for (final list in _requestsByPath.values) {
+      final index = list.indexWhere((r) => r.id == id);
+      if (index != -1) {
+        final request = list[index];
+        final now = DateTime.now();
+        final execTime = now.difference(request.timestamp);
+        list[index] = request.copyWith(
+          status: status,
+          responseData: responseData,
+          statusCode: statusCode,
+          responseHeaders: responseHeaders,
+          error: error,
+          execTime: now.subtract(execTime),
+        );
+        return;
+      }
+    }
   }
 
-  /// Returns a list of all requests made to the given [path],
-  /// sorted by descending timestamp (most recent first).
   @override
+
+  /// Retrieves all requests made to a specific [path], sorted by most recent first.
+  ///
+  /// Returns an empty list if no requests exist for the given path.
   List<NetworkRequest> getRequestsByPath(String path) {
-    final requests = _requestsByPath[path]?.toList() ?? [];
+    final requests = List<NetworkRequest>.from(_requestsByPath[path] ?? []);
     requests.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return requests;
   }
 
-  /// Returns a list of all paths that have been tracked,
-  /// sorted by the timestamp of their most recent request (descending).
   @override
+
+  /// Returns all tracked request paths sorted by latest request time (descending).
   List<String> getTrackedPaths() {
-    final pathsWithTimestamps = _requestsByPath.entries.map((entry) {
-      final latestRequest = entry.value.last;
-      return MapEntry(entry.key, latestRequest.timestamp);
-    }).toList();
+    final paths = _requestsByPath.entries
+        .map((e) => MapEntry(e.key, e.value.last.timestamp))
+        .toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
-    pathsWithTimestamps.sort((a, b) => b.value.compareTo(a.value));
+    return paths.map((e) => e.key).toList();
+  }
 
-    return pathsWithTimestamps.map((e) => e.key).toList();
+  @override
+
+  /// Retrieves and filters requests by method, status, and search query.
+  ///
+  /// Groups requests by path and returns only those that match the [filter].
+  /// Each group contains all matching requests for a single path.
+  List<List<NetworkRequest>> getFilteredGroups(NetworkRequestFilter filter) {
+    final List<List<NetworkRequest>> result = [];
+
+    for (final path in getTrackedPaths()) {
+      var requests = getRequestsByPath(path);
+
+      // Apply HTTP method filter
+      if (filter.method != null) {
+        requests = requests.where((r) => r.method == filter.method).toList();
+      }
+
+      // Apply request status filter
+      if (filter.status != null) {
+        requests = requests.where((r) => r.status == filter.status).toList();
+      }
+
+      // Apply search filter on path
+      if (filter.searchQuery.isNotEmpty &&
+          !path.toLowerCase().contains(filter.searchQuery.toLowerCase())) {
+        continue;
+      }
+
+      if (requests.isNotEmpty) {
+        result.add(requests);
+      }
+    }
+
+    return result;
   }
 }

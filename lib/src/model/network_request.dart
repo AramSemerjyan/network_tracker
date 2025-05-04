@@ -92,4 +92,39 @@ class NetworkRequest {
   ///
   /// Combines sanitized path, method, and timestamp.
   String get name => '${path.replaceAll('/', '')}_${method}_$timestamp';
+
+  /// Creates a copy of this [NetworkRequest] with optional overrides.
+  NetworkRequest copyWith({
+    String? id,
+    String? path,
+    NetworkRequestMethod? method,
+    DateTime? timestamp,
+    Map<String, dynamic>? headers,
+    dynamic requestData,
+    Map<String, dynamic>? queryParameters,
+    RequestStatus? status,
+    dynamic responseData,
+    int? statusCode,
+    Map<String, dynamic>? responseHeaders,
+    String? error,
+    DateTime? execTime,
+    DioException? dioError,
+  }) {
+    return NetworkRequest(
+      id: id ?? this.id,
+      path: path ?? this.path,
+      method: method ?? this.method,
+      timestamp: timestamp ?? this.timestamp,
+      headers: headers ?? this.headers,
+      requestData: requestData ?? this.requestData,
+      queryParameters: queryParameters ?? this.queryParameters,
+      status: status ?? this.status,
+      responseData: responseData ?? this.responseData,
+      statusCode: statusCode ?? this.statusCode,
+      responseHeaders: responseHeaders ?? this.responseHeaders,
+      error: error ?? this.error,
+      execTime: execTime ?? this.execTime,
+      dioError: dioError ?? this.dioError,
+    );
+  }
 }

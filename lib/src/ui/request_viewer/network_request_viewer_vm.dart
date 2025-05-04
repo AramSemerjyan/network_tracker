@@ -7,7 +7,7 @@ import '../../model/network_request_filter.dart';
 import '../../services/network_request_service.dart';
 
 class NetworkRequestViewerVM {
-  late final storage = NetworkRequestService.instance.storage;
+  final storage = NetworkRequestService.instance.storage;
 
   final ValueNotifier<NetworkRequestFilter> filterNotifier =
       ValueNotifier(NetworkRequestFilter());
@@ -22,21 +22,20 @@ class NetworkRequestViewerVM {
   }
 
   void dispose() {
+    filterNotifier.removeListener(_updateList);
     filterNotifier.dispose();
     filteredRequestsNotifier.dispose();
-
     _debounce?.cancel();
-    _debounce = null;
   }
 
   void search(String query) {
     _debounce?.cancel();
-    if (filterNotifier.value.searchQuery != query) {
-      _debounce?.cancel();
-      _debounce = Timer(const Duration(milliseconds: 300), () {
-        filterNotifier.value = filterNotifier.value.copy(searchQuery: query);
-      });
-    }
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final current = filterNotifier.value;
+      if (current.searchQuery != query) {
+        filterNotifier.value = current.copy(searchQuery: query);
+      }
+    });
   }
 
   void onFilterChanged(NetworkRequestFilter filter) {
@@ -51,36 +50,20 @@ class NetworkRequestViewerVM {
     filterNotifier.value = filterNotifier.value.copy(searchQuery: '');
   }
 
+  void clearSpecificFilter({
+    bool clearMethod = false,
+    bool clearStatus = false,
+  }) {
+    final current = filterNotifier.value;
+    filterNotifier.value = NetworkRequestFilter(
+      method: clearMethod ? null : current.method,
+      status: clearStatus ? null : current.status,
+      searchQuery: current.searchQuery,
+    );
+  }
+
   void _updateList() {
-    final List<List<NetworkRequest>> updatedRequest = [];
-    List<String> allPaths = storage.getTrackedPaths();
     final filter = filterNotifier.value;
-
-    if (filter.searchQuery.isNotEmpty) {
-      allPaths = allPaths
-          .where((path) =>
-              path.toLowerCase().contains(filter.searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    for (var p in allPaths) {
-      List<NetworkRequest> requests = storage.getRequestsByPath(p);
-
-      final method = filter.method;
-      if (method != null) {
-        requests = requests.where((r) => r.method == method).toList();
-      }
-
-      final status = filter.status;
-      if (status != null) {
-        requests = requests.where((r) => r.status == status).toList();
-      }
-
-      if (requests.isNotEmpty) {
-        updatedRequest.add(requests);
-      }
-    }
-
-    filteredRequestsNotifier.value = updatedRequest;
+    filteredRequestsNotifier.value = storage.getFilteredGroups(filter);
   }
 }
