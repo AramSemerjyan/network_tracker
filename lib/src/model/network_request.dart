@@ -48,9 +48,6 @@ class NetworkRequest {
   /// The response headers returned by the server.
   Map<String, dynamic>? responseHeaders;
 
-  /// A string describing any error that occurred.
-  String? error;
-
   /// The raw [DioException], if available.
   DioException? dioError;
 
@@ -77,7 +74,6 @@ class NetworkRequest {
     this.responseData,
     this.statusCode,
     this.responseHeaders,
-    this.error,
     this.dioError,
   });
 
@@ -95,7 +91,7 @@ class NetworkRequest {
       'requestData': requestData,
       'responseData': responseData,
       'duration': duration,
-      'error': error,
+      'dioError': dioError.toString(),
     };
   }
 
@@ -118,7 +114,6 @@ class NetworkRequest {
     dynamic responseData,
     int? statusCode,
     Map<String, dynamic>? responseHeaders,
-    String? error,
     DateTime? execTime,
     DioException? dioError,
   }) {
@@ -135,7 +130,6 @@ class NetworkRequest {
       responseData: responseData ?? this.responseData,
       statusCode: statusCode ?? this.statusCode,
       responseHeaders: responseHeaders ?? this.responseHeaders,
-      error: error ?? this.error,
       dioError: dioError ?? this.dioError,
     );
   }

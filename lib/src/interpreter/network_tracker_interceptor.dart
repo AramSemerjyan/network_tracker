@@ -72,10 +72,10 @@ class NetworkTrackerInterceptor extends Interceptor {
     storage.updateRequest(
       requestId,
       status: RequestStatus.failed,
-      error: err.message,
       statusCode: err.response?.statusCode,
       responseData: err.response?.data,
       endDate: DateTime.now(),
+      dioError: err,
     );
 
     super.onError(err, handler);

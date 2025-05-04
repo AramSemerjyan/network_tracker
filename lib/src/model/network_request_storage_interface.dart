@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../services/request_status.dart';
 import 'network_request.dart';
 import 'network_request_filter.dart';
@@ -20,8 +22,8 @@ abstract class NetworkRequestStorageInterface {
     dynamic responseData,
     int? statusCode,
     Map<String, dynamic>? responseHeaders,
-    String? error,
     DateTime? endDate,
+    DioException? dioError,
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.

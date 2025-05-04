@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
+import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen.dart';
 import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
 
 import '../request_details_screen/request_details_screen.dart';
@@ -84,6 +85,30 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   void _clearSearchText() {
     _searchController.text = '';
     _vm.clearSearchText();
+  }
+
+  void _moveToDetails(
+    String path,
+    List<NetworkRequest> requests,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestDetailsScreen(
+          path: path,
+          requests: requests,
+        ),
+      ),
+    );
+  }
+
+  void _moveToRepeat() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NetworkRepeatRequestScreen(),
+      ),
+    );
   }
 
   Widget _buildSearchBar() {
@@ -172,15 +197,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         return ListTile(
           title: Text(path),
           trailing: Text('${requests.length} requests'),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RequestDetailsScreen(
-                path: path,
-                requests: requests,
-              ),
-            ),
-          ),
+          onTap: () => _moveToDetails(path, requests),
         );
       },
     );
@@ -196,6 +213,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         surfaceTintColor: Colors.transparent,
         leading: CloseButton(),
         actions: [
+          IconButton(
+            onPressed: _moveToRepeat,
+            icon: Icon(Icons.repeat),
+          ),
           ValueListenableBuilder(
             valueListenable: _showSearchBar,
             builder: (c, v, w) {

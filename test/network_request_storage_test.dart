@@ -50,7 +50,6 @@ void main() {
         responseData: {'result': 'ok'},
         statusCode: 200,
         responseHeaders: {'Content-Type': 'application/json'},
-        error: 'none',
       );
 
       final updated = storage.getRequestsByPath('/update').first;
@@ -59,7 +58,6 @@ void main() {
       expect(updated.responseData, {'result': 'ok'});
       expect(updated.statusCode, 200);
       expect(updated.responseHeaders, {'Content-Type': 'application/json'});
-      expect(updated.error, 'none');
       expect(updated.duration, isNotNull);
     });
 

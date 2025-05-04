@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../model/network_request.dart';
 import '../model/network_request_filter.dart';
 import '../model/network_request_storage_interface.dart';
@@ -44,6 +46,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
     Map<String, dynamic>? responseHeaders,
     String? error,
     DateTime? endDate,
+    DioException? dioError,
   }) {
     for (final list in _requestsByPath.values) {
       final index = list.indexWhere((r) => r.id == id);
@@ -54,8 +57,8 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
           responseData: responseData,
           statusCode: statusCode,
           responseHeaders: responseHeaders,
-          error: error,
           endDate: endDate,
+          dioError: dioError,
         );
         return;
       }

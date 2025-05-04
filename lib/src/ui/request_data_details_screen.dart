@@ -51,10 +51,15 @@ class RequestDataDetailsScreen extends StatelessWidget {
                   '${request.duration?.inMilliseconds}ms',
                 ),
               ),
-            if (request.error != null)
+            if (request.dioError?.error != null)
               ListTile(
                 title: const Text('Error:'),
-                subtitle: Text('${request.error}'),
+                subtitle: Text('${request.dioError?.error}'),
+              ),
+            if (request.dioError?.message != null)
+              ListTile(
+                title: const Text('Error message:'),
+                subtitle: Text('${request.dioError?.message}'),
               ),
             if (request.responseData != null)
               Expanded(
