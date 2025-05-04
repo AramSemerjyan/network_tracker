@@ -4,7 +4,7 @@ import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
 
-import '../request_details_screen.dart';
+import '../request_details_screen/request_details_screen.dart';
 
 class NetworkRequestsViewer extends StatefulWidget {
   static showPage({

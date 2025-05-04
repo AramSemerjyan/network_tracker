@@ -22,7 +22,6 @@ class NetworkRequestViewerVM {
   }
 
   void dispose() {
-    filterNotifier.removeListener(_updateList);
     filterNotifier.dispose();
     filteredRequestsNotifier.dispose();
     _debounce?.cancel();
