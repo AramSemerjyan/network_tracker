@@ -24,3 +24,8 @@
 
 * Ability to edit request before repeat
 * UI improvements
+
+## 0.3.1
+
+* Badge to show that request is repeated from app
+* New filter to filter out repeated/ not repeated requests
