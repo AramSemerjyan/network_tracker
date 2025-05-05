@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
@@ -63,6 +64,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                 'Size req/res',
                 '${request.requestSizeString}/${request.responseSizeString}',
               ),
+              if (request.isRepeated ?? false) RepeatRequestBadge(),
             ],
           ),
           trailing: RepeatRequestButton(request: request),

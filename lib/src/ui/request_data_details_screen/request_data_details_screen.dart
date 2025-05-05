@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
+import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -35,7 +36,13 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
       ),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.request.isRepeated ?? false)
+              Padding(
+                padding: EdgeInsets.only(left: 16),
+                child: RepeatRequestBadge(),
+              ),
             if (widget.request.requestData != null)
               ListTile(
                 title: const Text('Request Data:'),

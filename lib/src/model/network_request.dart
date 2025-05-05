@@ -59,6 +59,8 @@ class NetworkRequest {
 
   String get responseSizeString => formatBytes(responseSizeBytes);
 
+  bool? isRepeated;
+
   /// The total execution time of the request, computed as a timestamp delta.
   Duration? get duration {
     final endDate = this.endDate;
@@ -85,6 +87,7 @@ class NetworkRequest {
     this.dioError,
     this.requestSizeBytes,
     this.responseSizeBytes,
+    this.isRepeated,
   });
 
   /// Converts the request to a simplified map representation,
@@ -104,6 +107,7 @@ class NetworkRequest {
       'dioError': dioError.toString(),
       'requestSize': requestSizeBytes,
       'responseSize': responseSizeBytes,
+      'isRepeated': isRepeated,
     };
   }
 
@@ -130,6 +134,7 @@ class NetworkRequest {
     DioException? dioError,
     int? requestSize,
     int? responseSize,
+    bool? isRepeated,
   }) {
     return NetworkRequest(
       id: id ?? this.id,
@@ -147,6 +152,7 @@ class NetworkRequest {
       dioError: dioError ?? this.dioError,
       requestSizeBytes: requestSize ?? requestSizeBytes,
       responseSizeBytes: responseSize ?? responseSizeBytes,
+      isRepeated: isRepeated ?? this.isRepeated,
     );
   }
 

@@ -43,6 +43,7 @@ class NetworkTrackerInterceptor extends Interceptor {
       queryParameters: options.queryParameters,
       status: RequestStatus.sent,
       requestSizeBytes: _estimateSize(options.data),
+      isRepeated: options.extra['is_repeated'] ?? false,
     );
 
     storage.addRequest(request);

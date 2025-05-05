@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:network_tracker/src/model/network_request.dart';
-import 'package:network_tracker/src/ui/common/repeat_request_button_vm.dart';
 
+import '../../model/network_request.dart';
 import '../repeat_request_screen/edit_request_screen/network_edit_request_screen.dart';
+import 'repeat_request_button_vm.dart';
 
 class RepeatRequestButton extends StatefulWidget {
   final bool shouldEditFirst;

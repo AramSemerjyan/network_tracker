@@ -44,6 +44,8 @@ class NetworkRepeatRequestService {
   /// Repeats the provided request using Dio.
   /// If a custom Dio is provided, it will be used; otherwise a default one is used.
   void repeat(NetworkRequest request) async {
+    request = request.copyWith(isRepeated: true);
+
     final dio = _customDio ??
         Dio(BaseOptions(
             baseUrl: NetworkRequestService.instance.storageService.baseUrl));
@@ -54,14 +56,20 @@ class NetworkRepeatRequestService {
       dio.interceptors.add(NetworkTrackerInterceptor());
     }
 
+    final options = Options(
+      method: request.method.value,
+      headers: request.headers,
+    );
+
+    options.extra = {
+      'is_repeated': request.isRepeated ?? false,
+    };
+
     dio
         .request(
       request.path,
       data: request.requestData,
-      options: Options(
-        method: request.method.value,
-        headers: request.headers,
-      ),
+      options: options,
       queryParameters: request.queryParameters,
     )
         .then((_) {
