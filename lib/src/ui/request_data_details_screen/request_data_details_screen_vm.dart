@@ -1,5 +1,5 @@
 import 'package:network_tracker/src/model/network_request.dart';
-import 'package:network_tracker/src/ui/utils/utils.dart';
+import 'package:network_tracker/src/utils/utils.dart';
 
 import '../../services/network_request_service.dart';
 

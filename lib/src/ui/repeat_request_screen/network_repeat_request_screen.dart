@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/repeat_request_screen/edit_request_screen/network_edit_request_screen.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen_vm.dart';
 
 import '../../model/network_request.dart';
@@ -14,6 +15,15 @@ class NetworkRepeatRequestScreen extends StatefulWidget {
 class _NetworkRepeatRequestScreenState
     extends State<NetworkRepeatRequestScreen> {
   late final _vm = NetworkRepeatRequestScreenVM();
+
+  void _moveToEdit(NetworkRequest request) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NetworkEditRequestScreen(originalRequest: request),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +41,11 @@ class _NetworkRepeatRequestScreenState
             itemBuilder: (_, index) {
               final req = requests[index];
               return ListTile(
-                title: Text('${req.method.value} ${req.path}'),
+                title: Text(
+                    '${req.method.value} ${req.method.symbol} - ${req.path}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () => _vm.repeatRequest(req),
+                  onPressed: () => _moveToEdit(req),
                 ),
               );
             },

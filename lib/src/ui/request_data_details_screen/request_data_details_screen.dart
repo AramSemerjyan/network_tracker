@@ -3,6 +3,7 @@ import 'package:json_view/json_view.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../model/network_request.dart';
+import '../repeat_request_screen/edit_request_screen/network_edit_request_screen.dart';
 import 'request_data_details_screen_vm.dart';
 
 class RequestDataDetailsScreen extends StatefulWidget {
@@ -18,6 +19,15 @@ class RequestDataDetailsScreen extends StatefulWidget {
 class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
   late final _vm = RequestDataDetailsScreenVM(widget.request);
 
+  void _moveToEdit(NetworkRequest request) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NetworkEditRequestScreen(originalRequest: request),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +39,12 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () => _vm.repeatRequest(widget.request),
+          GestureDetector(
+            onLongPress: () => _moveToEdit(widget.request),
+            child: IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: () => _vm.repeatRequest(widget.request),
+            ),
           ),
         ],
       ),

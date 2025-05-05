@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/repeat_request_screen/edit_request_screen/network_edit_request_screen.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
 import '../../model/network_request.dart';
@@ -24,6 +25,15 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     _showFilterBar.value = !_showFilterBar.value;
   }
 
+  void _moveToEdit(NetworkRequest request) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NetworkEditRequestScreen(originalRequest: request),
+      ),
+    );
+  }
+
   Widget _buildList(List<NetworkRequest> list) {
     return ListView.builder(
       itemCount: list.length,
@@ -47,9 +57,12 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
             ],
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () => _vm.repeatRequest(request),
+          trailing: GestureDetector(
+            onLongPress: () => _moveToEdit(request),
+            child: IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: () => _vm.repeatRequest(request),
+            ),
           ),
           onTap: () {
             Navigator.push(
