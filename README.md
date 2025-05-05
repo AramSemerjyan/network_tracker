@@ -55,7 +55,7 @@ dependencies:
 
 <img src="screenshots/request_details_screen.png" height="600"/>
 
-## Edit any request and repeat them for quicker debug
+## Edit any request and repeat them for quicker debug. Press send icon (➤) for quick repeat or long press to open edit menu
 
 <img src="screenshots/request_edit_screen.png" height="600"/>
 
