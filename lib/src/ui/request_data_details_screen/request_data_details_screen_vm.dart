@@ -11,10 +11,6 @@ class RequestDataDetailsScreenVM {
 
   RequestDataDetailsScreenVM(this.request);
 
-  void repeatRequest(NetworkRequest request) {
-    repeatRequestService.repeat(request);
-  }
-
   Future<String?> exportResponseData() async {
     return (await Utils.exportRequest(request))?.path;
   }

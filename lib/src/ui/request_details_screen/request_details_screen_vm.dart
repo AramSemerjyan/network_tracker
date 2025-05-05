@@ -38,10 +38,6 @@ class RequestDetailsScreenVM {
     filterNotifier.value = NetworkRequestFilter();
   }
 
-  void repeatRequest(NetworkRequest request) {
-    NetworkRequestService.instance.repeatRequestService.repeat(request);
-  }
-
   void _updateList() {
     final filter = filterNotifier.value;
     List<NetworkRequest> requests =
