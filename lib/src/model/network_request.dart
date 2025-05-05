@@ -51,6 +51,14 @@ class NetworkRequest {
   /// The raw [DioException], if available.
   DioException? dioError;
 
+  int? requestSizeBytes;
+
+  String get requestSizeString => formatBytes(requestSizeBytes);
+
+  int? responseSizeBytes;
+
+  String get responseSizeString => formatBytes(responseSizeBytes);
+
   /// The total execution time of the request, computed as a timestamp delta.
   Duration? get duration {
     final endDate = this.endDate;
@@ -75,6 +83,8 @@ class NetworkRequest {
     this.statusCode,
     this.responseHeaders,
     this.dioError,
+    this.requestSizeBytes,
+    this.responseSizeBytes,
   });
 
   /// Converts the request to a simplified map representation,
@@ -92,6 +102,8 @@ class NetworkRequest {
       'responseData': responseData,
       'duration': duration,
       'dioError': dioError.toString(),
+      'requestSize': requestSizeBytes,
+      'responseSize': responseSizeBytes,
     };
   }
 
@@ -116,6 +128,8 @@ class NetworkRequest {
     Map<String, dynamic>? responseHeaders,
     DateTime? execTime,
     DioException? dioError,
+    int? requestSize,
+    int? responseSize,
   }) {
     return NetworkRequest(
       id: id ?? this.id,
@@ -131,6 +145,24 @@ class NetworkRequest {
       statusCode: statusCode ?? this.statusCode,
       responseHeaders: responseHeaders ?? this.responseHeaders,
       dioError: dioError ?? this.dioError,
+      requestSizeBytes: requestSize ?? requestSizeBytes,
+      responseSizeBytes: responseSize ?? responseSizeBytes,
     );
+  }
+
+  String formatBytes(int? bytes, [int decimals = 0]) {
+    if (bytes == null) return '';
+
+    if (bytes < 1024) return '$bytes bytes';
+    const suffixes = ['Kb', 'Mb', 'Gb', 'Tb'];
+    double size = bytes / 1024;
+    int i = 0;
+
+    while (size >= 1024 && i < suffixes.length - 1) {
+      size /= 1024;
+      i++;
+    }
+
+    return '${size.toStringAsFixed(decimals)}${suffixes[i]}';
   }
 }

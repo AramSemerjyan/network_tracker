@@ -22,4 +22,23 @@ enum NetworkRequestMethod {
       orElse: () => throw FormatException('Invalid HTTP method: $value'),
     );
   }
+
+  String get symbol {
+    switch (this) {
+      case NetworkRequestMethod.get:
+        return "🔽";
+      case NetworkRequestMethod.post:
+        return "🔼";
+      case NetworkRequestMethod.put:
+        return "♻️";
+      case NetworkRequestMethod.delete:
+        return "🗑";
+      case NetworkRequestMethod.patch:
+        return "🧩";
+      case NetworkRequestMethod.head:
+        return "📌";
+      case NetworkRequestMethod.options:
+        return "⚙️";
+    }
+  }
 }

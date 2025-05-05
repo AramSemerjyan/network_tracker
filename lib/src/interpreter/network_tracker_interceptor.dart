@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:network_tracker/src/model/network_request_method.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
@@ -40,6 +42,7 @@ class NetworkTrackerInterceptor extends Interceptor {
       headers: options.headers,
       queryParameters: options.queryParameters,
       status: RequestStatus.sent,
+      requestSizeBytes: _estimateSize(options.data),
     );
 
     storage.addRequest(request);
@@ -55,12 +58,15 @@ class NetworkTrackerInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final requestId = response.requestOptions.extra['network_tracker_id'];
-    storage.updateRequest(requestId,
-        status: RequestStatus.completed,
-        responseData: response.data,
-        statusCode: response.statusCode,
-        responseHeaders: response.headers.map,
-        endDate: DateTime.now());
+    storage.updateRequest(
+      requestId,
+      status: RequestStatus.completed,
+      responseData: response.data,
+      statusCode: response.statusCode,
+      responseHeaders: response.headers.map,
+      endDate: DateTime.now(),
+      responseSize: _estimateSize(response.data),
+    );
 
     super.onResponse(response, handler);
   }
@@ -76,8 +82,18 @@ class NetworkTrackerInterceptor extends Interceptor {
       responseData: err.response?.data,
       endDate: DateTime.now(),
       dioError: err,
+      responseSize: _estimateSize(err.response?.data),
     );
 
     super.onError(err, handler);
+  }
+
+  int _estimateSize(dynamic data) {
+    if (data == null) return 0;
+    try {
+      return utf8.encode(jsonEncode(data)).length;
+    } catch (_) {
+      return 0;
+    }
   }
 }

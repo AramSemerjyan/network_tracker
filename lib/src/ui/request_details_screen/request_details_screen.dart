@@ -30,14 +30,21 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       itemBuilder: (context, index) {
         final request = list[index];
         return ListTile(
-          title: Text('${request.method.value} - ${request.startDate}'),
+          title: Text(
+              '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Status: ${request.status.symbol} ${request.status}'),
               if (request.duration != null)
-                Text('Duration: ${request.duration?.inMilliseconds}ms')
+                Text('Duration: ${request.duration?.inMilliseconds}ms'),
+              Row(
+                children: [
+                  Text(
+                      'Size req/res: ${request.requestSizeString}/${request.responseSizeString}')
+                ],
+              ),
             ],
           ),
           trailing: IconButton(

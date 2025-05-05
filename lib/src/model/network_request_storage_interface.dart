@@ -24,6 +24,7 @@ abstract class NetworkRequestStorageInterface {
     Map<String, dynamic>? responseHeaders,
     DateTime? endDate,
     DioException? dioError,
+    int? responseSize,
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.

@@ -47,6 +47,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
     String? error,
     DateTime? endDate,
     DioException? dioError,
+    int? responseSize,
   }) {
     for (final list in _requestsByPath.values) {
       final index = list.indexWhere((r) => r.id == id);
@@ -59,6 +60,7 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
           responseHeaders: responseHeaders,
           endDate: endDate,
           dioError: dioError,
+          responseSize: responseSize,
         );
         return;
       }
