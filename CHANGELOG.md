@@ -29,3 +29,7 @@
 
 * Badge to show that request is repeated from app
 * New filter to filter out repeated/ not repeated requests
+
+## 0.3.2
+
+* Fix analyze issue
