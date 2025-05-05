@@ -145,7 +145,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit & Repeat Request")),
+      appBar: AppBar(title: const Text("Edit & Repeat")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
@@ -174,12 +174,19 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
 
             const SizedBox(height: 16),
 
-            _buildKeyValueEditor(_queryParams, setState,
-                label: "Query Parameters"),
+            _buildKeyValueEditor(
+              _queryParams,
+              setState,
+              label: "Query Parameters",
+            ),
 
             const SizedBox(height: 16),
 
-            _buildKeyValueEditor(_headers, setState, label: "Headers"),
+            _buildKeyValueEditor(
+              _headers,
+              setState,
+              label: "Headers",
+            ),
 
             const SizedBox(height: 16),
 
