@@ -31,7 +31,7 @@ class _NetworkRepeatRequestScreenState
             itemBuilder: (_, index) {
               final req = requests[index];
               return ListTile(
-                title: Text('${req.method.name} ${req.path}'),
+                title: Text('${req.method.value} ${req.path}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () => _vm.repeatRequest(req),

@@ -35,25 +35,44 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final Dio _dio =
       Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
+
   String _selectedPath = '/posts/1';
-  final List<String> _paths = [
+  String _selectedMethod = 'GET';
+
+  final List<String> _allPaths = [
+    '/posts',
     '/posts/1',
     '/posts/2',
     '/comments/1',
     '/todos/1',
-    '/albums/1'
+    '/albums/1',
   ];
+
+  final List<String> _methods = ['GET', 'POST'];
 
   @override
   void initState() {
     super.initState();
-
     _dio.interceptors.add(NetworkTrackerInterceptor());
   }
 
   void _makeRequest() async {
     try {
-      final result = await _dio.get(_selectedPath);
+      Response result;
+
+      if (_selectedMethod == 'GET') {
+        result = await _dio.get(_selectedPath);
+      } else {
+        result = await _dio.post(
+          _selectedPath,
+          data: {
+            'title': 'foo',
+            'body': 'bar',
+            'userId': 1,
+          },
+        );
+      }
+
       if (kDebugMode) {
         print('Request success: $result');
       }
@@ -79,6 +98,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final filteredPaths = _allPaths.where((path) {
+      if (_selectedMethod == 'POST') {
+        return path == '/posts';
+      }
+      return true;
+    }).toList();
+
+    if (!filteredPaths.contains(_selectedPath)) {
+      _selectedPath = filteredPaths.first;
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -95,7 +125,26 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Select a test API path:'),
+          const Text('Select method and path:'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: DropdownButtonFormField<String>(
+              value: _selectedMethod,
+              onChanged: (value) => setState(() {
+                _selectedMethod = value!;
+              }),
+              items: _methods
+                  .map((method) => DropdownMenuItem(
+                        value: method,
+                        child: Text(method),
+                      ))
+                  .toList(),
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'HTTP Method',
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: DropdownButtonFormField<String>(
@@ -103,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onChanged: (value) => setState(() {
                 _selectedPath = value!;
               }),
-              items: _paths
+              items: filteredPaths
                   .map((path) => DropdownMenuItem(
                         value: path,
                         child: Text(path),
@@ -117,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.greenAccent.withValues(alpha: 0.7),
+              backgroundColor: Colors.greenAccent.withAlpha(180),
             ),
             onPressed: _makeRequest,
             child: const Text('Make Request'),
@@ -125,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 10),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.withValues(alpha: 0.7),
+              backgroundColor: Colors.red.withAlpha(180),
             ),
             onPressed: _makeErrorRequest,
             child: const Text('Make Error Request'),
