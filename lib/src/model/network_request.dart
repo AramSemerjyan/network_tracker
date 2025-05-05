@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/utils/utils.dart';
 
 import '../services/request_status.dart';
 import 'network_request_method.dart';
@@ -51,14 +52,27 @@ class NetworkRequest {
   /// The raw [DioException], if available.
   DioException? dioError;
 
+  /// The size of the request payload in bytes.
+  ///
+  /// This value is computed based on the serialized body before sending.
   int? requestSizeBytes;
 
-  String get requestSizeString => formatBytes(requestSizeBytes);
+  /// A human-readable string representation of [requestSizeBytes],
+  /// e.g. "512 bytes", "1.2Kb", "3Mb".
+  String get requestSizeString => Utils.formatBytes(requestSizeBytes);
 
+  /// The size of the response payload in bytes.
+  ///
+  /// This value is computed after receiving the response body.
   int? responseSizeBytes;
 
-  String get responseSizeString => formatBytes(responseSizeBytes);
+  /// A human-readable string representation of [responseSizeBytes],
+  /// e.g. "1Kb", "4.3Mb".
+  String get responseSizeString => Utils.formatBytes(responseSizeBytes);
 
+  /// Indicates whether this request is a repeated (manually re-sent) request.
+  ///
+  /// Useful for distinguishing between original requests and user-triggered retries.
   bool? isRepeated;
 
   /// The total execution time of the request, computed as a timestamp delta.
@@ -154,21 +168,5 @@ class NetworkRequest {
       responseSizeBytes: responseSize ?? responseSizeBytes,
       isRepeated: isRepeated ?? this.isRepeated,
     );
-  }
-
-  String formatBytes(int? bytes, [int decimals = 0]) {
-    if (bytes == null) return '';
-
-    if (bytes < 1024) return '$bytes bytes';
-    const suffixes = ['Kb', 'Mb', 'Gb', 'Tb'];
-    double size = bytes / 1024;
-    int i = 0;
-
-    while (size >= 1024 && i < suffixes.length - 1) {
-      size /= 1024;
-      i++;
-    }
-
-    return '${size.toStringAsFixed(decimals)}${suffixes[i]}';
   }
 }
