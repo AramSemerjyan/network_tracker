@@ -10,7 +10,7 @@ void main() {
     late NetworkRequestStorageInterface storage;
 
     setUp(() {
-      storage = NetworkRequestService.instance.storage;
+      storage = NetworkRequestService.instance.storageService;
     });
 
     NetworkRequest buildRequest({

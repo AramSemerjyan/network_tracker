@@ -87,17 +87,11 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     _vm.clearSearchText();
   }
 
-  void _moveToDetails(
-    String path,
-    List<NetworkRequest> requests,
-  ) {
+  void _moveToDetails(String path) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RequestDetailsScreen(
-          path: path,
-          requests: requests,
-        ),
+        builder: (_) => RequestDetailsScreen(path: path),
       ),
     );
   }
@@ -197,7 +191,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         return ListTile(
           title: Text(path),
           trailing: Text('${requests.length} requests'),
-          onTap: () => _moveToDetails(path, requests),
+          onTap: () => _moveToDetails(path),
         );
       },
     );
@@ -248,7 +242,8 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
               const Spacer(),
               InkWell(
                 onTap: () {
-                  Clipboard.setData(ClipboardData(text: _vm.storage.baseUrl));
+                  Clipboard.setData(
+                      ClipboardData(text: _vm.storageService.baseUrl));
                 },
                 child: Icon(
                   Icons.copy,
@@ -263,7 +258,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              _vm.storage.baseUrl,
+              _vm.storageService.baseUrl,
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),

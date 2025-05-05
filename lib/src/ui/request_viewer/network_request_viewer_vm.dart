@@ -7,7 +7,8 @@ import '../../model/network_request_filter.dart';
 import '../../services/network_request_service.dart';
 
 class NetworkRequestViewerVM {
-  final storage = NetworkRequestService.instance.storage;
+  final storageService = NetworkRequestService.instance.storageService;
+  final eventService = NetworkRequestService.instance.eventService;
 
   final ValueNotifier<NetworkRequestFilter> filterNotifier =
       ValueNotifier(NetworkRequestFilter());
@@ -15,16 +16,22 @@ class NetworkRequestViewerVM {
       ValueNotifier([]);
 
   Timer? _debounce;
+  late final StreamSubscription _repeatRequestSubscription;
 
   NetworkRequestViewerVM() {
     filterNotifier.addListener(_updateList);
     _updateList();
+
+    _repeatRequestSubscription = NetworkRequestService
+        .instance.eventService.onRepeatRequestDone.stream
+        .listen((_) => _updateList());
   }
 
   void dispose() {
     filterNotifier.dispose();
     filteredRequestsNotifier.dispose();
     _debounce?.cancel();
+    _repeatRequestSubscription.cancel();
   }
 
   void search(String query) {
@@ -63,6 +70,6 @@ class NetworkRequestViewerVM {
 
   void _updateList() {
     final filter = filterNotifier.value;
-    filteredRequestsNotifier.value = storage.getFilteredGroups(filter);
+    filteredRequestsNotifier.value = storageService.getFilteredGroups(filter);
   }
 }

@@ -22,7 +22,7 @@ class NetworkRepeatRequestService {
 
   /// Returns all captured requests grouped by path.
   List<NetworkRequest> get repeatableRequests {
-    final storage = NetworkRequestService.instance.storage;
+    final storage = NetworkRequestService.instance.storageService;
     final Map<String, NetworkRequest> uniqueRequests = {};
 
     final paths = storage.getTrackedPaths();
@@ -43,10 +43,10 @@ class NetworkRepeatRequestService {
 
   /// Repeats the provided request using Dio.
   /// If a custom Dio is provided, it will be used; otherwise a default one is used.
-  Future<Response?> repeat(NetworkRequest request) async {
+  void repeat(NetworkRequest request) async {
     final dio = _customDio ??
         Dio(BaseOptions(
-            baseUrl: NetworkRequestService.instance.storage.baseUrl));
+            baseUrl: NetworkRequestService.instance.storageService.baseUrl));
     final isInterceptorAlreadyAdded =
         dio.interceptors.any((i) => i is NetworkTrackerInterceptor);
 
@@ -54,19 +54,20 @@ class NetworkRepeatRequestService {
       dio.interceptors.add(NetworkTrackerInterceptor());
     }
 
-    try {
-      final response = await dio.request(
-        request.path,
-        data: request.requestData,
-        options: Options(
-          method: request.method.value,
-          headers: request.headers,
-        ),
-        queryParameters: request.queryParameters,
-      );
-      return response;
-    } catch (e) {
-      return null;
-    }
+    dio
+        .request(
+      request.path,
+      data: request.requestData,
+      options: Options(
+        method: request.method.value,
+        headers: request.headers,
+      ),
+      queryParameters: request.queryParameters,
+    )
+        .then((_) {
+      NetworkRequestService.instance.eventService.onRepeatRequestDone.add(null);
+    }).catchError((e) {
+      NetworkRequestService.instance.eventService.onRepeatRequestDone.add(null);
+    });
   }
 }

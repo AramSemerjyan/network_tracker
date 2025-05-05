@@ -20,7 +20,7 @@ import '../services/request_status.dart';
 /// ```
 class NetworkTrackerInterceptor extends Interceptor {
   /// Internal request storage for tracking all captured requests.
-  final storage = NetworkRequestService.instance.storage;
+  final storage = NetworkRequestService.instance.storageService;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
