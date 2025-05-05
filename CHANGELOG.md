@@ -19,3 +19,8 @@
 * Improves UI to use `ValueListenableBuilder` instead `setState({})`
 * Add `copy` button next to baseUrl to make it more clear url can be copied
 * Replace back button with `CloseButton`
+
+## 0.3.0
+
+* Ability to edit request before repeat
+* UI improvements

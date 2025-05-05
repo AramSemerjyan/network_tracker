@@ -8,6 +8,7 @@ A lightweight and developer-friendly Flutter package for tracking and viewing al
 
 - ✅ Automatically captures all Dio HTTP requests and responses
 - 🕵️‍♂️ View full request/response logs directly in your app
+- ✏️ Edit and repeat any captured request — including method, path, headers, query, and body
 - 🔍 Search by request path and filter by method or status
 - 📱 Simple integration with just two lines of code
 - 📦 No need for custom tooling or complex setup
@@ -53,6 +54,10 @@ dependencies:
 ## Inspect full request details including response data, headers, status, errors, and execution time in a dedicated detail view.
 
 <img src="screenshots/request_details_screen.png" height="600"/>
+
+## Edit any request and repeat them for quicker debug
+
+<img src="screenshots/request_edit_screen.png" height="600"/>
 
 ---------
 

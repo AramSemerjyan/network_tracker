@@ -145,7 +145,11 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit & Repeat")),
+      appBar: AppBar(
+        title: const Text("Edit & Repeat"),
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
