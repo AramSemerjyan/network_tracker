@@ -6,6 +6,7 @@ import '../../services/request_status.dart';
 import 'filter_card.dart';
 
 class FilterBar extends StatelessWidget {
+  final bool shouldShowRepeated;
   final NetworkRequestFilter filter;
   final Function(NetworkRequestFilter)? onChange;
   final VoidCallback? onClear;
@@ -15,6 +16,7 @@ class FilterBar extends StatelessWidget {
     required this.filter,
     this.onChange,
     this.onClear,
+    this.shouldShowRepeated = false,
   });
 
   @override
@@ -58,6 +60,27 @@ class FilterBar extends StatelessWidget {
                     onChange?.call(updatedFilter);
                   },
                 ),
+                if (shouldShowRepeated) ...[
+                  const SizedBox(width: 16),
+                  FilterCard<bool>(
+                    title: 'Repeated',
+                    value: filter.isRepeated,
+                    options: [true, false],
+                    getLabel: (v) {
+                      if (v ?? false) return 'Repeated';
+                      return 'Not repeated';
+                    },
+                    onChanged: (v) {
+                      final updatedFilter = NetworkRequestFilter(
+                        searchQuery: filter.searchQuery,
+                        method: filter.method,
+                        status: filter.status,
+                        isRepeated: v,
+                      );
+                      onChange?.call(updatedFilter);
+                    },
+                  ),
+                ]
               ],
             ),
           ),

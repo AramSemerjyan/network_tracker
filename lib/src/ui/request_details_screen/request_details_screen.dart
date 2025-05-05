@@ -103,6 +103,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   builder: (c, v, w) {
                     return FilterBar(
                       filter: v,
+                      shouldShowRepeated: true,
                       onChange: _vm.onFilterChanged,
                       onClear: _vm.clearFilter,
                     );

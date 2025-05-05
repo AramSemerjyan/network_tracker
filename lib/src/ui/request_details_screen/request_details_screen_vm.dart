@@ -51,6 +51,11 @@ class RequestDetailsScreenVM {
       requests = requests.where((r) => r.status == filter.status).toList();
     }
 
+    if (filter.isRepeated != null) {
+      requests =
+          requests.where((r) => r.isRepeated == filter.isRepeated).toList();
+    }
+
     requestsNotifier.value = requests;
   }
 }
