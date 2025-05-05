@@ -67,7 +67,7 @@ class FilterBar extends StatelessWidget {
                     value: filter.isRepeated,
                     options: [true, false],
                     getLabel: (v) {
-                      if (v ?? false) return 'Repeated';
+                      if (v) return 'Repeated';
                       return 'Not repeated';
                     },
                     onChanged: (v) {
