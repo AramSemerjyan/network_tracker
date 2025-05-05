@@ -49,6 +49,7 @@ void main() {
         status: RequestStatus.completed,
         responseData: {'result': 'ok'},
         statusCode: 200,
+        endDate: DateTime.now(),
         responseHeaders: {'Content-Type': 'application/json'},
       );
 
