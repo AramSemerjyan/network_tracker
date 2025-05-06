@@ -33,3 +33,10 @@
 ## 0.3.2
 
 * Fix analyze issue
+
+## 0.3.3
+
+* Show headers in request details page
+* Fix issue with scroll on request details page
+* Fix value conversion errors on `NetworkEditRequestScreen`
+* export `NetworkRepeatRequestService` to give ability to set custom `DIO` client
