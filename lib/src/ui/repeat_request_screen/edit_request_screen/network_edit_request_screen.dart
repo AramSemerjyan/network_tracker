@@ -23,7 +23,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   late TextEditingController _bodyController;
   late NetworkRequestMethod _method;
   late Map<String, String> _headers;
-  late Map<String, String> _queryParams;
+  late Map<String, dynamic> _queryParams;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
     _method = r.method;
     _headers = Map<String, String>.from(r.headers ?? {})
       ..remove('content-length');
-    _queryParams = Map<String, String>.from(r.queryParameters ?? {});
+    _queryParams = Map<String, dynamic>.from(r.queryParameters ?? {});
   }
 
   void _sendRequest() async {
@@ -93,7 +93,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   }
 
   Widget _buildKeyValueEditor(
-    Map<String, String> map,
+    Map<String, dynamic> map,
     void Function(void Function()) onChanged, {
     required String label,
   }) {
@@ -119,7 +119,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: TextFormField(
-                  initialValue: map[k],
+                  initialValue: map[k].toString(),
                   decoration: const InputDecoration(labelText: 'Value'),
                   onChanged: (val) => onChanged(() {
                     map[k] = val;

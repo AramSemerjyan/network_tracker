@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
 import '../../model/network_request.dart';
+import '../common/repeat_request_badge.dart';
 import '../filter/filter_bar.dart';
 import '../request_data_details_screen/request_data_details_screen.dart';
 
@@ -40,20 +40,30 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   }
 
   Widget _buildList(List<NetworkRequest> list) {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: list.length,
+      separatorBuilder: (_, __) => const Divider(
+        indent: 16,
+        endIndent: 16,
+      ),
       itemBuilder: (context, index) {
         final request = list[index];
         return ListTile(
-          title: Text(
-              '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (request.isRepeated ?? false) RepeatRequestBadge(),
+              Text(
+                  '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
+            ],
+          ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildValueRow(
                 'Status',
-                '${request.status.symbol} ${request.status.name}',
+                '${request.status.symbol} ${request.statusCode} ${request.status.name}',
               ),
               if (request.duration != null)
                 _buildValueRow(
@@ -64,7 +74,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                 'Size req/res',
                 '${request.requestSizeString}/${request.responseSizeString}',
               ),
-              if (request.isRepeated ?? false) RepeatRequestBadge(),
             ],
           ),
           trailing: RepeatRequestButton(request: request),

@@ -20,6 +20,21 @@ class RequestDataDetailsScreen extends StatefulWidget {
 class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
   late final _vm = RequestDataDetailsScreenVM(widget.request);
 
+  Widget _buildBody() {
+    final response = widget.request.responseData;
+
+    if (response is List || response is Map) {
+      return JsonView(
+        json: response,
+        padding: const EdgeInsets.only(bottom: 40),
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+      );
+    }
+
+    return Text(response.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,50 +50,61 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.request.isRepeated ?? false)
-              Padding(
-                padding: EdgeInsets.only(left: 16),
-                child: RepeatRequestBadge(),
-              ),
-            if (widget.request.requestData != null)
-              ListTile(
-                title: const Text('Request Data:'),
-                subtitle: JsonView(
-                  json: widget.request.requestData,
-                  shrinkWrap: true,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.request.isRepeated ?? false)
+                Padding(
+                  padding: EdgeInsets.only(left: 16),
+                  child: RepeatRequestBadge(),
                 ),
-              ),
-            if (widget.request.queryParameters?.isNotEmpty ?? false)
-              ListTile(
-                title: const Text('Request Parameters:'),
-                subtitle: JsonView(
-                  json: widget.request.queryParameters,
-                  shrinkWrap: true,
+              if (widget.request.requestData != null)
+                ListTile(
+                  title: const Text('Request Data:'),
+                  subtitle: JsonView(
+                    json: widget.request.requestData,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
                 ),
-              ),
-            if (widget.request.duration != null)
-              ListTile(
-                title: const Text('Duration:'),
-                subtitle: Text(
-                  '${widget.request.duration?.inMilliseconds}ms',
+              if (widget.request.queryParameters?.isNotEmpty ?? false)
+                ListTile(
+                  title: const Text('Request Parameters:'),
+                  subtitle: JsonView(
+                    json: widget.request.queryParameters,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
                 ),
-              ),
-            if (widget.request.dioError?.error != null)
-              ListTile(
-                title: const Text('Error:'),
-                subtitle: Text('${widget.request.dioError?.error}'),
-              ),
-            if (widget.request.dioError?.message != null)
-              ListTile(
-                title: const Text('Error message:'),
-                subtitle: Text('${widget.request.dioError?.message}'),
-              ),
-            if (widget.request.responseData != null)
-              Expanded(
-                child: ListTile(
+              if (widget.request.headers?.isNotEmpty ?? false)
+                ListTile(
+                  title: const Text('Request Headers:'),
+                  subtitle: JsonView(
+                    json: widget.request.headers,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
+                ),
+              if (widget.request.duration != null)
+                ListTile(
+                  title: const Text('Duration:'),
+                  subtitle: Text(
+                    '${widget.request.duration?.inMilliseconds}ms',
+                  ),
+                ),
+              if (widget.request.dioError?.error != null)
+                ListTile(
+                  title: const Text('Error:'),
+                  subtitle: Text('${widget.request.dioError?.error}'),
+                ),
+              if (widget.request.dioError?.message != null)
+                ListTile(
+                  title: const Text('Error message:'),
+                  subtitle: Text('${widget.request.dioError?.message}'),
+                ),
+              if (widget.request.responseData != null)
+                ListTile(
                   title: Row(
                     children: [
                       const Text('Response data:'),
@@ -95,13 +121,10 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
                       )
                     ],
                   ),
-                  subtitle: JsonView(
-                    json: widget.request.responseData,
-                    padding: const EdgeInsets.only(bottom: 40),
-                  ),
+                  subtitle: _buildBody(),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

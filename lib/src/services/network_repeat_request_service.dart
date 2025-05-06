@@ -5,10 +5,11 @@ import '../model/network_request.dart';
 import 'network_request_service.dart';
 
 class NetworkRepeatRequestService {
-  static final NetworkRepeatRequestService _instance =
-      NetworkRepeatRequestService._internal();
+  static NetworkRepeatRequestService? _instance;
 
-  factory NetworkRepeatRequestService() => _instance;
+  static NetworkRepeatRequestService get instance {
+    return _instance ??= NetworkRepeatRequestService._internal();
+  }
 
   NetworkRepeatRequestService._internal();
 

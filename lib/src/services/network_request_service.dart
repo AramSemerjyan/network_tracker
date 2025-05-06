@@ -7,7 +7,7 @@ import 'network_request_storage.dart';
 class NetworkRequestService {
   NetworkRequestStorageInterface storageService = NetworkRequestStorage();
   late final NetworkRepeatRequestService repeatRequestService =
-      NetworkRepeatRequestService();
+      NetworkRepeatRequestService.instance;
   late final EventService eventService = EventService();
 
   static NetworkRequestService? _instance;
