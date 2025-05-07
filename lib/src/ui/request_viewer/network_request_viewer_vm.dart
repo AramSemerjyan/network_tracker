@@ -68,8 +68,9 @@ class NetworkRequestViewerVM {
     );
   }
 
-  void _updateList() {
+  void _updateList() async {
     final filter = filterNotifier.value;
-    filteredRequestsNotifier.value = storageService.getFilteredGroups(filter);
+    filteredRequestsNotifier.value =
+        await storageService.getFilteredGroups(filter);
   }
 }

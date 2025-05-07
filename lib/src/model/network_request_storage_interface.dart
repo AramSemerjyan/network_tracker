@@ -28,11 +28,12 @@ abstract class NetworkRequestStorageInterface {
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.
-  List<NetworkRequest> getRequestsByPath(String path);
+  Future<List<NetworkRequest>> getRequestsByPath(String path);
 
   /// Returns a list of all tracked paths sorted by most recent activity.
-  List<String> getTrackedPaths();
+  Future<List<String>> getTrackedPaths();
 
   /// Returns a grouped list of filtered requests by path using [filter].
-  List<List<NetworkRequest>> getFilteredGroups(NetworkRequestFilter filter);
+  Future<List<List<NetworkRequest>>> getFilteredGroups(
+      NetworkRequestFilter filter);
 }

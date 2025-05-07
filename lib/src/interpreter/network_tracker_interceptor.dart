@@ -6,14 +6,14 @@ import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/network_request.dart';
-import '../services/network_request_storage.dart';
 import '../services/request_status.dart';
+import '../services/storage/network_request_local_storage.dart';
 
 /// A Dio interceptor that tracks all outgoing requests, responses, and errors.
 ///
 /// This interceptor records metadata such as method, path, headers,
 /// status code, response body, and any errors. The data is stored in
-/// [NetworkRequestStorage] and can be visualized using a UI like
+/// [NetworkRequestLocalStorage] and can be visualized using a UI like
 /// `NetworkRequestsViewer`.
 ///
 /// To use:

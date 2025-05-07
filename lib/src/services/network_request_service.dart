@@ -1,14 +1,18 @@
 import 'package:network_tracker/src/services/event_service.dart';
-import 'package:network_tracker/src/services/network_repeat_request_service.dart';
+import 'package:network_tracker/src/services/network_request_Persistent_storage.dart';
 
+import '../../network_tracker.dart';
 import '../model/network_request_storage_interface.dart';
-import 'network_request_storage.dart';
+import 'storage/network_request_local_storage.dart';
 
 class NetworkRequestService {
-  NetworkRequestStorageInterface storageService = NetworkRequestStorage();
   late final NetworkRepeatRequestService repeatRequestService =
       NetworkRepeatRequestService.instance;
   late final EventService eventService = EventService();
+
+  NetworkRequestStorageInterface get storageService => _storageService;
+
+  NetworkRequestStorageInterface _storageService = NetworkRequestLocalStorage();
 
   static NetworkRequestService? _instance;
 
@@ -17,6 +21,15 @@ class NetworkRequestService {
   }
 
   void setStorage(NetworkRequestStorageInterface storage) {
-    storageService = storage;
+    _storageService = storage;
+  }
+
+  void setStorageType(StorageType type) {
+    switch (type) {
+      case StorageType.local:
+        _storageService = NetworkRequestLocalStorage();
+      case StorageType.persistent:
+        _storageService = NetworkRequestPersistentStorage();
+    }
   }
 }

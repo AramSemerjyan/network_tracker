@@ -53,7 +53,7 @@ void main() {
         responseHeaders: {'Content-Type': 'application/json'},
       );
 
-      final updated = storage.getRequestsByPath('/update').first;
+      final updated = (await storage.getRequestsByPath('/update')).first;
 
       expect(updated.status, RequestStatus.completed);
       expect(updated.responseData, {'result': 'ok'});
@@ -62,7 +62,7 @@ void main() {
       expect(updated.duration, isNotNull);
     });
 
-    test('getRequestsByPath returns sorted list by timestamp desc', () {
+    test('getRequestsByPath returns sorted list by timestamp desc', () async {
       final now = DateTime.now();
       final oldRequest = buildRequest(
           id: '3',
@@ -73,13 +73,13 @@ void main() {
       storage.addRequest(oldRequest);
       storage.addRequest(newRequest);
 
-      final result = storage.getRequestsByPath('/sorted');
+      final result = await storage.getRequestsByPath('/sorted');
       expect(result.length, 2);
       expect(result.first.id, '4');
       expect(result.last.id, '3');
     });
 
-    test('getTrackedPaths returns paths sorted by latest timestamp', () {
+    test('getTrackedPaths returns paths sorted by latest timestamp', () async {
       final now = DateTime.now();
       final older = buildRequest(
           id: '5',
@@ -90,7 +90,7 @@ void main() {
       storage.addRequest(older);
       storage.addRequest(newer);
 
-      final paths = storage.getTrackedPaths();
+      final paths = await storage.getTrackedPaths();
       expect(paths.first, '/b');
       expect(paths.last, '/a');
     });

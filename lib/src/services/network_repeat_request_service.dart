@@ -22,14 +22,14 @@ class NetworkRepeatRequestService {
   }
 
   /// Returns all captured requests grouped by path.
-  List<NetworkRequest> get repeatableRequests {
+  Future<List<NetworkRequest>> repeatableRequests() async {
     final storage = NetworkRequestService.instance.storageService;
     final Map<String, NetworkRequest> uniqueRequests = {};
 
-    final paths = storage.getTrackedPaths();
+    final paths = await storage.getTrackedPaths();
 
     for (final path in paths) {
-      final requests = storage.getRequestsByPath(path);
+      final requests = await storage.getRequestsByPath(path);
       for (final request in requests) {
         final key = '${request.method.value}_${request.path}';
         if (!uniqueRequests.containsKey(key)) {

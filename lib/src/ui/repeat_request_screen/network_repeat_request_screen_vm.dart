@@ -6,7 +6,13 @@ import '../../model/network_request.dart';
 class NetworkRepeatRequestScreenVM {
   final repeatService = NetworkRequestService.instance.repeatRequestService;
   late final ValueNotifier<List<NetworkRequest>> availableRequestsNotifier =
-      ValueNotifier(repeatService.repeatableRequests);
+      ValueNotifier([]);
+
+  NetworkRepeatRequestScreenVM() {
+    repeatService.repeatableRequests().then((list) {
+      availableRequestsNotifier.value = list;
+    });
+  }
 
   void repeatRequest(NetworkRequest request) {
     repeatService.repeat(request);

@@ -15,8 +15,11 @@ class RequestDetailsScreenVM {
   late final StreamSubscription _repeatRequestSubscription;
 
   RequestDetailsScreenVM(this.path) {
-    requestsNotifier.value =
-        NetworkRequestService.instance.storageService.getRequestsByPath(path);
+    NetworkRequestService.instance.storageService
+        .getRequestsByPath(path)
+        .then((list) {
+      requestsNotifier.value = list;
+    });
     filterNotifier.addListener(_updateList);
 
     _repeatRequestSubscription = NetworkRequestService
@@ -38,10 +41,11 @@ class RequestDetailsScreenVM {
     filterNotifier.value = NetworkRequestFilter();
   }
 
-  void _updateList() {
+  void _updateList() async {
     final filter = filterNotifier.value;
-    List<NetworkRequest> requests =
-        NetworkRequestService.instance.storageService.getRequestsByPath(path);
+    List<NetworkRequest> requests = await NetworkRequestService
+        .instance.storageService
+        .getRequestsByPath(path);
 
     if (filter.method != null) {
       requests = requests.where((r) => r.method == filter.method).toList();

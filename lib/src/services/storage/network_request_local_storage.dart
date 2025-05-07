@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 
-import '../model/network_request.dart';
-import '../model/network_request_filter.dart';
-import '../model/network_request_storage_interface.dart';
-import 'request_status.dart';
+import '../../model/network_request.dart';
+import '../../model/network_request_filter.dart';
+import '../../model/network_request_storage_interface.dart';
+import '../request_status.dart';
 
 /// A concrete implementation of [NetworkRequestStorageInterface] that stores
 /// network requests in memory and allows filtering/grouping.
-class NetworkRequestStorage implements NetworkRequestStorageInterface {
+class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Internal map storing requests grouped by request path.
   final Map<String, List<NetworkRequest>> _requestsByPath = {};
 
@@ -72,22 +72,22 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
   /// Retrieves all requests made to a specific [path], sorted by most recent first.
   ///
   /// Returns an empty list if no requests exist for the given path.
-  List<NetworkRequest> getRequestsByPath(String path) {
+  Future<List<NetworkRequest>> getRequestsByPath(String path) {
     final requests = List<NetworkRequest>.from(_requestsByPath[path] ?? []);
     requests.sort((a, b) => b.startDate.compareTo(a.startDate));
-    return requests;
+    return Future.value(requests);
   }
 
   @override
 
   /// Returns all tracked request paths sorted by latest request time (descending).
-  List<String> getTrackedPaths() {
+  Future<List<String>> getTrackedPaths() {
     final paths = _requestsByPath.entries
         .map((e) => MapEntry(e.key, e.value.last.startDate))
         .toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    return paths.map((e) => e.key).toList();
+    return Future.value(paths.map((e) => e.key).toList());
   }
 
   @override
@@ -96,11 +96,13 @@ class NetworkRequestStorage implements NetworkRequestStorageInterface {
   ///
   /// Groups requests by path and returns only those that match the [filter].
   /// Each group contains all matching requests for a single path.
-  List<List<NetworkRequest>> getFilteredGroups(NetworkRequestFilter filter) {
+  Future<List<List<NetworkRequest>>> getFilteredGroups(
+      NetworkRequestFilter filter) async {
     final List<List<NetworkRequest>> result = [];
+    final paths = await getTrackedPaths();
 
-    for (final path in getTrackedPaths()) {
-      var requests = getRequestsByPath(path);
+    for (final path in paths) {
+      var requests = await getRequestsByPath(path);
 
       // Apply HTTP method filter
       if (filter.method != null) {
