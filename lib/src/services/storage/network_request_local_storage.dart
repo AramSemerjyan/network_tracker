@@ -127,4 +127,9 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
 
     return result;
   }
+
+  @override
+  Future<void> clear() async {
+    _requestsByPath.clear();
+  }
 }

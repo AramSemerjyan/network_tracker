@@ -36,4 +36,6 @@ abstract class NetworkRequestStorageInterface {
   /// Returns a grouped list of filtered requests by path using [filter].
   Future<List<List<NetworkRequest>>> getFilteredGroups(
       NetworkRequestFilter filter);
+
+  Future<void> clear();
 }

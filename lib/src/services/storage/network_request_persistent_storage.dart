@@ -12,25 +12,18 @@ import '../../model/network_request_storage_interface.dart';
 
 class NetworkRequestPersistentStorage
     implements NetworkRequestStorageInterface {
-  static Database? _db;
+  late final Database _db;
 
   @override
   String baseUrl = '';
 
-  Future<Database> get db async {
-    if (_db != null) return _db!;
-    _db = await _initDb();
-    return _db!;
-  }
-
-  Future<Database> _initDb() async {
-    final path = join(await getDatabasesPath(), 'network_tracker.db');
-    return openDatabase(
-      path,
+  Future<void> initDb() async {
+    _db = await openDatabase(
+      join(await getDatabasesPath(), 'network_tracker.db'),
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute('''
-        CREATE TABLE requests (
+        CREATE TABLE IF NOT EXISTS requests (
           id TEXT PRIMARY KEY,
           path TEXT,
           method TEXT,
@@ -74,8 +67,7 @@ class NetworkRequestPersistentStorage
 
   @override
   Future<void> addRequest(NetworkRequest request) async {
-    final dbClient = await db;
-    await dbClient.insert(
+    await _db.insert(
       'requests',
       _encodeRequest(request),
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -91,8 +83,7 @@ class NetworkRequestPersistentStorage
       DateTime? endDate,
       DioException? dioError,
       int? responseSize}) async {
-    final dbClient = await db;
-    await dbClient.update(
+    await _db.update(
       'requests',
       {
         if (status != null) 'status': status.name,
@@ -133,8 +124,7 @@ class NetworkRequestPersistentStorage
 
   @override
   Future<List<NetworkRequest>> getRequestsByPath(String path) async {
-    final dbClient = await db;
-    final result = await dbClient.query(
+    final result = await _db.query(
       'requests',
       where: 'path = ?',
       whereArgs: [path],
@@ -145,8 +135,7 @@ class NetworkRequestPersistentStorage
 
   @override
   Future<List<String>> getTrackedPaths() async {
-    final dbClient = await db;
-    final result = await dbClient.rawQuery('''
+    final result = await _db.rawQuery('''
       SELECT path, MAX(startDate) as latest FROM requests
       GROUP BY path
       ORDER BY latest DESC
@@ -189,5 +178,10 @@ class NetworkRequestPersistentStorage
   @override
   void setBaseUrl(String baseUrl) {
     this.baseUrl = baseUrl;
+  }
+
+  @override
+  Future<void> clear() async {
+    await _db.delete('requests');
   }
 }
