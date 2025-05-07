@@ -68,6 +68,11 @@ class NetworkRequestViewerVM {
     );
   }
 
+  void clearRequestsList() async {
+    await storageService.clear();
+    _updateList();
+  }
+
   void _updateList() async {
     final filter = filterNotifier.value;
     filteredRequestsNotifier.value =

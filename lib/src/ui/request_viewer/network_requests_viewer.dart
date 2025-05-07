@@ -197,6 +197,23 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     );
   }
 
+  Widget _buildActionButton({
+    VoidCallback? onTap,
+    required Widget child,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: SizedBox(
+          height: 20,
+          width: 20,
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,30 +224,33 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         surfaceTintColor: Colors.transparent,
         leading: CloseButton(),
         actions: [
-          IconButton(
-            onPressed: _moveToRepeat,
-            icon: Icon(Icons.repeat),
+          _buildActionButton(
+            onTap: _moveToRepeat,
+            child: Icon(Icons.repeat),
           ),
           ValueListenableBuilder(
             valueListenable: _showSearchBar,
             builder: (c, v, w) {
-              return IconButton(
-                icon: Icon(v ? Icons.close : Icons.search),
-                tooltip: v ? 'Hide search' : 'Show search',
-                onPressed: _onSearchTap,
+              return _buildActionButton(
+                onTap: _onSearchTap,
+                child: Icon(v ? Icons.close : Icons.search),
               );
             },
           ),
           ValueListenableBuilder(
             valueListenable: _showFilterBar,
             builder: (c, v, w) {
-              return IconButton(
-                onPressed: _onFilterTap,
-                icon: Icon(
+              return _buildActionButton(
+                onTap: _onFilterTap,
+                child: Icon(
                   v ? Icons.filter_alt_off : Icons.filter_alt,
                 ),
               );
             },
+          ),
+          _buildActionButton(
+            onTap: _vm.clearRequestsList,
+            child: Icon(Icons.delete_forever),
           ),
         ],
       ),

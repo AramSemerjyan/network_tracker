@@ -2,7 +2,7 @@ import '../../network_tracker.dart';
 import '../model/network_request_storage_interface.dart';
 import 'event_service.dart';
 import 'storage/network_request_local_storage.dart';
-import 'storage/network_request_persistent_storage.dart';
+import 'storage/persistent/network_request_persistent_storage.dart';
 
 class NetworkRequestService {
   late final NetworkRepeatRequestService repeatRequestService =

@@ -4,11 +4,12 @@ import 'package:dio/src/dio_exception.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/model/network_request_filter.dart';
 import 'package:network_tracker/src/services/request_status.dart';
+import 'package:network_tracker/src/services/storage/persistent/db_tables.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../model/network_request_method.dart';
-import '../../model/network_request_storage_interface.dart';
+import '../../../model/network_request_method.dart';
+import '../../../model/network_request_storage_interface.dart';
 
 class NetworkRequestPersistentStorage
     implements NetworkRequestStorageInterface {
@@ -22,26 +23,9 @@ class NetworkRequestPersistentStorage
       join(await getDatabasesPath(), 'network_tracker.db'),
       version: 1,
       onCreate: (Database db, int version) async {
-        await db.execute('''
-        CREATE TABLE IF NOT EXISTS requests (
-          id TEXT PRIMARY KEY,
-          path TEXT,
-          method TEXT,
-          startDate TEXT,
-          endDate TEXT,
-          headers TEXT,
-          requestData TEXT,
-          queryParameters TEXT,
-          status TEXT,
-          responseData TEXT,
-          statusCode INTEGER,
-          responseHeaders TEXT,
-          dioError TEXT,
-          requestSize INTEGER,
-          responseSize INTEGER,
-          isRepeated INTEGER
-        )
-        ''');
+        for (var t in DBTables.values) {
+          await db.execute(t.struct);
+        }
       },
     );
   }
