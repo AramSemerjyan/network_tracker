@@ -12,7 +12,7 @@ class NetworkRepeatRequestService {
 
   NetworkRepeatRequestService._internal();
 
-  Map<String, Dio> _clients = {};
+  final Map<String, Dio> _clients = {};
 
   /// Allows the user to provide their own Dio instance.
   /// This instance will be used when repeating requests.
