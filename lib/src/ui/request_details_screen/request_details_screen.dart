@@ -9,16 +9,20 @@ import '../request_data_details_screen/request_data_details_screen.dart';
 
 class RequestDetailsScreen extends StatefulWidget {
   final String path;
-  // final List<NetworkRequest> requests;
+  final String baseUrl;
 
-  const RequestDetailsScreen({super.key, required this.path});
+  const RequestDetailsScreen({
+    super.key,
+    required this.path,
+    required this.baseUrl,
+  });
 
   @override
   State<RequestDetailsScreen> createState() => _RequestDetailsScreenState();
 }
 
 class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
-  late final _vm = RequestDetailsScreenVM(widget.path);
+  late final _vm = RequestDetailsScreenVM(widget.baseUrl, widget.path);
 
   final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
 

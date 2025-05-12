@@ -26,16 +26,12 @@ class NetworkTrackerInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    /// Capture and store request data
-    if (storage.baseUrl.isEmpty) {
-      storage.setBaseUrl(options.baseUrl);
-    }
-
     final startDate = DateTime.now();
 
     final request = NetworkRequest(
       id: Uuid().v1(),
       path: options.path,
+      baseUrl: options.baseUrl,
       method: NetworkRequestMethod.fromString(options.method),
       startDate: startDate,
       requestData: options.data,
@@ -46,7 +42,7 @@ class NetworkTrackerInterceptor extends Interceptor {
       isRepeated: options.extra['is_repeated'] ?? false,
     );
 
-    storage.addRequest(request);
+    storage.addRequest(request, options.baseUrl);
 
     /// Store request ID to associate with later response or error
     options.extra['network_tracker_id'] = request.id;
@@ -61,6 +57,7 @@ class NetworkTrackerInterceptor extends Interceptor {
     final requestId = response.requestOptions.extra['network_tracker_id'];
     storage.updateRequest(
       requestId,
+      baseUrl: response.requestOptions.baseUrl,
       status: RequestStatus.completed,
       responseData: response.data,
       statusCode: response.statusCode,
@@ -78,6 +75,7 @@ class NetworkTrackerInterceptor extends Interceptor {
     final requestId = err.requestOptions.extra['network_tracker_id'];
     storage.updateRequest(
       requestId,
+      baseUrl: err.requestOptions.baseUrl,
       status: RequestStatus.failed,
       statusCode: err.response?.statusCode,
       responseData: err.response?.data,

@@ -12,7 +12,7 @@ extension DbTablesExt on DBTables {
     switch (this) {
       case DBTables.requests:
         return '''
-        CREATE TABLE IF NOT EXISTS requests (
+        CREATE TABLE IF NOT EXISTS ${DBTables.requests.key} (
           id TEXT PRIMARY KEY,
           path TEXT,
           method TEXT,

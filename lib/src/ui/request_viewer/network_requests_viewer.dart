@@ -91,7 +91,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RequestDetailsScreen(path: path),
+        builder: (_) => RequestDetailsScreen(
+          path: path,
+          baseUrl: _vm.selectedBaseUrl.value,
+        ),
       ),
     );
   }
@@ -100,7 +103,9 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => NetworkRepeatRequestScreen(),
+        builder: (_) => NetworkRepeatRequestScreen(
+          baseUrl: _vm.selectedBaseUrl.value,
+        ),
       ),
     );
   }
@@ -257,31 +262,55 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          Row(
-            children: [
-              const Spacer(),
-              InkWell(
-                onTap: () {
-                  Clipboard.setData(
-                      ClipboardData(text: _vm.storageService.baseUrl));
-                },
-                child: Icon(
-                  Icons.copy,
-                  size: 15,
-                ),
-              ),
-              const SizedBox(width: 5),
-              const Text('Base URL:'),
-              const Spacer(),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              _vm.storageService.baseUrl,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+          ValueListenableBuilder<String>(
+            valueListenable: _vm.selectedBaseUrl,
+            builder: (context, selected, _) {
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      const Spacer(),
+                      InkWell(
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(text: selected));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Base URL copied to clipboard')),
+                          );
+                        },
+                        child: const Icon(Icons.copy, size: 15),
+                      ),
+                      const SizedBox(width: 5),
+                      const Text('Base URL:'),
+                      const Spacer(),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: selected,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      onChanged: (value) {
+                        if (value != null) {
+                          _vm.selectedBaseUrl.value = value;
+                        }
+                      },
+                      items: _vm.storageService.getUrls().map((url) {
+                        return DropdownMenuItem<String>(
+                          value: url,
+                          child: Text(
+                            url,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           _buildSearchBar(),
           _buildFilterBar(),

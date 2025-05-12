@@ -8,6 +8,7 @@ import 'package:network_tracker/src/services/request_status.dart';
 void main() {
   group('NetworkRequestStorage', () {
     late NetworkRequestStorageInterface storage;
+    final String baseUrl = 'https://api.example.com';
 
     setUp(() {
       storage = NetworkRequestService.instance.storageService;
@@ -16,11 +17,13 @@ void main() {
     NetworkRequest buildRequest({
       required String id,
       required String path,
+      required String baseUrl,
       DateTime? timestamp,
     }) {
       return NetworkRequest(
         id: id,
         path: path,
+        baseUrl: baseUrl,
         method: NetworkRequestMethod.fromString('GET'),
         startDate: timestamp ?? DateTime.now(),
         headers: {'Authorization': 'Bearer token'},
@@ -29,31 +32,42 @@ void main() {
       );
     }
 
-    test('addRequest stores request in _allRequests and _requestsByPath', () {
-      final request = buildRequest(id: '1', path: '/test');
+    test('addRequest stores request in _allRequests and _requestsByPath',
+        () async {
+      final request = buildRequest(
+        id: '1',
+        path: '/test',
+        baseUrl: baseUrl,
+      );
 
-      storage.addRequest(request);
+      await storage.addRequest(request, baseUrl);
 
-      final byPath = storage.getRequestsByPath('/test');
+      final byPath = await storage.getRequestsByPath('/test', baseUrl);
       expect(byPath, contains(request));
-      expect(storage.getTrackedPaths(), contains('/test'));
+      expect(await storage.getTrackedPaths(baseUrl), contains('/test'));
     });
 
     test('updateRequest modifies the correct fields and sets execTime',
         () async {
-      final request = buildRequest(id: '2', path: '/update');
-      storage.addRequest(request);
+      final request = buildRequest(
+        id: '2',
+        path: '/update',
+        baseUrl: baseUrl,
+      );
+      await storage.addRequest(request, baseUrl);
 
-      storage.updateRequest(
+      await storage.updateRequest(
         '2',
         status: RequestStatus.completed,
+        baseUrl: baseUrl,
         responseData: {'result': 'ok'},
         statusCode: 200,
         endDate: DateTime.now(),
         responseHeaders: {'Content-Type': 'application/json'},
       );
 
-      final updated = (await storage.getRequestsByPath('/update')).first;
+      final updated =
+          (await storage.getRequestsByPath('/update', baseUrl)).first;
 
       expect(updated.status, RequestStatus.completed);
       expect(updated.responseData, {'result': 'ok'});
@@ -65,15 +79,22 @@ void main() {
     test('getRequestsByPath returns sorted list by timestamp desc', () async {
       final now = DateTime.now();
       final oldRequest = buildRequest(
-          id: '3',
-          path: '/sorted',
-          timestamp: now.subtract(const Duration(seconds: 5)));
-      final newRequest = buildRequest(id: '4', path: '/sorted', timestamp: now);
+        id: '3',
+        path: '/sorted',
+        baseUrl: baseUrl,
+        timestamp: now.subtract(const Duration(seconds: 5)),
+      );
+      final newRequest = buildRequest(
+        id: '4',
+        path: '/sorted',
+        baseUrl: baseUrl,
+        timestamp: now,
+      );
 
-      storage.addRequest(oldRequest);
-      storage.addRequest(newRequest);
+      await storage.addRequest(oldRequest, baseUrl);
+      await storage.addRequest(newRequest, baseUrl);
 
-      final result = await storage.getRequestsByPath('/sorted');
+      final result = await storage.getRequestsByPath('/sorted', baseUrl);
       expect(result.length, 2);
       expect(result.first.id, '4');
       expect(result.last.id, '3');
@@ -82,15 +103,22 @@ void main() {
     test('getTrackedPaths returns paths sorted by latest timestamp', () async {
       final now = DateTime.now();
       final older = buildRequest(
-          id: '5',
-          path: '/a',
-          timestamp: now.subtract(const Duration(seconds: 10)));
-      final newer = buildRequest(id: '6', path: '/b', timestamp: now);
+        id: '5',
+        path: '/a',
+        baseUrl: baseUrl,
+        timestamp: now.subtract(const Duration(seconds: 10)),
+      );
+      final newer = buildRequest(
+        id: '6',
+        path: '/b',
+        baseUrl: baseUrl,
+        timestamp: now,
+      );
 
-      storage.addRequest(older);
-      storage.addRequest(newer);
+      await storage.addRequest(older, baseUrl);
+      await storage.addRequest(newer, baseUrl);
 
-      final paths = await storage.getTrackedPaths();
+      final paths = await storage.getTrackedPaths(baseUrl);
       expect(paths.first, '/b');
       expect(paths.last, '/a');
     });

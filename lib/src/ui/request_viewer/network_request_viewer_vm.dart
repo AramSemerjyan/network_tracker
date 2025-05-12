@@ -14,12 +14,15 @@ class NetworkRequestViewerVM {
       ValueNotifier(NetworkRequestFilter());
   final ValueNotifier<List<List<NetworkRequest>>> filteredRequestsNotifier =
       ValueNotifier([]);
+  final ValueNotifier<String> selectedBaseUrl = ValueNotifier(
+      NetworkRequestService.instance.storageService.getUrls().first);
 
   Timer? _debounce;
   late final StreamSubscription _repeatRequestSubscription;
 
   NetworkRequestViewerVM() {
     filterNotifier.addListener(_updateList);
+    selectedBaseUrl.addListener(_updateList);
     _updateList();
 
     _repeatRequestSubscription = NetworkRequestService
@@ -76,6 +79,6 @@ class NetworkRequestViewerVM {
   void _updateList() async {
     final filter = filterNotifier.value;
     filteredRequestsNotifier.value =
-        await storageService.getFilteredGroups(filter);
+        await storageService.getFilteredGroups(filter, selectedBaseUrl.value);
   }
 }

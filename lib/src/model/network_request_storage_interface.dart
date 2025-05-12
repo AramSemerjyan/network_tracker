@@ -6,18 +6,13 @@ import 'network_request_filter.dart';
 
 /// An interface that defines the contract for storing and retrieving network requests.
 abstract class NetworkRequestStorageInterface {
-  /// The base URL used in tracked requests.
-  String get baseUrl;
-
-  /// Sets the base URL for tracked requests.
-  void setBaseUrl(String baseUrl);
-
   /// Adds a new [NetworkRequest] to the storage.
-  void addRequest(NetworkRequest request);
+  Future<void> addRequest(NetworkRequest request, String baseUrl);
 
   /// Updates an existing request by [id] with optional response data and status.
-  void updateRequest(
+  Future<void> updateRequest(
     String id, {
+    required String baseUrl,
     RequestStatus? status,
     dynamic responseData,
     int? statusCode,
@@ -28,14 +23,16 @@ abstract class NetworkRequestStorageInterface {
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.
-  Future<List<NetworkRequest>> getRequestsByPath(String path);
+  Future<List<NetworkRequest>> getRequestsByPath(String path, String baseUrl);
 
   /// Returns a list of all tracked paths sorted by most recent activity.
-  Future<List<String>> getTrackedPaths();
+  Future<List<String>> getTrackedPaths(String baseUrl);
 
   /// Returns a grouped list of filtered requests by path using [filter].
   Future<List<List<NetworkRequest>>> getFilteredGroups(
-      NetworkRequestFilter filter);
+      NetworkRequestFilter filter, String baseUrl);
+
+  List<String> getUrls();
 
   Future<void> clear();
 }

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 
 import '../../network_tracker.dart';
 import '../model/network_request.dart';
-import 'network_request_service.dart';
 
 class NetworkRepeatRequestService {
   static NetworkRepeatRequestService? _instance;
@@ -13,23 +12,24 @@ class NetworkRepeatRequestService {
 
   NetworkRepeatRequestService._internal();
 
-  Dio? _customDio;
+  Map<String, Dio> _clients = {};
 
   /// Allows the user to provide their own Dio instance.
   /// This instance will be used when repeating requests.
   void setCustomDio(Dio dio) {
-    _customDio = dio;
+    _clients[dio.options.baseUrl] = dio;
   }
 
   /// Returns all captured requests grouped by path.
-  Future<List<NetworkRequest>> repeatableRequests() async {
+  Future<List<NetworkRequest>> repeatableRequests(
+      {required String baseUrl}) async {
     final storage = NetworkRequestService.instance.storageService;
     final Map<String, NetworkRequest> uniqueRequests = {};
 
-    final paths = await storage.getTrackedPaths();
+    final paths = await storage.getTrackedPaths(baseUrl);
 
     for (final path in paths) {
-      final requests = await storage.getRequestsByPath(path);
+      final requests = await storage.getRequestsByPath(path, baseUrl);
       for (final request in requests) {
         final key = '${request.method.value}_${request.path}';
         if (!uniqueRequests.containsKey(key)) {
@@ -47,9 +47,8 @@ class NetworkRepeatRequestService {
   void repeat(NetworkRequest request) async {
     request = request.copyWith(isRepeated: true);
 
-    final dio = _customDio ??
-        Dio(BaseOptions(
-            baseUrl: NetworkRequestService.instance.storageService.baseUrl));
+    final dio =
+        _clients[request.baseUrl] ?? Dio(BaseOptions(baseUrl: request.baseUrl));
     final isInterceptorAlreadyAdded =
         dio.interceptors.any((i) => i is NetworkTrackerInterceptor);
 

@@ -35,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final Dio _dio =
       Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
+  final Dio _secondDio = Dio(BaseOptions(baseUrl: 'https://dummyjson.com'));
 
   String _selectedPath = '/posts/1';
   String _selectedMethod = 'GET';
@@ -53,9 +54,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // NetworkRequestService.instance.setStorageType(StorageType.persistent);
 
     _dio.interceptors.add(NetworkTrackerInterceptor());
+    _secondDio.interceptors.add(NetworkTrackerInterceptor());
+  }
+
+  void _makeSecondDioRequest() async {
+    try {
+      final result = await _secondDio.get('/test');
+
+      if (kDebugMode) {
+        print('Request success: $result');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Request failed: $e');
+      }
+    }
   }
 
   void _makeRequest() async {
@@ -172,6 +187,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: _makeRequest,
             child: const Text('Make Request'),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.greenAccent.withAlpha(180),
+            ),
+            onPressed: _makeSecondDioRequest,
+            child: const Text('Make Second Dio Request'),
           ),
           const SizedBox(height: 10),
           ElevatedButton(

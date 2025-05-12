@@ -7,6 +7,7 @@ import '../../model/network_request.dart';
 import '../../model/network_request_filter.dart';
 
 class RequestDetailsScreenVM {
+  final String baseUrl;
   final String path;
   ValueNotifier<List<NetworkRequest>> requestsNotifier = ValueNotifier([]);
   final ValueNotifier<NetworkRequestFilter> filterNotifier =
@@ -14,9 +15,9 @@ class RequestDetailsScreenVM {
 
   late final StreamSubscription _repeatRequestSubscription;
 
-  RequestDetailsScreenVM(this.path) {
+  RequestDetailsScreenVM(this.baseUrl, this.path) {
     NetworkRequestService.instance.storageService
-        .getRequestsByPath(path)
+        .getRequestsByPath(path, baseUrl)
         .then((list) {
       requestsNotifier.value = list;
     });
@@ -45,7 +46,7 @@ class RequestDetailsScreenVM {
     final filter = filterNotifier.value;
     List<NetworkRequest> requests = await NetworkRequestService
         .instance.storageService
-        .getRequestsByPath(path);
+        .getRequestsByPath(path, baseUrl);
 
     if (filter.method != null) {
       requests = requests.where((r) => r.method == filter.method).toList();

@@ -5,7 +5,12 @@ import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_requ
 import '../../model/network_request.dart';
 
 class NetworkRepeatRequestScreen extends StatefulWidget {
-  const NetworkRepeatRequestScreen({super.key});
+  final String baseUrl;
+
+  const NetworkRepeatRequestScreen({
+    super.key,
+    required this.baseUrl,
+  });
 
   @override
   State<NetworkRepeatRequestScreen> createState() =>
@@ -14,7 +19,7 @@ class NetworkRepeatRequestScreen extends StatefulWidget {
 
 class _NetworkRepeatRequestScreenState
     extends State<NetworkRepeatRequestScreen> {
-  late final _vm = NetworkRepeatRequestScreenVM();
+  late final _vm = NetworkRepeatRequestScreenVM(widget.baseUrl);
 
   void _moveToEdit(NetworkRequest request) {
     Navigator.push(

@@ -19,6 +19,9 @@ class NetworkRequest {
   /// The request path, e.g. `/users/1`.
   final String path;
 
+  /// Base url for request;
+  final String baseUrl;
+
   /// The HTTP method, e.g. `GET`, `POST`, `PUT`, etc.
   final NetworkRequestMethod method;
 
@@ -88,6 +91,7 @@ class NetworkRequest {
   NetworkRequest({
     required this.id,
     required this.path,
+    required this.baseUrl,
     required this.method,
     required this.startDate,
     this.endDate,
@@ -134,6 +138,7 @@ class NetworkRequest {
   NetworkRequest copyWith({
     String? id,
     String? path,
+    String? baseUrl,
     NetworkRequestMethod? method,
     DateTime? startDate,
     DateTime? endDate,
@@ -153,6 +158,7 @@ class NetworkRequest {
     return NetworkRequest(
       id: id ?? this.id,
       path: path ?? this.path,
+      baseUrl: baseUrl ?? this.baseUrl,
       method: method ?? this.method,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
@@ -167,6 +173,88 @@ class NetworkRequest {
       requestSizeBytes: requestSize ?? requestSizeBytes,
       responseSizeBytes: responseSize ?? responseSizeBytes,
       isRepeated: isRepeated ?? this.isRepeated,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'path': path,
+      'baseUrl': baseUrl,
+      'method': method.value,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate?.toIso8601String(),
+      'headers': headers,
+      'requestData': requestData,
+      'queryParameters': queryParameters,
+      'status': status.name,
+      'responseData': responseData,
+      'statusCode': statusCode,
+      'responseHeaders': responseHeaders,
+      'dioError': dioError?.dioExceptionToMap(),
+      'requestSizeBytes': requestSizeBytes,
+      'responseSizeBytes': responseSizeBytes,
+      'isRepeated': isRepeated,
+    };
+  }
+
+  static NetworkRequest fromJson(Map<String, dynamic> json) {
+    return NetworkRequest(
+      id: json['id'],
+      path: json['path'],
+      baseUrl: json['baseUrl'],
+      method: NetworkRequestMethod.fromString(json['method']),
+      startDate: DateTime.parse(json['startDate']),
+      endDate:
+          json['endDate'] != null ? DateTime.tryParse(json['endDate']) : null,
+      headers: (json['headers'] as Map?)?.cast<String, dynamic>(),
+      requestData: json['requestData'],
+      queryParameters:
+          (json['queryParameters'] as Map?)?.cast<String, dynamic>(),
+      status: RequestStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => RequestStatus.failed,
+      ),
+      responseData: json['responseData'],
+      statusCode: json['statusCode'],
+      responseHeaders:
+          (json['responseHeaders'] as Map?)?.cast<String, dynamic>(),
+      dioError: DioExceptionExt.mapToDioException(json['dioError']),
+      requestSizeBytes: json['requestSizeBytes'],
+      responseSizeBytes: json['responseSizeBytes'],
+      isRepeated: json['isRepeated'],
+    );
+  }
+}
+
+extension DioExceptionExt on DioException {
+  Map<String, dynamic>? dioExceptionToMap() {
+    return {
+      'type': type.name,
+      'message': message,
+      'error': error?.toString(),
+      'stackTrace': stackTrace.toString(),
+      'responseStatusCode': response?.statusCode,
+      'responseData': response?.data?.toString(),
+      'responseHeaders': response?.headers.map.toString(),
+      'requestPath': requestOptions.path,
+      'requestMethod': requestOptions.method,
+    };
+  }
+
+  static DioException mapToDioException(Map<String, dynamic> map) {
+    return DioException(
+      requestOptions: RequestOptions(path: map['requestPath']),
+      response: Response(
+        requestOptions: RequestOptions(path: map['requestPath']),
+        statusCode: map['responseStatusCode'],
+        data: map['responseData'],
+        headers: Headers.fromMap({}),
+      ),
+      error: map['error'],
+      message: map['message'],
+      type: DioExceptionType.values.firstWhere((t) => t.name == map['type'],
+          orElse: () => DioExceptionType.unknown),
     );
   }
 }

@@ -9,18 +9,11 @@ import '../request_status.dart';
 /// network requests in memory and allows filtering/grouping.
 class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Internal map storing requests grouped by request path.
-  final Map<String, List<NetworkRequest>> _requestsByPath = {};
+  final Map<String, Map<String, List<NetworkRequest>>> _requests = {};
 
   @override
-
-  /// The base URL used in tracked requests.
-  String baseUrl = '';
-
-  @override
-
-  /// Sets the [baseUrl] used for tracked network requests.
-  void setBaseUrl(String baseUrl) {
-    this.baseUrl = baseUrl;
+  List<String> getUrls() {
+    return _requests.keys.toList();
   }
 
   @override
@@ -28,8 +21,11 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Adds a new [NetworkRequest] to the internal map under its path.
   ///
   /// If the path is not already tracked, a new list will be created.
-  void addRequest(NetworkRequest request) {
-    _requestsByPath.putIfAbsent(request.path, () => []).add(request);
+  Future<void> addRequest(NetworkRequest request, String baseUrl) async {
+    final requests = _requests[baseUrl] ?? {};
+
+    requests.putIfAbsent(request.path, () => []).add(request);
+    _requests[baseUrl] = requests;
   }
 
   @override
@@ -38,8 +34,9 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   ///
   /// If found, updates the request with the new [status], [responseData],
   /// [statusCode], [responseHeaders], [error], and calculates its execution time.
-  void updateRequest(
+  Future<void> updateRequest(
     String id, {
+    required String baseUrl,
     RequestStatus? status,
     dynamic responseData,
     int? statusCode,
@@ -48,8 +45,10 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
     DateTime? endDate,
     DioException? dioError,
     int? responseSize,
-  }) {
-    for (final list in _requestsByPath.values) {
+  }) async {
+    final requests = _requests[baseUrl] ?? {};
+
+    for (final list in requests.values) {
       final index = list.indexWhere((r) => r.id == id);
       if (index != -1) {
         final request = list[index];
@@ -72,8 +71,10 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Retrieves all requests made to a specific [path], sorted by most recent first.
   ///
   /// Returns an empty list if no requests exist for the given path.
-  Future<List<NetworkRequest>> getRequestsByPath(String path) {
-    final requests = List<NetworkRequest>.from(_requestsByPath[path] ?? []);
+  Future<List<NetworkRequest>> getRequestsByPath(String path, String baseUrl) {
+    final requestsByUrl = _requests[baseUrl] ?? {};
+
+    final requests = List<NetworkRequest>.from(requestsByUrl[path] ?? []);
     requests.sort((a, b) => b.startDate.compareTo(a.startDate));
     return Future.value(requests);
   }
@@ -81,8 +82,10 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   @override
 
   /// Returns all tracked request paths sorted by latest request time (descending).
-  Future<List<String>> getTrackedPaths() {
-    final paths = _requestsByPath.entries
+  Future<List<String>> getTrackedPaths(String baseUrl) {
+    final requests = _requests[baseUrl] ?? {};
+
+    final paths = requests.entries
         .map((e) => MapEntry(e.key, e.value.last.startDate))
         .toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -97,12 +100,12 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Groups requests by path and returns only those that match the [filter].
   /// Each group contains all matching requests for a single path.
   Future<List<List<NetworkRequest>>> getFilteredGroups(
-      NetworkRequestFilter filter) async {
+      NetworkRequestFilter filter, String baseUrl) async {
     final List<List<NetworkRequest>> result = [];
-    final paths = await getTrackedPaths();
+    final paths = await getTrackedPaths(baseUrl);
 
     for (final path in paths) {
-      var requests = await getRequestsByPath(path);
+      var requests = await getRequestsByPath(path, baseUrl);
 
       // Apply HTTP method filter
       if (filter.method != null) {
@@ -130,6 +133,6 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
 
   @override
   Future<void> clear() async {
-    _requestsByPath.clear();
+    _requests.clear();
   }
 }
