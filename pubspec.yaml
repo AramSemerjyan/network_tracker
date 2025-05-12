@@ -1,7 +1,7 @@
 name: network_tracker
 description: "A lightweight and developer-friendly Flutter package for tracking and viewing all your app's HTTP network activity"
 
-version: 0.3.3
+version: 0.4.0
 homepage: https://github.com/AramSemerjyan/network_tracker
 repository: https://github.com/AramSemerjyan/network_tracker
 issue_tracker: https://github.com/AramSemerjyan/network_tracker/issues
@@ -20,6 +20,7 @@ dependencies:
   share_plus: ^10.1.4
   path_provider: ^2.1.1
   sqflite: ^2.4.1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

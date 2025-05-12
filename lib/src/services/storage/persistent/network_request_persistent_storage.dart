@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:dio/src/dio_exception.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/model/network_request_filter.dart';
 import 'package:network_tracker/src/services/request_status.dart';

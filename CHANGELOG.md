@@ -40,3 +40,11 @@
 * Fix issue with scroll on request details page
 * Fix value conversion errors on `NetworkEditRequestScreen`
 * export `NetworkRepeatRequestService` to give ability to set custom `DIO` client
+
+## 0.4.0
+
+* Add persistent request storage using `sqflite`
+* Support multiple base URLs and selection in UI
+* Improve request grouping logic to respect base URL context
+* Remove `NetworkRepeatRequestService` from exports (moved under `NetworkRequestService`)
+* Allow setting custom Dio client via `NetworkRequestService.setDioClient(...)`
