@@ -285,29 +285,34 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                       const Spacer(),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: selected,
-                      icon: const Icon(Icons.arrow_drop_down),
-                      onChanged: (value) {
-                        if (value != null) {
-                          _vm.selectedBaseUrl.value = value;
-                        }
-                      },
-                      items: _vm.storageService.getUrls().map((url) {
-                        return DropdownMenuItem<String>(
-                          value: url,
-                          child: Text(
-                            url,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                  FutureBuilder(
+                      future: _vm.storageService.getUrls(),
+                      builder: (c, f) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: selected,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            onChanged: (value) {
+                              if (value != null) {
+                                _vm.selectedBaseUrl.value = value;
+                              }
+                            },
+                            items: (f.data ?? []).map((url) {
+                              return DropdownMenuItem<String>(
+                                value: url,
+                                child: Text(
+                                  url,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         );
-                      }).toList(),
-                    ),
-                  ),
+                      }),
                 ],
               );
             },

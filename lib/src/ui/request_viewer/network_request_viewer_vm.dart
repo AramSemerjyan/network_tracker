@@ -14,13 +14,18 @@ class NetworkRequestViewerVM {
       ValueNotifier(NetworkRequestFilter());
   final ValueNotifier<List<List<NetworkRequest>>> filteredRequestsNotifier =
       ValueNotifier([]);
-  final ValueNotifier<String> selectedBaseUrl = ValueNotifier(
-      NetworkRequestService.instance.storageService.getUrls().first);
+  final ValueNotifier<String> selectedBaseUrl = ValueNotifier('');
 
   Timer? _debounce;
   late final StreamSubscription _repeatRequestSubscription;
 
   NetworkRequestViewerVM() {
+    NetworkRequestService.instance.storageService.getUrls().then((list) {
+      if (list.isNotEmpty) {
+        selectedBaseUrl.value = list.first;
+      }
+    });
+
     filterNotifier.addListener(_updateList);
     selectedBaseUrl.addListener(_updateList);
     _updateList();

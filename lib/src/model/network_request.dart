@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/utils/extensions.dart';
 import 'package:network_tracker/src/utils/utils.dart';
 
 import '../services/request_status.dart';
@@ -184,21 +187,40 @@ class NetworkRequest {
       'method': method.value,
       'startDate': startDate.toIso8601String(),
       'endDate': endDate?.toIso8601String(),
-      'headers': headers,
-      'requestData': requestData,
-      'queryParameters': queryParameters,
+      'headers': jsonEncode(headers),
+      'requestData': jsonEncode(requestData),
+      'queryParameters': jsonEncode(queryParameters),
       'status': status.name,
-      'responseData': responseData,
+      'responseData': jsonEncode(responseData),
       'statusCode': statusCode,
-      'responseHeaders': responseHeaders,
-      'dioError': dioError?.dioExceptionToMap(),
+      'responseHeaders': jsonEncode(responseHeaders),
+      'dioError': dioError?.dioExceptionToJsonString(),
       'requestSizeBytes': requestSizeBytes,
       'responseSizeBytes': responseSizeBytes,
-      'isRepeated': isRepeated,
+      'isRepeated': isRepeated == true ? 1 : 0,
     };
   }
 
   static NetworkRequest fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? tryDecodeMap(String? source) {
+      if (source == null) return null;
+      try {
+        final decoded = jsonDecode(source);
+        return decoded is Map ? decoded.cast<String, dynamic>() : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    dynamic tryDecodeAny(String? source) {
+      if (source == null) return null;
+      try {
+        return jsonDecode(source);
+      } catch (_) {
+        return null;
+      }
+    }
+
     return NetworkRequest(
       id: json['id'],
       path: json['path'],
@@ -207,54 +229,20 @@ class NetworkRequest {
       startDate: DateTime.parse(json['startDate']),
       endDate:
           json['endDate'] != null ? DateTime.tryParse(json['endDate']) : null,
-      headers: (json['headers'] as Map?)?.cast<String, dynamic>(),
-      requestData: json['requestData'],
-      queryParameters:
-          (json['queryParameters'] as Map?)?.cast<String, dynamic>(),
+      headers: tryDecodeMap(json['headers']),
+      requestData: tryDecodeAny(json['requestData']),
+      queryParameters: tryDecodeMap(json['queryParameters']),
       status: RequestStatus.values.firstWhere(
         (e) => e.name == json['status'],
         orElse: () => RequestStatus.failed,
       ),
-      responseData: json['responseData'],
+      responseData: tryDecodeAny(json['responseData']),
       statusCode: json['statusCode'],
-      responseHeaders:
-          (json['responseHeaders'] as Map?)?.cast<String, dynamic>(),
-      dioError: DioExceptionExt.mapToDioException(json['dioError']),
+      responseHeaders: tryDecodeMap(json['responseHeaders']),
+      dioError: DioExceptionExt.fromJsonString(json['dioError']),
       requestSizeBytes: json['requestSizeBytes'],
       responseSizeBytes: json['responseSizeBytes'],
-      isRepeated: json['isRepeated'],
-    );
-  }
-}
-
-extension DioExceptionExt on DioException {
-  Map<String, dynamic>? dioExceptionToMap() {
-    return {
-      'type': type.name,
-      'message': message,
-      'error': error?.toString(),
-      'stackTrace': stackTrace.toString(),
-      'responseStatusCode': response?.statusCode,
-      'responseData': response?.data?.toString(),
-      'responseHeaders': response?.headers.map.toString(),
-      'requestPath': requestOptions.path,
-      'requestMethod': requestOptions.method,
-    };
-  }
-
-  static DioException mapToDioException(Map<String, dynamic> map) {
-    return DioException(
-      requestOptions: RequestOptions(path: map['requestPath']),
-      response: Response(
-        requestOptions: RequestOptions(path: map['requestPath']),
-        statusCode: map['responseStatusCode'],
-        data: map['responseData'],
-        headers: Headers.fromMap({}),
-      ),
-      error: map['error'],
-      message: map['message'],
-      type: DioExceptionType.values.firstWhere((t) => t.name == map['type'],
-          orElse: () => DioExceptionType.unknown),
+      isRepeated: json['isRepeated'] == 1,
     );
   }
 }

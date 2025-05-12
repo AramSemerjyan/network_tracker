@@ -40,7 +40,7 @@ void main() {
         baseUrl: baseUrl,
       );
 
-      await storage.addRequest(request, baseUrl);
+      await storage.addRequest(request);
 
       final byPath = await storage.getRequestsByPath('/test', baseUrl);
       expect(byPath, contains(request));
@@ -54,7 +54,7 @@ void main() {
         path: '/update',
         baseUrl: baseUrl,
       );
-      await storage.addRequest(request, baseUrl);
+      await storage.addRequest(request);
 
       await storage.updateRequest(
         '2',
@@ -91,8 +91,8 @@ void main() {
         timestamp: now,
       );
 
-      await storage.addRequest(oldRequest, baseUrl);
-      await storage.addRequest(newRequest, baseUrl);
+      await storage.addRequest(oldRequest);
+      await storage.addRequest(newRequest);
 
       final result = await storage.getRequestsByPath('/sorted', baseUrl);
       expect(result.length, 2);
@@ -115,8 +115,8 @@ void main() {
         timestamp: now,
       );
 
-      await storage.addRequest(older, baseUrl);
-      await storage.addRequest(newer, baseUrl);
+      await storage.addRequest(older);
+      await storage.addRequest(newer);
 
       final paths = await storage.getTrackedPaths(baseUrl);
       expect(paths.first, '/b');

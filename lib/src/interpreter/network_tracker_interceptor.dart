@@ -42,7 +42,7 @@ class NetworkTrackerInterceptor extends Interceptor {
       isRepeated: options.extra['is_repeated'] ?? false,
     );
 
-    storage.addRequest(request, options.baseUrl);
+    storage.addRequest(request);
 
     /// Store request ID to associate with later response or error
     options.extra['network_tracker_id'] = request.id;

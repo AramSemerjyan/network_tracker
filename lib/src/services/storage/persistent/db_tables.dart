@@ -15,6 +15,7 @@ extension DbTablesExt on DBTables {
         CREATE TABLE IF NOT EXISTS ${DBTables.requests.key} (
           id TEXT PRIMARY KEY,
           path TEXT,
+          baseUrl TEXT, 
           method TEXT,
           startDate TEXT,
           endDate TEXT,
@@ -28,7 +29,9 @@ extension DbTablesExt on DBTables {
           dioError TEXT,
           requestSize INTEGER,
           responseSize INTEGER,
-          isRepeated INTEGER
+          isRepeated INTEGER,
+          requestSizeBytes INTEGER,
+          responseSizeBytes INTEGER
         )
         ''';
     }

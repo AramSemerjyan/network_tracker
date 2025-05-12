@@ -6,6 +6,7 @@ import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/model/network_request_filter.dart';
 import 'package:network_tracker/src/services/request_status.dart';
 import 'package:network_tracker/src/services/storage/persistent/db_tables.dart';
+import 'package:network_tracker/src/utils/extensions.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -16,8 +17,13 @@ class NetworkRequestPersistentStorage
   late final Database _db;
 
   @override
-  List<String> getUrls() {
-    return [];
+  Future<List<String>> getUrls() async {
+    final result = await _db
+        .rawQuery('SELECT DISTINCT baseUrl FROM ${DBTables.requests.key}');
+    return result
+        .map((e) => e['baseUrl'] as String)
+        .whereType<String>()
+        .toList();
   }
 
   Future<void> initDb() async {
@@ -33,7 +39,7 @@ class NetworkRequestPersistentStorage
   }
 
   @override
-  Future<void> addRequest(NetworkRequest request, String baseUrl) async {
+  Future<void> addRequest(NetworkRequest request) async {
     await _db.insert(
       DBTables.requests.key,
       request.toJson(),
@@ -83,8 +89,8 @@ class NetworkRequestPersistentStorage
       String path, String baseUrl) async {
     final result = await _db.query(
       DBTables.requests.key,
-      where: 'path = ?',
-      whereArgs: [path],
+      where: 'path = ? AND baseUrl = ?',
+      whereArgs: [path, baseUrl],
       orderBy: 'startDate DESC',
     );
     return result.map(_fromMap).toList();
@@ -93,10 +99,12 @@ class NetworkRequestPersistentStorage
   @override
   Future<List<String>> getTrackedPaths(String baseUrl) async {
     final result = await _db.rawQuery('''
-      SELECT path, MAX(startDate) as latest FROM ${DBTables.requests.key}
-      GROUP BY path
-      ORDER BY latest DESC
-    ''');
+        SELECT path, MAX(startDate) as latest
+        FROM ${DBTables.requests.key}
+        WHERE baseUrl = ?
+        GROUP BY path
+        ORDER BY latest DESC
+      ''', [baseUrl]);
     return result.map((e) => e['path'] as String).toList();
   }
 
@@ -121,8 +129,9 @@ class NetworkRequestPersistentStorage
         if (responseHeaders != null)
           'responseHeaders': jsonEncode(responseHeaders),
         if (endDate != null) 'endDate': endDate.toIso8601String(),
-        if (dioError != null) 'dioError': dioError.dioExceptionToMap(),
+        if (dioError != null) 'dioError': dioError.dioExceptionToJsonString(),
         if (responseSize != null) 'responseSize': responseSize,
+        if (baseUrl.isNotEmpty) 'baseUrl': baseUrl,
       },
       where: 'id = ?',
       whereArgs: [id],

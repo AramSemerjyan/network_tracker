@@ -7,7 +7,7 @@ import 'network_request_filter.dart';
 /// An interface that defines the contract for storing and retrieving network requests.
 abstract class NetworkRequestStorageInterface {
   /// Adds a new [NetworkRequest] to the storage.
-  Future<void> addRequest(NetworkRequest request, String baseUrl);
+  Future<void> addRequest(NetworkRequest request);
 
   /// Updates an existing request by [id] with optional response data and status.
   Future<void> updateRequest(
@@ -32,7 +32,7 @@ abstract class NetworkRequestStorageInterface {
   Future<List<List<NetworkRequest>>> getFilteredGroups(
       NetworkRequestFilter filter, String baseUrl);
 
-  List<String> getUrls();
+  Future<List<String>> getUrls();
 
   Future<void> clear();
 }

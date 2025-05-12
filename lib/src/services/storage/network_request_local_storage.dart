@@ -12,7 +12,7 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   final Map<String, Map<String, List<NetworkRequest>>> _requests = {};
 
   @override
-  List<String> getUrls() {
+  Future<List<String>> getUrls() async {
     return _requests.keys.toList();
   }
 
@@ -21,11 +21,11 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// Adds a new [NetworkRequest] to the internal map under its path.
   ///
   /// If the path is not already tracked, a new list will be created.
-  Future<void> addRequest(NetworkRequest request, String baseUrl) async {
-    final requests = _requests[baseUrl] ?? {};
+  Future<void> addRequest(NetworkRequest request) async {
+    final requests = _requests[request.baseUrl] ?? {};
 
     requests.putIfAbsent(request.path, () => []).add(request);
-    _requests[baseUrl] = requests;
+    _requests[request.baseUrl] = requests;
   }
 
   @override

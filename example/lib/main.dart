@@ -54,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    NetworkRequestService.instance.setStorageType(StorageType.persistent);
 
     _dio.interceptors.add(NetworkTrackerInterceptor());
     _secondDio.interceptors.add(NetworkTrackerInterceptor());
