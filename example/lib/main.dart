@@ -33,12 +33,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Dio _dio =
-      Dio(BaseOptions(baseUrl: 'https://jsonplaceholder.typicode.com'));
-  final Dio _secondDio = Dio(BaseOptions(baseUrl: 'https://dummyjson.com'));
+  static const String _jsonPlaceholder = 'https://jsonplaceholder.typicode.com';
+  static const String _dummyJson = 'https://dummyjson.com';
+  late final List<String> _baseUrls = [
+    _jsonPlaceholder,
+    _dummyJson,
+  ];
 
   String _selectedPath = '/posts/1';
   String _selectedMethod = 'GET';
+  late final ValueNotifier<String> _selectedClient =
+      ValueNotifier(_jsonPlaceholder);
 
   final List<String> _allPaths = [
     '/posts',
@@ -49,20 +54,24 @@ class _MyHomePageState extends State<MyHomePage> {
     '/albums/1',
   ];
 
+  late final Dio _jsonPlaceholderDio =
+      Dio(BaseOptions(baseUrl: _jsonPlaceholder));
+
+  late final Dio _dummyJsonDio = Dio(BaseOptions(baseUrl: _dummyJson));
+
   final List<String> _methods = ['GET', 'POST'];
 
   @override
   void initState() {
     super.initState();
-    NetworkRequestService.instance.setStorageType(StorageType.persistent);
 
-    _dio.interceptors.add(NetworkTrackerInterceptor());
-    _secondDio.interceptors.add(NetworkTrackerInterceptor());
+    _jsonPlaceholderDio.interceptors.add(NetworkTrackerInterceptor());
+    _dummyJsonDio.interceptors.add(NetworkTrackerInterceptor());
   }
 
-  void _makeSecondDioRequest() async {
+  void _makeDummyJsonRequest() async {
     try {
-      final result = await _secondDio.get('/test');
+      final result = await _dummyJsonDio.get('/test');
 
       if (kDebugMode) {
         print('Request success: $result');
@@ -74,14 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _makeRequest() async {
+  void _makeJsonPlaceholderRequest() async {
     try {
       Response result;
 
       if (_selectedMethod == 'GET') {
-        result = await _dio.get(_selectedPath);
+        result = await _jsonPlaceholderDio.get(_selectedPath);
       } else {
-        result = await _dio.post(
+        result = await _jsonPlaceholderDio.post(
           _selectedPath,
           data: {
             'title': 'foo',
@@ -103,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _makeErrorRequest() async {
     try {
-      final result = await _dio.get('/invalid-endpoint-404');
+      final result = await _jsonPlaceholderDio.get('/invalid-endpoint-404');
       if (kDebugMode) {
         print('Unexpected success: $result');
       }
@@ -111,6 +120,15 @@ class _MyHomePageState extends State<MyHomePage> {
       if (kDebugMode) {
         print('Expected failure occurred: $e');
       }
+    }
+  }
+
+  void _makeRequest() async {
+    switch (_selectedClient.value) {
+      case _jsonPlaceholder:
+        _makeJsonPlaceholderRequest();
+      case _dummyJson:
+        _makeDummyJsonRequest();
     }
   }
 
@@ -143,67 +161,96 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Select method and path:'),
+          const Text('Select Dio client:'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: DropdownButtonFormField<String>(
-              value: _selectedMethod,
-              onChanged: (value) => setState(() {
-                _selectedMethod = value!;
+              value: _selectedClient.value,
+              isExpanded: true,
+              onChanged: (clientBaseUrl) => setState(() {
+                _selectedClient.value = clientBaseUrl!;
               }),
-              items: _methods
-                  .map((method) => DropdownMenuItem(
-                        value: method,
-                        child: Text(method),
+              items: _baseUrls
+                  .map((clientBaseUrl) => DropdownMenuItem(
+                        value: clientBaseUrl,
+                        child: Text(
+                          clientBaseUrl,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ))
                   .toList(),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'HTTP Method',
+                labelText: 'Dio client',
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: DropdownButtonFormField<String>(
-              value: _selectedPath,
-              onChanged: (value) => setState(() {
-                _selectedPath = value!;
+          ValueListenableBuilder(
+              valueListenable: _selectedClient,
+              builder: (_, baseUrl, __) {
+                if (baseUrl == _jsonPlaceholder) {
+                  return Column(
+                    children: [
+                      const Text('Select method and path:'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedMethod,
+                          onChanged: (value) => setState(() {
+                            _selectedMethod = value!;
+                          }),
+                          items: _methods
+                              .map((method) => DropdownMenuItem(
+                                    value: method,
+                                    child: Text(method),
+                                  ))
+                              .toList(),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'HTTP Method',
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedPath,
+                          onChanged: (value) => setState(() {
+                            _selectedPath = value!;
+                          }),
+                          items: filteredPaths
+                              .map((path) => DropdownMenuItem(
+                                    value: path,
+                                    child: Text(path),
+                                  ))
+                              .toList(),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Endpoint',
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.withAlpha(180),
+                        ),
+                        onPressed: _makeErrorRequest,
+                        child: const Text('Make Error Request'),
+                      ),
+                    ],
+                  );
+                }
+
+                return Container();
               }),
-              items: filteredPaths
-                  .map((path) => DropdownMenuItem(
-                        value: path,
-                        child: Text(path),
-                      ))
-                  .toList(),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Endpoint',
-              ),
-            ),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.greenAccent.withAlpha(180),
             ),
             onPressed: _makeRequest,
             child: const Text('Make Request'),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.greenAccent.withAlpha(180),
-            ),
-            onPressed: _makeSecondDioRequest,
-            child: const Text('Make Second Dio Request'),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.withAlpha(180),
-            ),
-            onPressed: _makeErrorRequest,
-            child: const Text('Make Error Request'),
           ),
         ],
       ),
