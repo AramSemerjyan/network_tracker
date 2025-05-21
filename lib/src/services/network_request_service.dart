@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
 
 import '../../network_tracker.dart';
 import '../model/network_request_storage_interface.dart';
@@ -11,6 +12,8 @@ class NetworkRequestService {
   late final NetworkRepeatRequestService repeatRequestService =
       NetworkRepeatRequestService.instance;
   late final EventService eventService = EventService();
+  late final NetworkSpeedTestServiceInterface networkSpeedTestService =
+      NetworkSpeedTestService();
 
   NetworkRequestStorageInterface get storageService => _storageService;
 

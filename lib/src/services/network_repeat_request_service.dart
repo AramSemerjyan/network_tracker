@@ -12,12 +12,12 @@ class NetworkRepeatRequestService {
 
   NetworkRepeatRequestService._internal();
 
-  final Map<String, Dio> _clients = {};
+  final Map<String, Dio> clients = {};
 
   /// Allows the user to provide their own Dio instance.
   /// This instance will be used when repeating requests.
   void setCustomDio(Dio dio) {
-    _clients[dio.options.baseUrl] = dio;
+    clients[dio.options.baseUrl] = dio;
   }
 
   /// Returns all captured requests grouped by path.
@@ -48,7 +48,7 @@ class NetworkRepeatRequestService {
     request = request.copyWith(isRepeated: true);
 
     final dio =
-        _clients[request.baseUrl] ?? Dio(BaseOptions(baseUrl: request.baseUrl));
+        clients[request.baseUrl] ?? Dio(BaseOptions(baseUrl: request.baseUrl));
     final isInterceptorAlreadyAdded =
         dio.interceptors.any((i) => i is NetworkTrackerInterceptor);
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen.dart';
 import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
@@ -106,6 +107,15 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         builder: (_) => NetworkRepeatRequestScreen(
           baseUrl: _vm.selectedBaseUrl.value,
         ),
+      ),
+    );
+  }
+
+  void _moveToDebugTools() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DebugToolsScreen(),
       ),
     );
   }
@@ -229,6 +239,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         surfaceTintColor: Colors.transparent,
         leading: CloseButton(),
         actions: [
+          _buildActionButton(
+            onTap: _moveToDebugTools,
+            child: Icon(Icons.bug_report),
+          ),
           _buildActionButton(
             onTap: _moveToRepeat,
             child: Icon(Icons.repeat),

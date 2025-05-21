@@ -65,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
+    NetworkRequestService.instance.setDioClient(_jsonPlaceholderDio);
+
     _jsonPlaceholderDio.interceptors.add(NetworkTrackerInterceptor());
     _dummyJsonDio.interceptors.add(NetworkTrackerInterceptor());
   }
