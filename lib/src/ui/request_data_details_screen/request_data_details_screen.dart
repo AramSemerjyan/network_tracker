@@ -35,6 +35,22 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
     return Text(response.toString());
   }
 
+  Widget _buildBadgesRow(NetworkRequest request) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 5,
+        children: [
+          if (request.isRepeated ?? false)
+            RequestBadge(config: RequestBadgeConfig.repeated()),
+          if (request.isThrottled ?? false)
+            RequestBadge(config: RequestBadgeConfig.throttled()),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,11 +70,7 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.request.isRepeated ?? false)
-                Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: RepeatRequestBadge(),
-                ),
+              _buildBadgesRow(widget.request),
               if (widget.request.requestData != null)
                 ListTile(
                   title: const Text('Request Data:'),

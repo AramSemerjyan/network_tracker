@@ -29,7 +29,7 @@ class TestFile {
 class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   @override
 
-  /// A large static file hosted on a CDN. ~30MB
+  /// A large static file hosted on a CDN. ~100MB
   final TestFile testFile = TestFile.pdf100mb();
 
   final Dio _dio;

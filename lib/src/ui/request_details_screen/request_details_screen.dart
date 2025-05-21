@@ -43,6 +43,19 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     );
   }
 
+  Widget _buildBadgesRow(NetworkRequest request) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      spacing: 5,
+      children: [
+        if (request.isRepeated ?? false)
+          RequestBadge(config: RequestBadgeConfig.repeated()),
+        if (request.isThrottled ?? false)
+          RequestBadge(config: RequestBadgeConfig.throttled()),
+      ],
+    );
+  }
+
   Widget _buildList(List<NetworkRequest> list) {
     return ListView.separated(
       itemCount: list.length,
@@ -56,7 +69,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (request.isRepeated ?? false) RepeatRequestBadge(),
+              _buildBadgesRow(request),
               Text(
                   '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
             ],

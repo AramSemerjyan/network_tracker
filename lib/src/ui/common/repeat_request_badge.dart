@@ -1,18 +1,47 @@
 import 'package:flutter/material.dart';
 
-class RepeatRequestBadge extends StatelessWidget {
-  const RepeatRequestBadge({super.key});
+class RequestBadgeConfig {
+  final String title;
+  final Color color;
+
+  RequestBadgeConfig({
+    required this.title,
+    required this.color,
+  });
+
+  factory RequestBadgeConfig.repeated() {
+    return RequestBadgeConfig(
+      title: 'Repeated',
+      color: Colors.orange.shade300,
+    );
+  }
+
+  factory RequestBadgeConfig.throttled() {
+    return RequestBadgeConfig(
+      title: 'Throttled',
+      color: Colors.amber.shade300,
+    );
+  }
+}
+
+class RequestBadge extends StatelessWidget {
+  final RequestBadgeConfig config;
+
+  const RequestBadge({
+    super.key,
+    required this.config,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.orange.shade300,
+        color: config.color,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: const Text(
-        'Repeated',
+      child: Text(
+        config.title,
         style: TextStyle(
           color: Colors.white,
           fontSize: 10,

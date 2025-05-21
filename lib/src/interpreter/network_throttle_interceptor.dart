@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 
-class ThrottleInterceptor extends Interceptor {
+class NetworkThrottleInterceptor extends Interceptor {
   final int maxBytesPerSecond;
 
-  ThrottleInterceptor(this.maxBytesPerSecond);
+  NetworkThrottleInterceptor(this.maxBytesPerSecond);
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
@@ -12,6 +12,9 @@ class ThrottleInterceptor extends Interceptor {
       final delayMs = (length / maxBytesPerSecond * 1000).ceil();
       await Future.delayed(Duration(milliseconds: delayMs));
     }
+
+    response.requestOptions.extra['is_throttled'] = true;
+
     handler.next(response);
   }
 
