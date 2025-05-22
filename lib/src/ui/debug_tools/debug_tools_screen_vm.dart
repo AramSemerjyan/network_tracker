@@ -29,7 +29,7 @@ class DebugToolsScreenVM {
     );
   }
 
-  Future<String?> fetchExternalIp() async {
+  void fetchExternalIp() async {
     networkInfoState.value =
         LoadingState(loadingProgress: LoadingProgressState.inProgress);
 

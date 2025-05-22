@@ -116,7 +116,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         child: ListView.separated(
           itemBuilder: (_, i) {
             if (i == 0) return _buildSpeedTestRow();
-            if (i == 1) return _buildExternalIpRow();
+            return _buildExternalIpRow();
           },
           separatorBuilder: (_, __) => const Divider(),
           itemCount: 2,
