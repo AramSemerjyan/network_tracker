@@ -8,21 +8,14 @@ import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
 ///
 /// Provides access to a test file and a method to measure download speed.
 abstract class NetworkSpeedTestServiceInterface {
-  /// The file used for measuring download speed.
-  SpeedTestFile get testFile;
-
   /// Measures download speed and returns a human-readable string (e.g., "23.45 Mbps").
-  Future<String> testDownloadSpeed();
+  Future<String> testDownloadSpeed(SpeedTestFile file);
 }
 
 /// Default implementation of [NetworkSpeedTestServiceInterface] using Dio.
 ///
 /// Downloads a known large file and calculates the download speed in megabits per second (Mbps).
 class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
-  /// The file used for speed testing. Defaults to a ~70MB ZIP file.
-  @override
-  final SpeedTestFile testFile = SpeedTestFile.zip70Mb();
-
   /// Dio instance used to perform the download. Can be injected for testing or customization.
   final Dio _dio;
 
@@ -34,12 +27,12 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   /// Returns a human-readable string representing the speed (e.g., "12.87 Mbps").
   /// Throws an [HttpException] if the file fails to download or if the response is invalid.
   @override
-  Future<String> testDownloadSpeed() async {
+  Future<String> testDownloadSpeed(SpeedTestFile file) async {
     final stopwatch = Stopwatch()..start();
 
     try {
       final response = await _dio.get<List<int>>(
-        testFile.urlString,
+        file.urlString,
         options: Options(responseType: ResponseType.bytes),
       );
 

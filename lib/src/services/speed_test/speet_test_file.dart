@@ -18,6 +18,14 @@ class SpeedTestFile {
     required this.urlString,
   });
 
+  /// Returns a test file representing a 250MB ZIP archive.
+  factory SpeedTestFile.zip250Mb() {
+    return SpeedTestFile(
+      name: 'Zip 250Mb',
+      urlString: 'https://link.testfile.org/250MB',
+    );
+  }
+
   /// Returns a test file representing a 100MB PDF.
   factory SpeedTestFile.pdf100Mb() {
     return SpeedTestFile(
@@ -33,4 +41,30 @@ class SpeedTestFile {
       urlString: 'https://link.testfile.org/70MB',
     );
   }
+
+  /// Returns a test file representing a 30MB ZIP archive.
+  factory SpeedTestFile.zip30Mb() {
+    return SpeedTestFile(
+      name: 'Zip 30Mb',
+      urlString: 'https://link.testfile.org/30MB',
+    );
+  }
+
+  static List<SpeedTestFile> all() => [
+        SpeedTestFile.zip30Mb(),
+        SpeedTestFile.zip70Mb(),
+        SpeedTestFile.pdf100Mb(),
+        SpeedTestFile.zip250Mb(),
+      ];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SpeedTestFile &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          urlString == other.urlString;
+
+  @override
+  int get hashCode => name.hashCode ^ urlString.hashCode;
 }

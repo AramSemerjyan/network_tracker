@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
+import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 
@@ -47,8 +48,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
         switch (state.loadingProgress) {
           case LoadingProgressState.idle:
-            subtitle = Text(
-                'Run to test download speed\n(${_vm.testFileName} is used for test)');
+            subtitle = Text('Run to test download speed');
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
           case LoadingProgressState.completed:
@@ -57,7 +57,36 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
         return _buildRow(
           const Text('Internet Speed Test'),
-          subtitle,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(child: subtitle),
+              ValueListenableBuilder(
+                valueListenable: _vm.selectedSpeedTestFile,
+                builder: (_, selectedFile, __) {
+                  return DropdownButton<SpeedTestFile>(
+                    value: selectedFile,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _vm.selectedSpeedTestFile.value = value;
+                      }
+                    },
+                    items: _vm.speedTestFiles.map((file) {
+                      return DropdownMenuItem<SpeedTestFile>(
+                        value: file,
+                        child: Text(
+                          file.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ],
+          ),
           state.loadingProgress,
           _runSpeedTest,
         );

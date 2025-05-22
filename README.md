@@ -14,6 +14,9 @@ A lightweight and developer-friendly Flutter package for tracking and viewing al
 - 🔍 Search by request path and filter by method or status
 - 📱 Simple integration with just two lines of code
 - 📦 No need for custom tooling or complex setup
+- 🚀 Built-in internet speed test tool with real-time download measurement
+- 🌍 Network info panel showing external IP, geolocation, local IP
+- 📋 Export requests as cURL for easy terminal debugging or sharing
 - 🧩 Useful for debugging, QA, and network profiling
 
 ---
@@ -57,7 +60,7 @@ dependencies:
 
 <img src="screenshots/request_details_screen.png" height="600"/>
 
-## Edit any request and repeat them for quicker debug. Press send icon (➤) for quick repeat or long press to open edit menu
+## Edit any request and repeat them for quicker debug. Press repeat icon (🔁) for quick repeat or long press to open edit menu
 
 <img src="screenshots/request_edit_screen.png" height="600"/>
 

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:network_tracker/network_tracker.dart';
 import 'package:network_tracker/src/services/network_info_service.dart';
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
+import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loading_state.dart';
 import 'package:network_tracker/src/utils/utils.dart';
 
@@ -10,18 +11,21 @@ class DebugToolsScreenVM {
       NetworkRequestService.instance.networkSpeedTestService;
   late final NetworkInfoServiceInterface _ipInfoService = NetworkInfoService();
 
-  ValueNotifier<LoadingState<String?>> speedTestState =
+  late ValueNotifier<SpeedTestFile> selectedSpeedTestFile =
+      ValueNotifier(speedTestFiles[1]);
+  late ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
-  ValueNotifier<LoadingState<Map<String, dynamic>?>> networkInfoState =
+  late ValueNotifier<LoadingState<Map<String, dynamic>?>> networkInfoState =
       ValueNotifier(LoadingState());
 
-  String get testFileName => _speedTestService.testFile.name;
+  List<SpeedTestFile> get speedTestFiles => SpeedTestFile.all();
 
   void testSpeed() async {
     speedTestState.value =
         LoadingState(loadingProgress: LoadingProgressState.inProgress);
 
-    final result = await _speedTestService.testDownloadSpeed();
+    final result =
+        await _speedTestService.testDownloadSpeed(selectedSpeedTestFile.value);
 
     speedTestState.value = LoadingState(
       loadingProgress: LoadingProgressState.completed,
@@ -36,6 +40,7 @@ class DebugToolsScreenVM {
     final networkInfo = await _ipInfoService.fetchExternalInfo();
     final localIP = await _ipInfoService.fetchLocalIP();
     networkInfo?['local_ip'] = localIP;
+    networkInfo?['external_ip'] = networkInfo.remove('query');
 
     networkInfoState.value = LoadingState(
       loadingProgress: LoadingProgressState.completed,
