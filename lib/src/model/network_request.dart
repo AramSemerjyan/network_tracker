@@ -241,7 +241,9 @@ extension CurlExporter on NetworkRequest {
 
     final methodUpper = method.name.toUpperCase();
     final queryString = _buildQueryString(queryParameters);
-    final fullUrl = '$baseUrl$path$queryString';
+    final fullUrl = '${baseUrl.trim().replaceAll(RegExp(r'/+$'), '')}'
+        '/${path.trim().replaceAll(RegExp(r'^/+'), '')}'
+        '$queryString';
 
     buffer.write('curl -X $methodUpper "$fullUrl"');
 

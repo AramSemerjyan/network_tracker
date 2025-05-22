@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:network_tracker/src/services/connectivity/network_connectivity_service.dart';
@@ -5,6 +7,13 @@ import 'package:network_tracker/src/services/connectivity/network_connectivity_s
 class ConnectionStatusViewVM {
   final NetworkConnectivityService connectivityService =
       NetworkConnectivityService();
+
+  late final StreamController<ConnectivityResult> onConnectionUpdate =
+      connectivityService.onConnectionStatusChanged;
+
+  void dispose() {
+    connectivityService.dispose();
+  }
 }
 
 extension ConnectivityResultExt on ConnectivityResult {

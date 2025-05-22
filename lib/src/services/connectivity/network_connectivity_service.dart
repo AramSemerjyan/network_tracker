@@ -1,12 +1,22 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class NetworkConnectivityService {
   final _connectivity = Connectivity();
+  late final StreamSubscription<ConnectivityResult> subscription;
+  StreamController<ConnectivityResult> onConnectionStatusChanged =
+      StreamController();
 
-  /// Stream of connectivity changes
-  Stream<ConnectivityResult> get onConnectivityChanged =>
-      _connectivity.onConnectivityChanged;
+  NetworkConnectivityService() {
+    subscription = _connectivity.onConnectivityChanged
+        .map((result) => result.first)
+        .listen((result) {
+      onConnectionStatusChanged.add(result);
+    });
+  }
 
-  /// Manual check if needed
-  Future<ConnectivityResult> checkNow() => _connectivity.checkConnectivity();
+  void dispose() {
+    subscription.cancel();
+  }
 }

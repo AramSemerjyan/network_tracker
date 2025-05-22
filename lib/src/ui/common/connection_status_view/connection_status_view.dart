@@ -12,9 +12,16 @@ class _ConnectionStatusViewState extends State<ConnectionStatusView> {
   late final ConnectionStatusViewVM _vm = ConnectionStatusViewVM();
 
   @override
+  void dispose() {
+    _vm.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _vm.connectivityService.onConnectivityChanged,
+      stream: _vm.onConnectionUpdate.stream,
       builder: (_, s) {
         final result = s.data;
 
