@@ -3,21 +3,18 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-abstract class NetworkIPInfoServiceInterface {
-  Future<String?> fetchExternalIP();
+abstract class NetworkInfoServiceInterface {
+  Future<Map<String, dynamic>?> fetchExternalInfo();
   Future<String?> fetchLocalIP();
 }
 
-class NetworkIPInfoService implements NetworkIPInfoServiceInterface {
+class NetworkInfoService implements NetworkInfoServiceInterface {
   @override
-  Future<String?> fetchExternalIP() async {
+  Future<Map<String, dynamic>?> fetchExternalInfo() async {
     try {
-      final response = await Dio().get<String>(
-        'https://api.ipify.org',
-        options: Options(responseType: ResponseType.plain),
-      );
+      final response = await Dio().get('http://ip-api.com/json');
       if (response.statusCode == 200) {
-        return response.data?.trim();
+        return response.data;
       }
     } catch (e) {
       if (kDebugMode) {

@@ -1,9 +1,9 @@
-class IPInfo {
-  final String? externalIP;
+class NetworkInfo {
+  final Map<String, dynamic>? externalInfo;
   final String? localIP;
 
-  IPInfo({
-    this.externalIP,
+  NetworkInfo({
+    this.externalInfo,
     this.localIP,
   });
 }

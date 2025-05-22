@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 import 'package:network_tracker/src/ui/debug_tools/models/speed_throttle.dart';
@@ -109,8 +110,18 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
           case LoadingProgressState.completed:
-            subtitle = Text(
-                'External IP: ${state.result?.externalIP ?? 'NaN'}\nLocal IP: ${state.result?.localIP ?? 'NaN'}');
+            subtitle = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Local IP: ${state.result?.localIP ?? 'NaN'}'),
+                JsonView(
+                  json: state.result?.externalInfo,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
+              ],
+            );
         }
 
         return ListTile(
@@ -130,17 +141,29 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Debug Tools')),
+      appBar: AppBar(
+        title: const Text('Debug Tools'),
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildSpeedTestRow(),
-            const Divider(),
-            _buildExternalIpRow(),
-            // _buildThrottleRow(),
-          ],
+        child: ListView.separated(
+          itemBuilder: (_, i) {
+            if (i == 0) return _buildSpeedTestRow();
+            if (i == 1) return _buildExternalIpRow();
+          },
+          separatorBuilder: (_, __) => const Divider(),
+          itemCount: 2,
         ),
+        // child: Column(
+        //   children: [
+        //     _buildSpeedTestRow(),
+        //     const Divider(),
+        //     _buildExternalIpRow(),
+        //     // _buildThrottleRow(),
+        //   ],
+        // ),
       ),
     );
   }
