@@ -15,13 +15,6 @@ class RequestBadgeConfig {
       color: Colors.orange.shade300,
     );
   }
-
-  factory RequestBadgeConfig.throttled() {
-    return RequestBadgeConfig(
-      title: 'Throttled',
-      color: Colors.amber.shade300,
-    );
-  }
 }
 
 class RequestBadge extends StatelessWidget {

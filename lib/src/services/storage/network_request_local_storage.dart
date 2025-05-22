@@ -45,7 +45,6 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
     DateTime? endDate,
     DioException? dioError,
     int? responseSize,
-    bool? isThrottled,
   }) async {
     final requests = _requests[baseUrl] ?? {};
 
@@ -61,7 +60,6 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
           endDate: endDate,
           dioError: dioError,
           responseSize: responseSize,
-          isThrottled: isThrottled,
         );
         return;
       }

@@ -81,8 +81,6 @@ class NetworkRequest {
   /// Useful for distinguishing between original requests and user-triggered retries.
   bool? isRepeated;
 
-  bool? isThrottled;
-
   /// The total execution time of the request, computed as a timestamp delta.
   Duration? get duration {
     final endDate = this.endDate;
@@ -111,7 +109,6 @@ class NetworkRequest {
     this.requestSizeBytes,
     this.responseSizeBytes,
     this.isRepeated,
-    this.isThrottled,
   });
 
   /// A human-readable name for the request, useful for display in UI or logs.
@@ -139,7 +136,6 @@ class NetworkRequest {
     int? requestSize,
     int? responseSize,
     bool? isRepeated,
-    bool? isThrottled,
   }) {
     return NetworkRequest(
       id: id ?? this.id,
@@ -159,7 +155,6 @@ class NetworkRequest {
       requestSizeBytes: requestSize ?? requestSizeBytes,
       responseSizeBytes: responseSize ?? responseSizeBytes,
       isRepeated: isRepeated ?? this.isRepeated,
-      isThrottled: isThrottled ?? this.isThrottled,
     );
   }
 
@@ -184,7 +179,6 @@ class NetworkRequest {
       'requestSizeBytes': requestSizeBytes,
       'responseSizeBytes': responseSizeBytes,
       'isRepeated': isRepeated == true ? 1 : 0,
-      'isThrottled': isThrottled == true ? 1 : 0,
     };
   }
 
@@ -230,7 +224,6 @@ class NetworkRequest {
       requestSizeBytes: json['requestSizeBytes'],
       responseSizeBytes: json['responseSizeBytes'],
       isRepeated: json['isRepeated'] == 1,
-      isThrottled: json['isThrottled'] == 1,
     );
   }
 }

@@ -118,9 +118,7 @@ class NetworkRequestPersistentStorage
     DateTime? endDate,
     DioException? dioError,
     int? responseSize,
-    bool? isThrottled,
   }) async {
-    /// TODO: add isThrottled
     await _db.update(
       DBTables.requests.key,
       {

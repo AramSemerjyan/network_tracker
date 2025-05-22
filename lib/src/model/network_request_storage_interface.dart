@@ -20,7 +20,6 @@ abstract class NetworkRequestStorageInterface {
     DateTime? endDate,
     DioException? dioError,
     int? responseSize,
-    bool? isThrottled,
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.

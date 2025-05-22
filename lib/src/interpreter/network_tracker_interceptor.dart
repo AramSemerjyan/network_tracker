@@ -67,7 +67,6 @@ class NetworkTrackerInterceptor extends Interceptor {
       responseHeaders: response.headers.map,
       endDate: DateTime.now(),
       responseSize: _estimateSize(response.data),
-      isThrottled: response.requestOptions.extra['is_throttled'],
     );
 
     super.onResponse(response, handler);

@@ -43,8 +43,6 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
         children: [
           if (request.isRepeated ?? false)
             RequestBadge(config: RequestBadgeConfig.repeated()),
-          if (request.isThrottled ?? false)
-            RequestBadge(config: RequestBadgeConfig.throttled()),
         ],
       ),
     );
