@@ -2,20 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:network_tracker/src/model/network_request.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 class Utils {
-  /// Exports the [responseData] of a [NetworkRequest] to a temporary `.json` file.
+  /// Exports the provided [data] to a temporary `.json` file.
   ///
-  /// The file is saved using the request's [NetworkRequest.name] as the filename
-  /// and stored in the system's temporary directory.
+  /// The file is saved in the system's temporary directory using the optional [fileName].
+  /// If no [fileName] is provided, a unique name is generated automatically.
+  ///
+  /// The [data] can be any JSON-serializable object (e.g. `Map`, `List`, custom models).
   ///
   /// Returns the created [File] on success, or `null` if an error occurs.
   ///
-  /// This method is useful for debugging or sharing response data from within the app.
+  /// This method is useful for exporting debug information, request/response payloads,
+  /// or any app data in JSON format for external use.
   static Future<File?> exportFile(dynamic data, {String? fileName}) async {
     try {
       final tempDir = await getTemporaryDirectory();
@@ -33,6 +35,15 @@ class Utils {
     }
   }
 
+  /// Exports the given [data] as a temporary `.json` file and shares it using the system share sheet.
+  ///
+  /// Optionally accepts a [fileName] to use for the exported file; if not provided,
+  /// a unique name will be generated automatically.
+  ///
+  /// The [data] must be JSON-serializable.
+  ///
+  /// If the export is successful, the generated file is shared using the platform's
+  /// native sharing capabilities (e.g., AirDrop, email, messaging apps).
   static Future<void> shareFile(dynamic data, {String? fileName}) async {
     final file = await Utils.exportFile(
       data,
