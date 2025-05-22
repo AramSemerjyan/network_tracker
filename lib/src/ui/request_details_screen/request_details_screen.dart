@@ -70,8 +70,15 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBadgesRow(request),
-              Text(
-                  '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                        '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
+                  ),
+                  RepeatRequestButton(request: request),
+                ],
+              )
             ],
           ),
           subtitle: Column(
@@ -93,7 +100,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
             ],
           ),
-          trailing: RepeatRequestButton(request: request),
           onTap: () {
             Navigator.push(
               context,

@@ -234,3 +234,53 @@ class NetworkRequest {
     );
   }
 }
+
+extension CurlExporter on NetworkRequest {
+  String toCurl() {
+    final buffer = StringBuffer();
+
+    final methodUpper = method.name.toUpperCase();
+    final queryString = _buildQueryString(queryParameters);
+    final fullUrl = '$baseUrl$path$queryString';
+
+    buffer.write('curl -X $methodUpper "$fullUrl"');
+
+    // Headers
+    if (headers != null && headers!.isNotEmpty) {
+      headers!.forEach((key, value) {
+        if (value != null) {
+          buffer.write(
+              ' \\\n  -H "${_escape(key)}: ${_escape(value.toString())}"');
+        }
+      });
+    }
+
+    // Request body
+    if (requestData != null && methodUpper != 'GET') {
+      try {
+        final encoded = jsonEncode(requestData);
+        buffer.write(' \\\n  -d \'$encoded\'');
+      } catch (_) {
+        // Fallback to .toString() if not JSON serializable
+        buffer.write(' \\\n  -d "${_escape(requestData.toString())}"');
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  String _escape(String input) {
+    return input.replaceAll('"', r'\"');
+  }
+
+  String _buildQueryString(Map<String, dynamic>? queryParams) {
+    if (queryParams == null || queryParams.isEmpty) return '';
+
+    final query = queryParams.entries
+        .map((e) =>
+            '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value.toString())}')
+        .join('&');
+
+    return '?$query';
+  }
+}
