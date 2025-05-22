@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:network_tracker/src/ui/common/loadin_label.dart';
+import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 import 'package:network_tracker/src/ui/debug_tools/models/speed_throttle.dart';
 
-import 'models/speed_test_state.dart';
+import '../common/loading_label/loading_state.dart';
 
 class DebugToolsScreen extends StatefulWidget {
   const DebugToolsScreen({super.key});
@@ -30,6 +30,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
     _vm.testSpeed();
   }
 
+  void _fetchExternalIP() async {
+    _vm.fetchExternalIp();
+  }
+
   void _applyThrottling(SpeedThrottle throttle) {
     _vm.selectThrottle(throttle);
   }
@@ -40,13 +44,13 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
       builder: (_, state, __) {
         Widget subtitle;
 
-        switch (state.progressState) {
-          case SpeedTestProgressState.idle:
+        switch (state.loadingProgress) {
+          case LoadingProgressState.idle:
             subtitle = Text(
-                'Tap to test download speed\n(${_vm.testFileName} is used for test)');
-          case SpeedTestProgressState.inProgress:
+                'Run to test download speed\n(${_vm.testFileName} is used for test)');
+          case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
-          case SpeedTestProgressState.completed:
+          case LoadingProgressState.completed:
             subtitle = Text('Download speed: ${state.result}');
         }
 
@@ -54,7 +58,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           title: const Text('Internet Speed Test'),
           subtitle: subtitle,
           trailing: ElevatedButton(
-            onPressed: state.progressState == SpeedTestProgressState.inProgress
+            onPressed: state.loadingProgress == LoadingProgressState.inProgress
                 ? null
                 : _runSpeedTest,
             child: const Text('Run'),
@@ -93,6 +97,35 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
     );
   }
 
+  Widget _buildExternalIpRow() {
+    return ValueListenableBuilder(
+      valueListenable: _vm.externalIpState,
+      builder: (_, state, __) {
+        Widget subtitle;
+
+        switch (state.loadingProgress) {
+          case LoadingProgressState.idle:
+            subtitle = Text('Run to get external IP');
+          case LoadingProgressState.inProgress:
+            subtitle = LoadingLabel();
+          case LoadingProgressState.completed:
+            subtitle = Text('External IP: ${state.result}');
+        }
+
+        return ListTile(
+          title: const Text('External IP'),
+          subtitle: subtitle,
+          trailing: ElevatedButton(
+            onPressed: state.loadingProgress == LoadingProgressState.inProgress
+                ? null
+                : _fetchExternalIP,
+            child: const Text('Run'),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +135,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         child: Column(
           children: [
             _buildSpeedTestRow(),
-            // const Divider(),
+            const Divider(),
+            _buildExternalIpRow(),
             // _buildThrottleRow(),
           ],
         ),
