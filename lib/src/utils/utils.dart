@@ -51,7 +51,11 @@ class Utils {
     );
 
     if (file != null) {
-      await Share.shareXFiles([XFile(file.path)]);
+      final params = ShareParams(
+        files: [XFile(file.path)],
+      );
+
+      await SharePlus.instance.share(params);
     }
   }
 

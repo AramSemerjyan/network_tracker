@@ -53,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: connectivity_plus
-      sha256: "3e7d1d9dbae40ae82cbe6c23c518f0c4ffe32764ee9749b9a99d32cbac8734f6"
+      sha256: "051849e2bd7c7b3bc5844ea0d096609ddc3a859890ec3a9ac4a65a2620cc1f99"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.4"
+    version: "6.1.4"
   connectivity_plus_platform_interface:
     dependency: transitive
     description:
