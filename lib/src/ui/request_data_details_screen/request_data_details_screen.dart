@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../model/network_request.dart';
 import 'request_data_details_screen_vm.dart';
@@ -122,13 +121,7 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
                       const Text('Response data:'),
                       const Spacer(),
                       IconButton(
-                        onPressed: () async {
-                          final path = await _vm.exportResponseData();
-
-                          if (path != null) {
-                            await Share.shareXFiles([XFile(path)]);
-                          }
-                        },
+                        onPressed: _vm.shareRequest,
                         icon: const Icon(Icons.save_alt),
                       )
                     ],

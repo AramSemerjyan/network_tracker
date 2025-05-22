@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
@@ -40,6 +39,22 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
     _vm.selectThrottle(throttle);
   }
 
+  Widget _buildRow(Widget title, Widget subtitle, LoadingProgressState state,
+      VoidCallback onTap) {
+    return ListTile(
+      title: Row(
+        children: [
+          Expanded(child: title),
+          ElevatedButton(
+            onPressed: state == LoadingProgressState.inProgress ? null : onTap,
+            child: const Text('Run'),
+          )
+        ],
+      ),
+      subtitle: subtitle,
+    );
+  }
+
   Widget _buildSpeedTestRow() {
     return ValueListenableBuilder(
       valueListenable: _vm.speedTestState,
@@ -56,15 +71,11 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
             subtitle = Text('Download speed: ${state.result}');
         }
 
-        return ListTile(
-          title: const Text('Internet Speed Test'),
-          subtitle: subtitle,
-          trailing: ElevatedButton(
-            onPressed: state.loadingProgress == LoadingProgressState.inProgress
-                ? null
-                : _runSpeedTest,
-            child: const Text('Run'),
-          ),
+        return _buildRow(
+          const Text('Internet Speed Test'),
+          subtitle,
+          state.loadingProgress,
+          _runSpeedTest,
         );
       },
     );
@@ -101,7 +112,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
   Widget _buildExternalIpRow() {
     return ValueListenableBuilder(
-      valueListenable: _vm.externalIpState,
+      valueListenable: _vm.networkInfoState,
       builder: (_, state, __) {
         Widget subtitle;
 
@@ -111,45 +122,27 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
           case LoadingProgressState.completed:
-            subtitle = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Clipboard.setData(
-                            ClipboardData(text: state.result?.localIP ?? ''));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Local IP copied to clipboard')),
-                        );
-                      },
-                      child: const Icon(Icons.copy, size: 15),
-                    ),
-                    const SizedBox(width: 2),
-                    Text('Local IP: ${state.result?.localIP ?? 'NaN'}'),
-                  ],
-                ),
-                JsonView(
-                  json: state.result?.externalInfo,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                ),
-              ],
+            subtitle = JsonView(
+              json: state.result,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
             );
         }
 
-        return ListTile(
-          title: const Text('IP Info'),
-          subtitle: subtitle,
-          trailing: ElevatedButton(
-            onPressed: state.loadingProgress == LoadingProgressState.inProgress
-                ? null
-                : _fetchExternalIP,
-            child: const Text('Run'),
+        return _buildRow(
+          Row(
+            children: [
+              Expanded(child: const Text('IP Info')),
+              if (state.result != null)
+                IconButton(
+                  onPressed: _vm.shareNetworkInfo,
+                  icon: const Icon(Icons.save_alt),
+                ),
+            ],
           ),
+          subtitle,
+          state.loadingProgress,
+          _fetchExternalIP,
         );
       },
     );

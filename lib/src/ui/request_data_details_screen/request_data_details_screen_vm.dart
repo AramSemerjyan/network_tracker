@@ -11,7 +11,7 @@ class RequestDataDetailsScreenVM {
 
   RequestDataDetailsScreenVM(this.request);
 
-  Future<String?> exportResponseData() async {
-    return (await Utils.exportRequest(request))?.path;
+  Future<void> shareRequest() async {
+    Utils.shareFile(request.responseData, fileName: request.name);
   }
 }

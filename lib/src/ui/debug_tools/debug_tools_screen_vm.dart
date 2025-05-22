@@ -4,8 +4,8 @@ import 'package:network_tracker/src/services/network_info_service.dart';
 import 'package:network_tracker/src/services/shared_prefs/shared_prefs_service.dart';
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loading_state.dart';
-import 'package:network_tracker/src/ui/debug_tools/models/ip_info.dart';
 import 'package:network_tracker/src/ui/debug_tools/models/speed_throttle.dart';
+import 'package:network_tracker/src/utils/utils.dart';
 
 class DebugToolsScreenVM {
   late final NetworkSpeedTestServiceInterface _speedTestService =
@@ -17,7 +17,7 @@ class DebugToolsScreenVM {
       ValueNotifier(LoadingState());
   ValueNotifier<SpeedThrottle> selectedThrottle =
       ValueNotifier(SpeedThrottle.unlimited());
-  ValueNotifier<LoadingState<NetworkInfo?>> externalIpState =
+  ValueNotifier<LoadingState<Map<String, dynamic>?>> networkInfoState =
       ValueNotifier(LoadingState());
 
   List<SpeedThrottle> get throttleOptions => SpeedThrottle.allCases();
@@ -52,18 +52,24 @@ class DebugToolsScreenVM {
   }
 
   Future<String?> fetchExternalIp() async {
-    externalIpState.value =
+    networkInfoState.value =
         LoadingState(loadingProgress: LoadingProgressState.inProgress);
 
-    final externalIP = await _ipInfoService.fetchExternalInfo();
+    final networkInfo = await _ipInfoService.fetchExternalInfo();
     final localIP = await _ipInfoService.fetchLocalIP();
+    networkInfo?['local_ip'] = localIP;
 
-    externalIpState.value = LoadingState(
+    networkInfoState.value = LoadingState(
       loadingProgress: LoadingProgressState.completed,
-      result: NetworkInfo(
-        externalInfo: externalIP,
-        localIP: localIP,
-      ),
+      result: networkInfo,
     );
+  }
+
+  void shareNetworkInfo() {
+    final networkInfo = networkInfoState.value.result;
+
+    if (networkInfo != null) {
+      Utils.shareFile(networkInfo, fileName: 'network_info_${DateTime.now()}');
+    }
   }
 }

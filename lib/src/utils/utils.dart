@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:uuid/uuid.dart';
 
 class Utils {
   /// Exports the [responseData] of a [NetworkRequest] to a temporary `.json` file.
@@ -14,11 +16,12 @@ class Utils {
   /// Returns the created [File] on success, or `null` if an error occurs.
   ///
   /// This method is useful for debugging or sharing response data from within the app.
-  static Future<File?> exportRequest(NetworkRequest request) async {
+  static Future<File?> exportFile(dynamic data, {String? fileName}) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final filePath = '${tempDir.path}/${request.name}.json';
-      final jsonString = jsonEncode(request.responseData);
+      final name = fileName ?? Uuid().v1();
+      final filePath = '${tempDir.path}/$name.json';
+      final jsonString = jsonEncode(data);
       final file = File(filePath);
       await file.writeAsString(jsonString);
 
@@ -27,6 +30,17 @@ class Utils {
       if (kDebugMode) print(e);
 
       return null;
+    }
+  }
+
+  static Future<void> shareFile(dynamic data, {String? fileName}) async {
+    final file = await Utils.exportFile(
+      data,
+      fileName: fileName,
+    );
+
+    if (file != null) {
+      await Share.shareXFiles([XFile(file.path)]);
     }
   }
 
