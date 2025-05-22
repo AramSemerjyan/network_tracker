@@ -11,12 +11,12 @@ class DebugToolsScreenVM {
       NetworkRequestService.instance.networkSpeedTestService;
   late final NetworkInfoServiceInterface _ipInfoService = NetworkInfoService();
 
-  late ValueNotifier<SpeedTestFile> selectedSpeedTestFile =
+  late final ValueNotifier<SpeedTestFile> selectedSpeedTestFile =
       ValueNotifier(speedTestFiles[1]);
-  late ValueNotifier<LoadingState<String?>> speedTestState =
+  late final ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
-  late ValueNotifier<LoadingState<Map<String, dynamic>?>> networkInfoState =
-      ValueNotifier(LoadingState());
+  late final ValueNotifier<LoadingState<Map<String, dynamic>?>>
+      networkInfoState = ValueNotifier(LoadingState());
 
   List<SpeedTestFile> get speedTestFiles => SpeedTestFile.all();
 

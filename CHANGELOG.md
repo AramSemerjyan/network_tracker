@@ -60,3 +60,9 @@
 * Add cURL Export feature to generate cURL command for any captured request
 * Display Connection Type (Wi-Fi / Mobile / None) in the UI
 * Minor UI tweaks
+
+## 0.5.1
+
+* Upgrade share_plus to v11.0.0 to align with latest dependency versions
+* Updated README
+* Added ability to select test file (e.g. 30MB, 70MB, 100MB) when running internet speed tests for more control over download size
