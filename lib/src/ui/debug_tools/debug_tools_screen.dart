@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
@@ -114,7 +115,23 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Local IP: ${state.result?.localIP ?? 'NaN'}'),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                            ClipboardData(text: state.result?.localIP ?? ''));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Local IP copied to clipboard')),
+                        );
+                      },
+                      child: const Icon(Icons.copy, size: 15),
+                    ),
+                    const SizedBox(width: 2),
+                    Text('Local IP: ${state.result?.localIP ?? 'NaN'}'),
+                  ],
+                ),
                 JsonView(
                   json: state.result?.externalInfo,
                   shrinkWrap: true,
@@ -156,14 +173,6 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           separatorBuilder: (_, __) => const Divider(),
           itemCount: 2,
         ),
-        // child: Column(
-        //   children: [
-        //     _buildSpeedTestRow(),
-        //     const Divider(),
-        //     _buildExternalIpRow(),
-        //     // _buildThrottleRow(),
-        //   ],
-        // ),
       ),
     );
   }
