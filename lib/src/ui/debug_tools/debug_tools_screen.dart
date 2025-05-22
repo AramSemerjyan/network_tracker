@@ -105,15 +105,16 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
         switch (state.loadingProgress) {
           case LoadingProgressState.idle:
-            subtitle = Text('Run to get external IP');
+            subtitle = Text('Run to get IP info');
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
           case LoadingProgressState.completed:
-            subtitle = Text('External IP: ${state.result}');
+            subtitle = Text(
+                'External IP: ${state.result?.externalIP ?? 'NaN'}\nLocal IP: ${state.result?.localIP ?? 'NaN'}');
         }
 
         return ListTile(
-          title: const Text('External IP'),
+          title: const Text('IP Info'),
           subtitle: subtitle,
           trailing: ElevatedButton(
             onPressed: state.loadingProgress == LoadingProgressState.inProgress

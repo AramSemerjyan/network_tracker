@@ -1,23 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:network_tracker/network_tracker.dart';
-import 'package:network_tracker/src/services/network_external_info_service.dart';
+import 'package:network_tracker/src/services/network_ip_info_service.dart';
 import 'package:network_tracker/src/services/shared_prefs/shared_prefs_service.dart';
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loading_state.dart';
+import 'package:network_tracker/src/ui/debug_tools/models/ip_info.dart';
 import 'package:network_tracker/src/ui/debug_tools/models/speed_throttle.dart';
 
 class DebugToolsScreenVM {
   late final NetworkSpeedTestServiceInterface _speedTestService =
       NetworkRequestService.instance.networkSpeedTestService;
   late final SharedPrefsService _sharedPrefsService = SharedPrefsService();
-  late final NetworkExternalInfoServiceInterface _externalInfoService =
-      NetworkExternalInfoService();
+  late final NetworkIPInfoServiceInterface _ipInfoService =
+      NetworkIPInfoService();
 
   ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
   ValueNotifier<SpeedThrottle> selectedThrottle =
       ValueNotifier(SpeedThrottle.unlimited());
-  ValueNotifier<LoadingState<String?>> externalIpState =
+  ValueNotifier<LoadingState<IPInfo?>> externalIpState =
       ValueNotifier(LoadingState());
 
   List<SpeedThrottle> get throttleOptions => SpeedThrottle.allCases();
@@ -55,11 +56,15 @@ class DebugToolsScreenVM {
     externalIpState.value =
         LoadingState(loadingProgress: LoadingProgressState.inProgress);
 
-    final ip = await _externalInfoService.fetchExternalIp();
+    final externalIP = await _ipInfoService.fetchExternalIP();
+    final localIP = await _ipInfoService.fetchLocalIP();
 
     externalIpState.value = LoadingState(
       loadingProgress: LoadingProgressState.completed,
-      result: ip,
+      result: IPInfo(
+        externalIP: externalIP,
+        localIP: localIP,
+      ),
     );
   }
 }
