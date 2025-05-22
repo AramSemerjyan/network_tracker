@@ -18,10 +18,17 @@ class TestFile {
     required this.urlString,
   });
 
-  factory TestFile.pdf100mb() {
+  factory TestFile.pdf100Mb() {
     return TestFile(
       name: 'PDF 100Mb',
       urlString: 'https://link.testfile.org/PDF100MB',
+    );
+  }
+
+  factory TestFile.zip70Mb() {
+    return TestFile(
+      name: 'Zip 70Mb',
+      urlString: 'https://link.testfile.org/70MB',
     );
   }
 }
@@ -29,8 +36,8 @@ class TestFile {
 class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   @override
 
-  /// A large static file hosted on a CDN. ~100MB
-  final TestFile testFile = TestFile.pdf100mb();
+  /// A large static file hosted on a CDN. ~70MB
+  final TestFile testFile = TestFile.zip70Mb();
 
   final Dio _dio;
 

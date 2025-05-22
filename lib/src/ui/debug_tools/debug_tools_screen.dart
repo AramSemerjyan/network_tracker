@@ -102,8 +102,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         child: Column(
           children: [
             _buildSpeedTestRow(),
-            const Divider(),
-            _buildThrottleRow(),
+            // const Divider(),
+            // _buildThrottleRow(),
           ],
         ),
       ),

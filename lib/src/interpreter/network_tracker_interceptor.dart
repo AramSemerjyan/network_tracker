@@ -25,7 +25,10 @@ class NetworkTrackerInterceptor extends Interceptor {
   final storage = NetworkRequestService.instance.storageService;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final startDate = DateTime.now();
 
     final request = NetworkRequest(
@@ -53,7 +56,7 @@ class NetworkTrackerInterceptor extends Interceptor {
 
   /// Retrieve stored request ID and update with response details
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
     final requestId = response.requestOptions.extra['network_tracker_id'];
     storage.updateRequest(
       requestId,

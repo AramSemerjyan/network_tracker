@@ -4,7 +4,6 @@ import 'package:network_tracker/src/services/shared_prefs/shared_prefs_service.d
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
 import 'package:network_tracker/src/ui/debug_tools/models/speed_throttle.dart';
 
-import '../../interpreter/network_throttle_interceptor.dart';
 import 'models/speed_test_state.dart';
 
 class DebugToolsScreenVM {
@@ -47,14 +46,14 @@ class DebugToolsScreenVM {
 
     await _sharedPrefsService.setThrottle(throttle);
 
-    for (final dio
-        in NetworkRequestService.instance.repeatRequestService.clients.values) {
-      dio.interceptors.removeWhere((i) => i is NetworkThrottleInterceptor);
-      final limit = throttle.value;
-
-      if (limit != null) {
-        dio.interceptors.insert(0, NetworkThrottleInterceptor(limit));
-      }
-    }
+    // for (final dio
+    //     in NetworkRequestService.instance.repeatRequestService.clients.values) {
+    //   dio.interceptors.removeWhere((i) => i is NetworkThrottleInterceptor);
+    //   final limit = throttle.value;
+    //
+    //   if (limit != null) {
+    //     dio.interceptors.insert(0, NetworkThrottleInterceptor(limit));
+    //   }
+    // }
   }
 }
