@@ -6,6 +6,7 @@ import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen.dart';
 import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
 
+import '../common/connection_status_view/connection_status_view.dart';
 import '../request_details_screen/request_details_screen.dart';
 
 class NetworkRequestsViewer extends StatefulWidget {
@@ -229,6 +230,63 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     );
   }
 
+  Widget _buildBaseUrlRow() {
+    return ValueListenableBuilder<String>(
+      valueListenable: _vm.selectedBaseUrl,
+      builder: (context, selected, _) {
+        return Column(
+          children: [
+            Row(
+              children: [
+                const Spacer(),
+                InkWell(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: selected));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Base URL copied to clipboard')),
+                    );
+                  },
+                  child: const Icon(Icons.copy, size: 15),
+                ),
+                const SizedBox(width: 5),
+                const Text('Base URL:'),
+                const Spacer(),
+              ],
+            ),
+            FutureBuilder(
+                future: _vm.storageService.getUrls(),
+                builder: (c, f) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: selected,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      onChanged: (value) {
+                        if (value != null) {
+                          _vm.selectedBaseUrl.value = value;
+                        }
+                      },
+                      items: (f.data ?? []).map((url) {
+                        return DropdownMenuItem<String>(
+                          value: url,
+                          child: Text(
+                            url,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,74 +331,29 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 8),
-          ValueListenableBuilder<String>(
-            valueListenable: _vm.selectedBaseUrl,
-            builder: (context, selected, _) {
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      const Spacer(),
-                      InkWell(
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: selected));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Base URL copied to clipboard')),
-                          );
-                        },
-                        child: const Icon(Icons.copy, size: 15),
-                      ),
-                      const SizedBox(width: 5),
-                      const Text('Base URL:'),
-                      const Spacer(),
-                    ],
-                  ),
-                  FutureBuilder(
-                      future: _vm.storageService.getUrls(),
-                      builder: (c, f) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: selected,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            onChanged: (value) {
-                              if (value != null) {
-                                _vm.selectedBaseUrl.value = value;
-                              }
-                            },
-                            items: (f.data ?? []).map((url) {
-                              return DropdownMenuItem<String>(
-                                value: url,
-                                child: Text(
-                                  url,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        );
-                      }),
-                ],
-              );
-            },
+          Column(
+            children: [
+              const SizedBox(height: 8),
+              _buildBaseUrlRow(),
+              _buildSearchBar(),
+              _buildFilterBar(),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: _vm.filteredRequestsNotifier,
+                  builder: (c, f, w) {
+                    return f.isEmpty ? _buildEmptyState() : _buildList(f);
+                  },
+                ),
+              ),
+            ],
           ),
-          _buildSearchBar(),
-          _buildFilterBar(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: _vm.filteredRequestsNotifier,
-              builder: (c, f, w) {
-                return f.isEmpty ? _buildEmptyState() : _buildList(f);
-              },
-            ),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: ConnectionStatusView(),
           ),
         ],
       ),

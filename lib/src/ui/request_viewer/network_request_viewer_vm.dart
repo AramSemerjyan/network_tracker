@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:network_tracker/src/services/connectivity/network_connectivity_service.dart';
 
 import '../../model/network_request.dart';
 import '../../model/network_request_filter.dart';
@@ -15,6 +16,8 @@ class NetworkRequestViewerVM {
   final ValueNotifier<List<List<NetworkRequest>>> filteredRequestsNotifier =
       ValueNotifier([]);
   final ValueNotifier<String> selectedBaseUrl = ValueNotifier('');
+  final NetworkConnectivityService networkConnectivityService =
+      NetworkConnectivityService();
 
   Timer? _debounce;
   late final StreamSubscription _repeatRequestSubscription;
