@@ -48,3 +48,15 @@
 * Improve request grouping logic to respect base URL context
 * Remove `NetworkRepeatRequestService` from exports (moved under `NetworkRequestService`)
 * Allow setting custom Dio client via `NetworkRequestService.setDioClient(...)`
+
+## 0.5.0
+
+* Add Internet Speed Test tool
+* Add Network Info Panel displaying:
+  * Local IP address
+  * External IP address
+  * Country
+  * Timezone
+* Add cURL Export feature to generate cURL command for any captured request
+* Display Connection Type (Wi-Fi / Mobile / None) in the UI
+* Minor UI tweaks
