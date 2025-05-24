@@ -20,14 +20,19 @@ abstract class NetworkRequestStorageInterface {
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.
-  Future<List<NetworkRequest>> getRequestsByPath(String path, String baseUrl);
+  Future<List<NetworkRequest>> getRequestsByPath(
+    String path,
+    String baseUrl,
+  );
 
   /// Returns a list of all tracked paths sorted by most recent activity.
   Future<List<String>> getTrackedPaths(String baseUrl);
 
   /// Returns a grouped list of filtered requests by path using [filter].
   Future<List<List<NetworkRequest>>> getFilteredGroups(
-      NetworkRequestFilter filter, String baseUrl);
+    NetworkRequestFilter filter,
+    String baseUrl,
+  );
 
   Future<List<String>> getUrls();
 
