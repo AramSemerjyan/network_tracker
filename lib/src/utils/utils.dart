@@ -84,4 +84,13 @@ class Utils {
 
     return '${size.toStringAsFixed(decimals)}${suffixes[i]}';
   }
+
+  static int estimateSize(dynamic data) {
+    if (data == null) return 0;
+    try {
+      return utf8.encode(jsonEncode(data)).length;
+    } catch (_) {
+      return 0;
+    }
+  }
 }

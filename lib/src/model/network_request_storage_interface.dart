@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/services/request_status.dart';
 
-import '../services/request_status.dart';
 import 'network_request.dart';
 import 'network_request_filter.dart';
 
@@ -12,14 +12,11 @@ abstract class NetworkRequestStorageInterface {
   /// Updates an existing request by [id] with optional response data and status.
   Future<void> updateRequest(
     String id, {
-    required String baseUrl,
+    Response? response,
+    required RequestOptions requestOptions,
     RequestStatus? status,
-    dynamic responseData,
-    int? statusCode,
-    Map<String, dynamic>? responseHeaders,
     DateTime? endDate,
     DioException? dioError,
-    int? responseSize,
   });
 
   /// Retrieves all requests made to a specific [path], sorted by most recent first.

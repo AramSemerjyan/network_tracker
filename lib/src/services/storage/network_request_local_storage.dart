@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/utils/utils.dart';
 
 import '../../model/network_request.dart';
 import '../../model/network_request_filter.dart';
@@ -36,17 +37,13 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
   /// [statusCode], [responseHeaders], [error], and calculates its execution time.
   Future<void> updateRequest(
     String id, {
-    required String baseUrl,
+    required RequestOptions requestOptions,
+    Response? response,
     RequestStatus? status,
-    dynamic responseData,
-    int? statusCode,
-    Map<String, dynamic>? responseHeaders,
-    String? error,
     DateTime? endDate,
     DioException? dioError,
-    int? responseSize,
   }) async {
-    final requests = _requests[baseUrl] ?? {};
+    final requests = _requests[requestOptions.baseUrl] ?? {};
 
     for (final list in requests.values) {
       final index = list.indexWhere((r) => r.id == id);
@@ -54,12 +51,12 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
         final request = list[index];
         list[index] = request.copyWith(
           status: status,
-          responseData: responseData,
-          statusCode: statusCode,
-          responseHeaders: responseHeaders,
+          responseData: response?.data,
+          statusCode: response?.statusCode,
+          responseHeaders: response?.headers.map,
           endDate: endDate,
           dioError: dioError,
-          responseSize: responseSize,
+          responseSize: Utils.estimateSize(response?.data),
         );
         return;
       }

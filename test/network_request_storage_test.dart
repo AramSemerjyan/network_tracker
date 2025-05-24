@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/model/network_request_method.dart';
@@ -56,14 +57,29 @@ void main() {
       );
       await storage.addRequest(request);
 
+      final endTime = DateTime.now();
+
+      final requestOptions = RequestOptions(
+        path: '/update',
+        baseUrl: baseUrl,
+        method: 'GET',
+      );
+
+      final response = Response(
+        requestOptions: requestOptions,
+        data: {'result': 'ok'},
+        statusCode: 200,
+        headers: Headers.fromMap({
+          'Content-Type': ['application/json']
+        }),
+      );
+
       await storage.updateRequest(
         '2',
+        requestOptions: requestOptions,
+        response: response,
         status: RequestStatus.completed,
-        baseUrl: baseUrl,
-        responseData: {'result': 'ok'},
-        statusCode: 200,
-        endDate: DateTime.now(),
-        responseHeaders: {'Content-Type': 'application/json'},
+        endDate: endTime,
       );
 
       final updated =
@@ -72,7 +88,9 @@ void main() {
       expect(updated.status, RequestStatus.completed);
       expect(updated.responseData, {'result': 'ok'});
       expect(updated.statusCode, 200);
-      expect(updated.responseHeaders, {'Content-Type': 'application/json'});
+      expect(updated.responseHeaders, {
+        'Content-Type': ['application/json']
+      });
       expect(updated.duration, isNotNull);
     });
 

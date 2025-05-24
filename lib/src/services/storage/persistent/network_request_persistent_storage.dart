@@ -6,6 +6,7 @@ import 'package:network_tracker/src/model/network_request_filter.dart';
 import 'package:network_tracker/src/services/request_status.dart';
 import 'package:network_tracker/src/services/storage/persistent/db_tables.dart';
 import 'package:network_tracker/src/utils/extensions.dart';
+import 'package:network_tracker/src/utils/utils.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -110,27 +111,26 @@ class NetworkRequestPersistentStorage
   @override
   Future<void> updateRequest(
     String id, {
-    required String baseUrl,
+    required RequestOptions requestOptions,
+    Response? response,
     RequestStatus? status,
-    responseData,
-    int? statusCode,
-    Map<String, dynamic>? responseHeaders,
     DateTime? endDate,
     DioException? dioError,
-    int? responseSize,
   }) async {
     await _db.update(
       DBTables.requests.key,
       {
         if (status != null) 'status': status.name,
-        if (responseData != null) 'responseData': jsonEncode(responseData),
-        if (statusCode != null) 'statusCode': statusCode,
-        if (responseHeaders != null)
-          'responseHeaders': jsonEncode(responseHeaders),
+        if (response?.data != null) 'responseData': jsonEncode(response!.data),
+        if (response?.statusCode != null) 'statusCode': response!.statusCode,
+        if (response?.headers.map != null)
+          'responseHeaders': jsonEncode(response!.headers.map),
         if (endDate != null) 'endDate': endDate.toIso8601String(),
         if (dioError != null) 'dioError': dioError.dioExceptionToJsonString(),
-        if (responseSize != null) 'responseSize': responseSize,
-        if (baseUrl.isNotEmpty) 'baseUrl': baseUrl,
+        if (response!.data != null)
+          'responseSize': Utils.estimateSize(response.data),
+        if (requestOptions.baseUrl.isNotEmpty)
+          'baseUrl': requestOptions.baseUrl,
       },
       where: 'id = ?',
       whereArgs: [id],
