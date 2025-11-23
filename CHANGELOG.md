@@ -66,3 +66,8 @@
 * Upgrade share_plus to v11.0.0 to align with latest dependency versions
 * Updated README
 * Added ability to select test file (e.g. 30MB, 70MB, 100MB) when running internet speed tests for more control over download size
+
+## 0.6.0
+* Update packages
+* Fix issue with background colors
+* Fix linter issues
