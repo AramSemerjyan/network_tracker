@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: DropdownButtonFormField<String>(
-              value: _selectedClient.value,
+              initialValue: _selectedClient.value,
               isExpanded: true,
               onChanged: (clientBaseUrl) => setState(() {
                 _selectedClient.value = clientBaseUrl!;
@@ -198,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: DropdownButtonFormField<String>(
-                          value: _selectedMethod,
+                          initialValue: _selectedMethod,
                           onChanged: (value) => setState(() {
                             _selectedMethod = value!;
                           }),
@@ -218,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: DropdownButtonFormField<String>(
-                          value: _selectedPath,
+                          initialValue: _selectedPath,
                           onChanged: (value) => setState(() {
                             _selectedPath = value!;
                           }),

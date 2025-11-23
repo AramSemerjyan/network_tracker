@@ -164,7 +164,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
 
             // Method dropdown
             DropdownButtonFormField<NetworkRequestMethod>(
-              value: _method,
+              initialValue: _method,
               items: NetworkRequestMethod.values
                   .map((m) => DropdownMenuItem(
                         value: m,
