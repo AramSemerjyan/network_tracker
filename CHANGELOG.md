@@ -72,5 +72,5 @@
 * Fix issue with background colors
 * Fix linter issues
 
-## 0.6.0
+## 0.6.1
 * Fix dart format
