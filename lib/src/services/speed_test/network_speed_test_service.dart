@@ -67,12 +67,12 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
 
     if (bitsPerSecond < 1000) {
       return '${bitsPerSecond.toStringAsFixed(0)} bps';
-    } else if (bitsPerSecond < 1_000_000) {
+    } else if (bitsPerSecond < 1000000) {
       return '${(bitsPerSecond / 1000).toStringAsFixed(2)} Kbps';
-    } else if (bitsPerSecond < 1_000_000_000) {
-      return '${(bitsPerSecond / 1_000_000).toStringAsFixed(2)} Mbps';
+    } else if (bitsPerSecond < 1000000000) {
+      return '${(bitsPerSecond / 1000000).toStringAsFixed(2)} Mbps';
     } else {
-      return '${(bitsPerSecond / 1_000_000_000).toStringAsFixed(2)} Gbps';
+      return '${(bitsPerSecond / 1000000000).toStringAsFixed(2)} Gbps';
     }
   }
 }

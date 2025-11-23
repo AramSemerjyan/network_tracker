@@ -49,8 +49,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         switch (state.loadingProgress) {
           case LoadingProgressState.idle:
             subtitle = Text('Run to test download speed');
+            break;
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
+            break;
           case LoadingProgressState.completed:
             subtitle = Text('Download speed: ${state.result}');
         }
@@ -103,8 +105,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         switch (state.loadingProgress) {
           case LoadingProgressState.idle:
             subtitle = Text('Run to get IP info');
+            break;
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
+            break;
           case LoadingProgressState.completed:
             subtitle = JsonView(
               json: state.result,
