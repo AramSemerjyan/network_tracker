@@ -33,7 +33,7 @@ class NetworkRequestService {
     switch (type) {
       case StorageType.local:
         _storageService = NetworkRequestLocalStorage();
-          break;
+        break;
       case StorageType.persistent:
         final persistentStorage = NetworkRequestPersistentStorage();
         persistentStorage.initDb();
