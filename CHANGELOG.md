@@ -71,3 +71,6 @@
 * Update packages
 * Fix issue with background colors
 * Fix linter issues
+
+## 0.6.0
+* Fix dart format
