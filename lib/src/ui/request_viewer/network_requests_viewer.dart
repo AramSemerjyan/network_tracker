@@ -10,7 +10,7 @@ import '../common/connection_status_view/connection_status_view.dart';
 import '../request_details_screen/request_details_screen.dart';
 
 class NetworkRequestsViewer extends StatefulWidget {
-  static showPage({
+  static void showPage({
     required BuildContext context,
   }) {
     showModalBottomSheet(
