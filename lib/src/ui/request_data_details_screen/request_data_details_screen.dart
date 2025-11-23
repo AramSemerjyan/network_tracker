@@ -51,6 +51,7 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           '${widget.request.method.value} - ${widget.request.startDate}',

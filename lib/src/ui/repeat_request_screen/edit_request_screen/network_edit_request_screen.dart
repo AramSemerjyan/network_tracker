@@ -145,6 +145,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Edit & Repeat"),
         backgroundColor: Colors.transparent,
