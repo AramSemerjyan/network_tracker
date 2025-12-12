@@ -7,7 +7,7 @@ repository: https://github.com/AramSemerjyan/network_tracker
 issue_tracker: https://github.com/AramSemerjyan/network_tracker/issues
 
 environment:
-  sdk: '>=2.18.0 <4.0.0'
+  sdk: ">=2.18.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -22,6 +22,8 @@ dependencies:
   path: ^1.9.1
   shared_preferences: ^2.5.3
   connectivity_plus: ^7.0.0
+  dart_ping: 9.0.1
+  dart_ping_ios: 4.0.2
 
 dev_dependencies:
   flutter_test:

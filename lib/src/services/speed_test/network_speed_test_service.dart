@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
 
@@ -20,7 +21,29 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   final Dio _dio;
 
   /// Creates a new [NetworkSpeedTestService] with an optional custom Dio instance.
-  NetworkSpeedTestService({Dio? dio}) : _dio = dio ?? Dio();
+  NetworkSpeedTestService({Dio? dio}) : _dio = dio ?? _createDio();
+
+  /// Creates a Dio instance with proper SSL configuration for speed tests.
+  static Dio _createDio() {
+    final dio = Dio();
+    
+    // Configure SSL certificate handling for Android
+    (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+        // Allow certificates from known speed test servers
+        final allowedHosts = [
+          'speed.hetzner.de',
+          'proof.ovh.net',
+          'speedtest.tele2.net',
+        ];
+        return allowedHosts.any((allowedHost) => host.contains(allowedHost));
+      };
+      return client;
+    };
+    
+    return dio;
+  }
 
   /// Downloads the [testFile] and calculates download speed based on elapsed time.
   ///

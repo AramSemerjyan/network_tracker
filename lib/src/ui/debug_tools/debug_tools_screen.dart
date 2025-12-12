@@ -32,7 +32,9 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           Expanded(child: title),
           ElevatedButton(
             onPressed: state == LoadingProgressState.inProgress ? null : onTap,
-            child: const Text('Run'),
+            child: Text(state == LoadingProgressState.inProgressStoppable
+                ? 'Stop'
+                : 'Run'),
           )
         ],
       ),
@@ -50,11 +52,15 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           case LoadingProgressState.idle:
             subtitle = Text('Run to test download speed');
             break;
+          case LoadingProgressState.inProgressStoppable:
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
             break;
           case LoadingProgressState.completed:
             subtitle = Text('Download speed: ${state.result}');
+            break;
+          case LoadingProgressState.error:
+            subtitle = Text('Error: ${state.error}');
         }
 
         return _buildRow(
@@ -78,9 +84,20 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                     items: _vm.speedTestFiles.map((file) {
                       return DropdownMenuItem<SpeedTestFile>(
                         value: file,
-                        child: Text(
-                          file.name,
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              file.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              file.urlString,
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       );
                     }).toList(),
@@ -106,6 +123,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           case LoadingProgressState.idle:
             subtitle = Text('Run to get IP info');
             break;
+          case LoadingProgressState.inProgressStoppable:
           case LoadingProgressState.inProgress:
             subtitle = LoadingLabel();
             break;
@@ -115,6 +133,9 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
             );
+            break;
+          case LoadingProgressState.error:
+            subtitle = Text('Error: ${state.error}');
         }
 
         return _buildRow(
@@ -136,6 +157,115 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
     );
   }
 
+  Widget _buildPingRow() {
+    return ValueListenableBuilder(
+      valueListenable: _vm.pingState,
+      builder: (_, state, __) {
+        Widget subtitle;
+
+        switch (state.loadingProgress) {
+          case LoadingProgressState.idle:
+            subtitle = Text('Run to ping host');
+            break;
+          case LoadingProgressState.inProgressStoppable:
+          case LoadingProgressState.inProgress:
+            subtitle = LoadingLabel();
+            break;
+          case LoadingProgressState.completed:
+            subtitle = Text('Ping completed');
+            break;
+          case LoadingProgressState.error:
+            subtitle = Text('Error: ${state.error}');
+        }
+
+        return _buildRow(
+          const Text('Ping Host'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(child: subtitle),
+              const SizedBox(height: 8),
+              ValueListenableBuilder(
+                  valueListenable: _vm.allHosts,
+                  builder: (_, hosts, __) {
+                    if (hosts.isEmpty) {
+                      return SizedBox.shrink();
+                    }
+
+                    return ValueListenableBuilder(
+                      valueListenable: _vm.selectedPingUrl,
+                      builder: (_, selectedUrl, __) {
+                        final selected = hosts.contains(selectedUrl)
+                            ? selectedUrl
+                            : hosts.first;
+
+                        return DropdownButton<String>(
+                          value: selected,
+                          hint: const Text('Select from recent URLs'),
+                          isExpanded: true,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          onChanged: (value) {
+                            if (value != null) {
+                              _vm.selectedPingUrl.value = value;
+                            }
+                          },
+                          items: hosts.map((url) {
+                            return DropdownMenuItem<String>(
+                              value: url,
+                              child: Text(
+                                url,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    );
+                  }),
+              const SizedBox(height: 8),
+              ValueListenableBuilder(
+                valueListenable: _vm.selectedPingUrl,
+                builder: (_, selectedUrl, __) {
+                  return TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Enter host to ping (e.g., google.com)',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    controller: TextEditingController(text: selectedUrl)
+                      ..selection =
+                          TextSelection.collapsed(offset: selectedUrl.length),
+                    onChanged: (value) {
+                      _vm.selectedPingUrl.value = value;
+                    },
+                  );
+                },
+              ),
+              ValueListenableBuilder(
+                valueListenable: _vm.pingResults,
+                builder: (_, result, __) {
+                  return SizedBox(
+                    height: 200,
+                    child: ListView(
+                      children: result.map((r) {
+                        return Text(r.error != null
+                            ? 'Error: ${r.error}'
+                            : 'from ${r.response?.ip ?? 'unknown'}: time=${r.response?.time?.inMilliseconds ?? 'N/A'} ms: ');
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          state.loadingProgress,
+          _vm.pingHost,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,13 +276,17 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView.separated(
-          itemBuilder: (_, i) {
-            if (i == 0) return _buildSpeedTestRow();
-            return _buildExternalIpRow();
-          },
-          separatorBuilder: (_, __) => const Divider(),
-          itemCount: 2,
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 16,
+            children: [
+              _buildSpeedTestRow(),
+              Divider(height: 1),
+              _buildExternalIpRow(),
+              Divider(height: 1),
+              _buildPingRow(),
+            ],
+          ),
         ),
       ),
     );
