@@ -26,11 +26,12 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   /// Creates a Dio instance with proper SSL configuration for speed tests.
   static Dio _createDio() {
     final dio = Dio();
-    
+
     // Configure SSL certificate handling for Android
     (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
       final client = HttpClient();
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
         // Allow certificates from known speed test servers
         final allowedHosts = [
           'speed.hetzner.de',
@@ -41,7 +42,7 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
       };
       return client;
     };
-    
+
     return dio;
   }
 

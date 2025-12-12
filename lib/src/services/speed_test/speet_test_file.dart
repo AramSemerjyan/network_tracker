@@ -11,6 +11,7 @@ enum SpeedTestFile {
     name: 'Zip 200Mb',
     urlString: 'http://ipv4.download.thinkbroadband.com/200MB.zip',
   ),
+
   /// Returns a test file representing a 512MB ZIP archive.
   zip512(
     name: 'Zip 512Mb',
