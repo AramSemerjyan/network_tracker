@@ -75,6 +75,6 @@
 ## 0.6.1
 * Fix dart format
 
-## 0.6.2
+## 0.7.0
 * Fix speed test files links
 * Add feature to ping hosts from debug tools screen
