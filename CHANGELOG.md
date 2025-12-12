@@ -78,3 +78,7 @@
 ## 0.7.0
 * Fix speed test files links
 * Add feature to ping hosts from debug tools screen
+
+## 0.7.1
+* Fix issue with iOS ping implementation
+* Update iOS project
