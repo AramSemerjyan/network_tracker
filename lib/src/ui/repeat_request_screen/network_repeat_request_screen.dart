@@ -34,7 +34,11 @@ class _NetworkRepeatRequestScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Repeat Network Request')),
+      appBar: AppBar(
+        title: const Text('Repeat Network Request'),
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: ValueListenableBuilder<List<NetworkRequest>>(
         valueListenable: _vm.availableRequestsNotifier,
         builder: (_, requests, __) {

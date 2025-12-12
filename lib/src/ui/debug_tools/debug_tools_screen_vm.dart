@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dart_ping/dart_ping.dart';
+import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:network_tracker/network_tracker.dart';
 import 'package:network_tracker/src/model/network_request_storage_interface.dart';
@@ -68,6 +70,10 @@ class DebugToolsScreenVM {
 
   /// Initializes the view model and loads previously accessed hosts
   DebugToolsScreenVM() {
+    if (Platform.isIOS) {
+      DartPingIOS.register();
+    }
+
     storageService.getUrls().then((urls) {
       allHosts.value = urls.map(_extractHost).toList();
       selectedPingUrl.value =

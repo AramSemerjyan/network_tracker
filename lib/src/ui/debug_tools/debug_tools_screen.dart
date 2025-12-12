@@ -91,11 +91,14 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                               file.name,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Text(
-                              file.urlString,
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 12),
-                              overflow: TextOverflow.ellipsis,
+                            SizedBox(
+                              width: 200,
+                              child: Text(
+                                file.urlString,
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
                             ),
                           ],
                         ),
@@ -274,6 +277,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
