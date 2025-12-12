@@ -16,6 +16,7 @@ A lightweight and developer-friendly Flutter package for tracking and viewing al
 - 📦 No need for custom tooling or complex setup
 - 🚀 Built-in internet speed test tool with real-time download measurement
 - 🌍 Network info panel showing external IP, geolocation, local IP
+- 🏓 Host ping tool for testing network connectivity and latency
 - 📋 Export requests as cURL for easy terminal debugging or sharing
 - 🧩 Useful for debugging, QA, and network profiling
 
@@ -63,6 +64,26 @@ dependencies:
 ## Edit any request and repeat them for quicker debug. Press repeat icon (🔁) for quick repeat or long press to open edit menu
 
 <img src="screenshots/request_edit_screen.png" height="600"/>
+
+---------
+
+## 🛠️ Debug Tools
+
+Access network diagnostic tools through the Debug Tools screen:
+
+### 🚀 Internet Speed Test
+- Test your download speed with configurable test file sizes
+- Real-time speed measurement in Mbps/Gbps
+
+### 🌍 Network Information
+- View external IP address with geolocation data
+- Display local IP address
+- Export network info as JSON file
+
+### 🏓 Host Ping
+- Ping any host to test connectivity and latency
+- Select from previously accessed URLs or enter custom hosts
+- Continuous ping with real-time results
 
 ---------
 
