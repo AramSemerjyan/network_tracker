@@ -22,8 +22,8 @@ dependencies:
   path: ^1.9.1
   shared_preferences: ^2.5.3
   connectivity_plus: ^7.0.0
-  dart_ping: 9.0.1
-  dart_ping_ios: 4.0.2
+  dart_ping: ^9.0.1
+  dart_ping_ios: ^4.0.2
 
 dev_dependencies:
   flutter_test:
