@@ -182,9 +182,9 @@ class DebugToolsScreenVM {
       _ping = Ping(_extractHost(selectedPingUrl.value), interval: 1);
 
       _pingSubscription = _ping?.stream.listen((result) {
-          final pingResult = pingResults.value.toList();
-          pingResult.add(result);
-          pingResults.value = pingResult;
+        final pingResult = pingResults.value.toList();
+        pingResult.add(result);
+        pingResults.value = pingResult;
       }, onDone: () {
         pingState.value = LoadingState(
           loadingProgress: LoadingProgressState.completed,
