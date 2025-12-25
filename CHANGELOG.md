@@ -82,3 +82,18 @@
 ## 0.7.1
 * Fix issue with iOS ping implementation
 * Update iOS project
+
+## 0.7.2
+* **Speed Test Improvements:**
+  * Add download progress tracking with `onProgress` callback
+  * Implement multi-iteration testing (default 3 runs) for more accurate speed measurements
+  * Add warmup HEAD request to eliminate DNS/SSL connection overhead
+  * Use median speed calculation to filter out network outliers
+  * Add configurable `iterations` parameter
+* **UI Enhancements:**
+  * Display download progress in megabytes
+  * Auto-scroll ping results to show latest entries
+* **Documentation:**
+  * Add comprehensive documentation comments across all service classes
+  * Improve API documentation for better developer experience
+  * Add usage examples in doc comments
