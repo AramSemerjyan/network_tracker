@@ -36,6 +36,12 @@ class DebugToolsScreenVM {
   late final ValueNotifier<SpeedTestFile> selectedSpeedTestFile =
       ValueNotifier(speedTestFiles.first);
 
+  /// Available iteration counts for speed test
+  late final iterations = [1, 3, 5, 10];
+
+  /// Number of iterations to perform during speed test
+  late final ValueNotifier<int> speedTestIterations = ValueNotifier(3);
+
   /// State of the speed test operation (idle, in progress, completed, error)
   late final ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
@@ -93,6 +99,7 @@ class DebugToolsScreenVM {
     try {
       final result = await _speedTestService.testDownloadSpeed(
         selectedSpeedTestFile.value,
+        iterations: speedTestIterations.value,
         onProgress: (received, total) {
           downloadProgress.value = total > 0
               ? '${(received / total * 100).toStringAsFixed(2)}%'

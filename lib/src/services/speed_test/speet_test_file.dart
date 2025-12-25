@@ -6,6 +6,18 @@
 /// Use predefined factories like [SpeedTestFile.pdf100Mb] or [SpeedTestFile.zip70Mb]
 /// to get commonly used test files with known sizes.
 enum SpeedTestFile {
+  /// Returns a test file representing a 50MB ZIP archive.
+  zip50(
+    name: 'Zip 50Mb',
+    urlString: 'http://ipv4.download.thinkbroadband.com/50MB.zip',
+  ),
+
+  /// Returns a test file representing a 100MB ZIP archive.
+  zip100(
+    name: 'Zip 100Mb',
+    urlString: 'http://ipv4.download.thinkbroadband.com/100MB.zip',
+  ),
+
   /// Returns a test file representing a 200MB ZIP archive.
   zip200(
     name: 'Zip 200Mb',

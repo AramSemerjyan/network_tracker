@@ -98,21 +98,59 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  subtitle,
-                  ValueListenableBuilder(
-                    valueListenable: _vm.downloadProgress,
-                    builder: (_, progress, __) {
-                      if (progress == null) {
-                        return SizedBox.shrink();
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    subtitle,
+                    ValueListenableBuilder(
+                      valueListenable: _vm.downloadProgress,
+                      builder: (_, progress, __) {
+                        if (progress == null) {
+                          return SizedBox.shrink();
+                        }
+                        return Text('Progress: $progress');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              ValueListenableBuilder(
+                valueListenable: _vm.speedTestIterations,
+                builder: (_, selectedIteration, __) {
+                  return DropdownButton<int>(
+                    value: selectedIteration,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _vm.speedTestIterations.value = value;
                       }
-                      return Text('Progress: $progress');
                     },
-                  ),
-                ],
-              )),
+                    items: _vm.iterations.map((iteration) {
+                      return DropdownMenuItem<int>(
+                        value: iteration,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Iteration',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(
+                              width: 200,
+                              child: Text(
+                                iteration.toString(),
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
               ValueListenableBuilder(
                 valueListenable: _vm.selectedSpeedTestFile,
                 builder: (_, selectedFile, __) {
