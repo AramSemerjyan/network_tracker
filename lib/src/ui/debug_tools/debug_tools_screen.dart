@@ -15,6 +15,34 @@ class DebugToolsScreen extends StatefulWidget {
 
 class _DebugToolsScreenState extends State<DebugToolsScreen> {
   late final DebugToolsScreenVM _vm = DebugToolsScreenVM();
+  late final ScrollController _pingScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _vm.pingResults.addListener(_scrollToBottom);
+  }
+
+  @override
+  void dispose() {
+    _pingScrollController.dispose();
+    _vm.pingResults.removeListener(_scrollToBottom);
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (_pingScrollController.hasClients) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_pingScrollController.hasClients) {
+          _pingScrollController.animateTo(
+            _pingScrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
+  }
 
   void _runSpeedTest() async {
     _vm.testSpeed();
@@ -69,7 +97,22 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(child: subtitle),
+              Flexible(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  subtitle,
+                  ValueListenableBuilder(
+                    valueListenable: _vm.downloadProgress,
+                    builder: (_, progress, __) {
+                      if (progress == null) {
+                        return SizedBox.shrink();
+                      }
+                      return Text('Progress: $progress');
+                    },
+                  ),
+                ],
+              )),
               ValueListenableBuilder(
                 valueListenable: _vm.selectedSpeedTestFile,
                 builder: (_, selectedFile, __) {
@@ -251,10 +294,16 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                   return SizedBox(
                     height: 200,
                     child: ListView(
+                      controller: _pingScrollController,
                       children: result.map((r) {
-                        return Text(r.error != null
-                            ? 'Error: ${r.error}'
-                            : 'from ${r.response?.ip ?? 'unknown'}: time=${r.response?.time?.inMilliseconds ?? 'N/A'} ms: ');
+                        return Text(
+                          r.error != null
+                              ? 'Error: ${r.error}'
+                              : 'from ${r.response?.ip ?? 'unknown'}: time=${r.response?.time?.inMilliseconds ?? 'N/A'} ms: ',
+                          style: r.error != null
+                              ? TextStyle(color: Colors.red)
+                              : null,
+                        );
                       }).toList(),
                     ),
                   );

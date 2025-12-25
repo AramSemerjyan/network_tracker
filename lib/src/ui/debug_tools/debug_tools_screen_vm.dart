@@ -39,6 +39,7 @@ class DebugToolsScreenVM {
   /// State of the speed test operation (idle, in progress, completed, error)
   late final ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
+  late final ValueNotifier<String?> downloadProgress = ValueNotifier(null);
 
   // Network Info State
   /// State of the network information fetch operation
@@ -90,8 +91,14 @@ class DebugToolsScreenVM {
         LoadingState(loadingProgress: LoadingProgressState.inProgress);
 
     try {
-      final result = await _speedTestService
-          .testDownloadSpeed(selectedSpeedTestFile.value);
+      final result = await _speedTestService.testDownloadSpeed(
+        selectedSpeedTestFile.value,
+        onProgress: (received, total) {
+          downloadProgress.value = total > 0
+              ? '${(received / total * 100).toStringAsFixed(2)}%'
+              : '${(received / 1048576).toStringAsFixed(2)} MB received';
+        },
+      );
 
       speedTestState.value = LoadingState(
         loadingProgress: LoadingProgressState.completed,
@@ -175,16 +182,9 @@ class DebugToolsScreenVM {
       _ping = Ping(_extractHost(selectedPingUrl.value), interval: 1);
 
       _pingSubscription = _ping?.stream.listen((result) {
-        if (result.error != null) {
-          pingState.value = LoadingState(
-            loadingProgress: LoadingProgressState.error,
-            error: result.error,
-          );
-        } else {
           final pingResult = pingResults.value.toList();
           pingResult.add(result);
           pingResults.value = pingResult;
-        }
       }, onDone: () {
         pingState.value = LoadingState(
           loadingProgress: LoadingProgressState.completed,
