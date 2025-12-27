@@ -5,6 +5,8 @@ import 'package:dart_ping/dart_ping.dart';
 import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:network_tracker/network_tracker.dart';
+import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/model/network_request_filter.dart';
 import 'package:network_tracker/src/model/network_request_storage_interface.dart';
 import 'package:network_tracker/src/services/network_info_service.dart';
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
@@ -73,7 +75,17 @@ class DebugToolsScreenVM {
   List<SpeedTestFile> get speedTestFiles => SpeedTestFile.values;
 
   /// List of all previously accessed hosts extracted from stored URLs
-  ValueNotifier<List<String>> allHosts = ValueNotifier([]);
+  late ValueNotifier<List<String>> allPingHosts = ValueNotifier([]);
+
+  /// Currently selected base URL for Postman collection export
+  late ValueNotifier<String> selectedExportHost = ValueNotifier('');
+
+  /// List of all previously accessed base URLs available for export
+  late final ValueNotifier<List<String>> allExportHosts = ValueNotifier([]);
+
+  /// State of the Postman collection export operation (idle, in progress, completed, error)
+  late final ValueNotifier<LoadingState<void>> exportCollectionState =
+      ValueNotifier(LoadingState());
 
   /// Initializes the view model and loads previously accessed hosts
   DebugToolsScreenVM() {
@@ -82,9 +94,11 @@ class DebugToolsScreenVM {
     }
 
     storageService.getUrls().then((urls) {
-      allHosts.value = urls.map(_extractHost).toList();
+      allExportHosts.value = urls;
+      allPingHosts.value = urls.map(_extractHost).toList();
       selectedPingUrl.value =
-          allHosts.value.isNotEmpty ? allHosts.value.first : '';
+          allPingHosts.value.isNotEmpty ? allPingHosts.value.first : '';
+      selectedExportHost.value = urls.isNotEmpty ? urls.first : '';
     });
   }
 
@@ -210,6 +224,28 @@ class DebugToolsScreenVM {
         stackTrace: s,
       );
     }
+  }
+
+  /// Exports network requests as a Postman collection and shares via system dialog.
+  ///
+  /// Retrieves all requests for the currently selected host [selectedExportHost],
+  /// converts them to Postman Collection v2.1 format, and shares the JSON file
+  /// through the device's share functionality.
+  ///
+  /// Takes the last request from each grouped set of requests with the same path.
+  Future<void> exportPostmanCollection() async {
+    final host = selectedExportHost.value;
+    final requests =
+        await storageService.getFilteredGroups(NetworkRequestFilter(), host);
+    final postmanJson = PostmanExportService.exportToPostmanCollection(
+      requests: requests
+          .map((list) => list.isNotEmpty ? list.last : null)
+          .whereType<NetworkRequest>()
+          .toList(),
+      collectionName: 'Network Tracker Export - $host',
+    );
+
+    Utils.shareFile(postmanJson);
   }
 
   /// Extracts the hostname from a URL or returns the input if it's already a host.

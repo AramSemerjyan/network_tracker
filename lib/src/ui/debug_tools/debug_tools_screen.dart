@@ -271,7 +271,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
               Flexible(child: subtitle),
               const SizedBox(height: 8),
               ValueListenableBuilder(
-                  valueListenable: _vm.allHosts,
+                  valueListenable: _vm.allPingHosts,
                   builder: (_, hosts, __) {
                     if (hosts.isEmpty) {
                       return SizedBox.shrink();
@@ -329,10 +329,14 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
               ValueListenableBuilder(
                 valueListenable: _vm.pingResults,
                 builder: (_, result, __) {
-                  return SizedBox(
-                    height: 200,
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 200,
+                      minHeight: 0,
+                    ),
                     child: ListView(
                       controller: _pingScrollController,
+                      shrinkWrap: true,
                       children: result.map((r) {
                         return Text(
                           r.error != null
@@ -351,6 +355,79 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
           ),
           state.loadingProgress,
           _vm.pingHost,
+        );
+      },
+    );
+  }
+
+  Widget _buildPostmanExportRow() {
+    return ValueListenableBuilder(
+      valueListenable: _vm.exportCollectionState,
+      builder: (_, state, __) {
+        Widget subtitle;
+
+        switch (state.loadingProgress) {
+          case LoadingProgressState.idle:
+            subtitle = Text('Export network requests to Postman collection');
+            break;
+          case LoadingProgressState.inProgressStoppable:
+          case LoadingProgressState.inProgress:
+            subtitle = LoadingLabel();
+            break;
+          case LoadingProgressState.completed:
+            subtitle = Text('Export completed successfully');
+            break;
+          case LoadingProgressState.error:
+            subtitle = Text('Error: ${state.error}');
+        }
+
+        return _buildRow(
+          const Text('Export Postman Collection'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              subtitle,
+              ValueListenableBuilder(
+                  valueListenable: _vm.allExportHosts,
+                  builder: (_, hosts, __) {
+                    if (hosts.isEmpty) {
+                      return SizedBox.shrink();
+                    }
+
+                    return ValueListenableBuilder(
+                      valueListenable: _vm.selectedExportHost,
+                      builder: (_, selectedUrl, __) {
+                        final selected = hosts.contains(selectedUrl)
+                            ? selectedUrl
+                            : hosts.first;
+
+                        return DropdownButton<String>(
+                          value: selected,
+                          hint: const Text('Select from recent URLs'),
+                          isExpanded: true,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          onChanged: (value) {
+                            if (value != null) {
+                              _vm.selectedExportHost.value = value;
+                            }
+                          },
+                          items: hosts.map((url) {
+                            return DropdownMenuItem<String>(
+                              value: url,
+                              child: Text(
+                                url,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    );
+                  }),
+            ],
+          ),
+          state.loadingProgress,
+          _vm.exportPostmanCollection,
         );
       },
     );
@@ -376,6 +453,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
               _buildExternalIpRow(),
               Divider(height: 1),
               _buildPingRow(),
+              Divider(height: 1),
+              _buildPostmanExportRow(),
             ],
           ),
         ),
