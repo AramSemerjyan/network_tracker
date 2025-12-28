@@ -38,6 +38,12 @@ abstract class NetworkSpeedTestServiceInterface {
     int iterations = 3,
     void Function(int received, int total)? onProgress,
   });
+
+  /// Stops any ongoing speed test.
+  ///
+  /// Cancels the current download operation if a test is in progress.
+  /// This is safe to call even if no test is running.
+  void stopTest();
 }
 
 /// Default implementation of [NetworkSpeedTestServiceInterface] using Dio.
@@ -46,6 +52,12 @@ abstract class NetworkSpeedTestServiceInterface {
 class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
   /// Dio instance used to perform the download. Can be injected for testing or customization.
   final Dio _dio;
+
+  /// Cancel token for stopping ongoing speed tests
+  CancelToken? _cancelToken;
+
+  /// Flag to track if a test is currently active and callbacks should be invoked
+  bool _isTestActive = false;
 
   /// Creates a new [NetworkSpeedTestService] with an optional custom Dio instance.
   NetworkSpeedTestService({Dio? dio}) : _dio = dio ?? _createDio();
@@ -107,11 +119,17 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
     int iterations = 3,
     void Function(int received, int total)? onProgress,
   }) async {
+    // Create a new cancel token for this test
+    _cancelToken = CancelToken();
+    _isTestActive = true;
     final speeds = <double>[];
 
     // Warmup request (not counted)
     try {
-      await _dio.head(file.urlString);
+      await _dio.head(
+        file.urlString,
+        cancelToken: _cancelToken,
+      );
     } catch (_) {}
 
     // Perform multiple test runs
@@ -122,7 +140,15 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
         final response = await _dio.get<List<int>>(
           file.urlString,
           options: Options(responseType: ResponseType.bytes),
-          onReceiveProgress: onProgress,
+          onReceiveProgress: onProgress != null
+              ? (received, total) {
+                  // Only call progress callback if test is still active and not cancelled
+                  if (_isTestActive && !(_cancelToken?.isCancelled ?? false)) {
+                    onProgress(received, total);
+                  }
+                }
+              : null,
+          cancelToken: _cancelToken,
         );
 
         stopwatch.stop();
@@ -142,6 +168,14 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
     }
 
     if (speeds.isEmpty) {
+      // Check if it was cancelled
+      if (_cancelToken?.isCancelled ?? false) {
+        _cancelToken = null;
+        _isTestActive = false;
+        throw HttpException('Speed test was cancelled');
+      }
+      _cancelToken = null;
+      _isTestActive = false;
       throw HttpException('All speed test runs failed');
     }
 
@@ -149,7 +183,22 @@ class NetworkSpeedTestService implements NetworkSpeedTestServiceInterface {
     speeds.sort();
     final medianSpeed = speeds[speeds.length ~/ 2];
 
+    // Clear cancel token and active flag after successful completion
+    _cancelToken = null;
+    _isTestActive = false;
+
     return _formatNetworkSpeed(medianSpeed);
+  }
+
+  /// Stops any ongoing speed test by cancelling the current download operation.
+  ///
+  /// This method is safe to call even if no test is currently running.
+  /// Once stopped, the test will throw an [HttpException] with message "Speed test was cancelled".
+  @override
+  void stopTest() {
+    _isTestActive = false;
+    _cancelToken?.cancel('Speed test stopped by user');
+    _cancelToken = null;
   }
 
   /// Formats a speed value in bits per second to a human-readable string.

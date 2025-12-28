@@ -27,6 +27,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   void dispose() {
     _pingScrollController.dispose();
     _vm.pingResults.removeListener(_scrollToBottom);
+    _vm.dispose();
     super.dispose();
   }
 
@@ -44,8 +45,13 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
     }
   }
 
-  void _runSpeedTest() async {
-    _vm.testSpeed();
+  void _runSpeedTest() {
+    if (_vm.speedTestState.value.loadingProgress ==
+        LoadingProgressState.inProgressStoppable) {
+      _vm.stopSpeedTest();
+    } else {
+      _vm.testSpeed();
+    }
   }
 
   void _fetchExternalIP() async {
@@ -54,15 +60,16 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
   Widget _buildRow(Widget title, Widget subtitle, LoadingProgressState state,
       VoidCallback onTap) {
+    final isStoppable = state == LoadingProgressState.inProgressStoppable;
+    final isInProgress = state == LoadingProgressState.inProgress;
+
     return ListTile(
       title: Row(
         children: [
           Expanded(child: title),
           ElevatedButton(
-            onPressed: state == LoadingProgressState.inProgress ? null : onTap,
-            child: Text(state == LoadingProgressState.inProgressStoppable
-                ? 'Stop'
-                : 'Run'),
+            onPressed: isInProgress ? null : onTap,
+            child: Text(isStoppable ? 'Stop' : 'Run'),
           )
         ],
       ),

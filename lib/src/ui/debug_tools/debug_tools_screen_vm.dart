@@ -66,7 +66,7 @@ class DebugToolsScreenVM {
   late final ValueNotifier<List<PingData>> pingResults = ValueNotifier([]);
 
   /// Active ping instance (used for stopping ongoing pings)
-  late Ping? _ping;
+  Ping? _ping;
 
   /// Subscription to the ping stream (used for cleanup)
   late StreamSubscription? _pingSubscription;
@@ -75,10 +75,10 @@ class DebugToolsScreenVM {
   List<SpeedTestFile> get speedTestFiles => SpeedTestFile.values;
 
   /// List of all previously accessed hosts extracted from stored URLs
-  late ValueNotifier<List<String>> allPingHosts = ValueNotifier([]);
+  late final ValueNotifier<List<String>> allPingHosts = ValueNotifier([]);
 
   /// Currently selected base URL for Postman collection export
-  late ValueNotifier<String> selectedExportHost = ValueNotifier('');
+  late final ValueNotifier<String> selectedExportHost = ValueNotifier('');
 
   /// List of all previously accessed base URLs available for export
   late final ValueNotifier<List<String>> allExportHosts = ValueNotifier([]);
@@ -93,22 +93,36 @@ class DebugToolsScreenVM {
       DartPingIOS.register();
     }
 
-    storageService.getUrls().then((urls) {
+    _initialize();
+  }
+
+  /// Initializes the view model by loading previously accessed URLs.
+  ///
+  /// This method is called automatically during construction but can also
+  /// be called manually to refresh the list of hosts.
+  Future<void> _initialize() async {
+    try {
+      final urls = await storageService.getUrls();
       allExportHosts.value = urls;
       allPingHosts.value = urls.map(_extractHost).toList();
       selectedPingUrl.value =
           allPingHosts.value.isNotEmpty ? allPingHosts.value.first : '';
       selectedExportHost.value = urls.isNotEmpty ? urls.first : '';
-    });
+    } catch (e, s) {
+      // Handle initialization errors if necessary
+      print('Error initializing DebugToolsScreenVM: $e\n$s');
+    }
   }
 
   /// Performs an internet speed test using the currently selected test file.
   ///
   /// Downloads a file and calculates download speed. Updates [speedTestState]
   /// with the result (speed as a formatted string) or error.
+  /// Can be stopped mid-test by calling [stopSpeedTest].
   Future<void> testSpeed() async {
     speedTestState.value =
-        LoadingState(loadingProgress: LoadingProgressState.inProgress);
+        LoadingState(loadingProgress: LoadingProgressState.inProgressStoppable);
+    downloadProgress.value = null;
 
     try {
       final result = await _speedTestService.testDownloadSpeed(
@@ -125,13 +139,27 @@ class DebugToolsScreenVM {
         loadingProgress: LoadingProgressState.completed,
         result: result,
       );
+      downloadProgress.value = null;
     } catch (e, s) {
       speedTestState.value = LoadingState(
         loadingProgress: LoadingProgressState.error,
         error: e,
         stackTrace: s,
       );
+      downloadProgress.value = null;
     }
+  }
+
+  /// Stops any ongoing speed test.
+  ///
+  /// Cancels the current download operation if a test is in progress.
+  /// Updates [speedTestState] to completed state.
+  void stopSpeedTest() {
+    _speedTestService.stopTest();
+    speedTestState.value = LoadingState(
+      loadingProgress: LoadingProgressState.completed,
+    );
+    downloadProgress.value = null;
   }
 
   /// Fetches network information including external IP, local IP, and location data.
@@ -230,22 +258,77 @@ class DebugToolsScreenVM {
   ///
   /// Retrieves all requests for the currently selected host [selectedExportHost],
   /// converts them to Postman Collection v2.1 format, and shares the JSON file
-  /// through the device's share functionality.
-  ///
-  /// Takes the last request from each grouped set of requests with the same path.
+  /// Updates [exportCollectionState] to reflect the operation status.
   Future<void> exportPostmanCollection() async {
-    final host = selectedExportHost.value;
-    final requests =
-        await storageService.getFilteredGroups(NetworkRequestFilter(), host);
-    final postmanJson = PostmanExportService.exportToPostmanCollection(
-      requests: requests
+    exportCollectionState.value =
+        LoadingState(loadingProgress: LoadingProgressState.inProgress);
+
+    try {
+      final host = selectedExportHost.value;
+      final requests =
+          await storageService.getFilteredGroups(NetworkRequestFilter(), host);
+
+      final requestList = requests
           .map((list) => list.isNotEmpty ? list.last : null)
           .whereType<NetworkRequest>()
-          .toList(),
-      collectionName: 'Network Tracker Export - $host',
-    );
+          .toList();
 
-    Utils.shareFile(postmanJson);
+      if (requestList.isEmpty) {
+        exportCollectionState.value = LoadingState(
+          loadingProgress: LoadingProgressState.error,
+          error: 'No requests available for export',
+        );
+        return;
+      }
+
+      final postmanJson = PostmanExportService.exportToPostmanCollection(
+        requests: requestList,
+        collectionName: 'Network Tracker Export - $host',
+      );
+
+      await Utils.shareFile(postmanJson);
+
+      exportCollectionState.value = LoadingState(
+        loadingProgress: LoadingProgressState.completed,
+      );
+    } catch (e, s) {
+      exportCollectionState.value = LoadingState(
+        loadingProgress: LoadingProgressState.error,
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  /// Disposes of all resources used by this view model.
+  ///
+  /// Should be called when the view model is no longer needed to prevent memory leaks.
+  /// Cancels any ongoing ping operations and disposes all ValueNotifier instances.
+  void dispose() {
+    // Stop ongoing speed test
+    stopSpeedTest();
+
+    // Stop ongoing ping
+    if (_ping != null) {
+      _ping?.stop();
+      _pingSubscription?.cancel();
+      _pingSubscription = null;
+      _ping = null;
+    }
+
+    // Dispose all ValueNotifiers
+    selectedSpeedTestFile.dispose();
+    speedTestIterations.dispose();
+    speedTestState.dispose();
+    downloadProgress.dispose();
+    networkInfoState.dispose();
+    selectedPingUrl.dispose();
+    pingState.dispose();
+    pingResults.dispose();
+    allPingHosts.dispose();
+    selectedExportHost.dispose();
+    allExportHosts.dispose();
+    exportCollectionState.dispose();
   }
 
   /// Extracts the hostname from a URL or returns the input if it's already a host.
