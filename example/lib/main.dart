@@ -54,8 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
     '/albums/1',
   ];
 
-  late final Dio _jsonPlaceholderDio =
-      Dio(BaseOptions(baseUrl: _jsonPlaceholder));
+  late final Dio _jsonPlaceholderDio = Dio(
+    BaseOptions(
+      baseUrl: _jsonPlaceholder,
+      headers: {
+        'User-Agent': 'network-tracker-example',
+        'Accept': 'application/json',
+      },
+    ),
+  );
 
   late final Dio _dummyJsonDio = Dio(BaseOptions(baseUrl: _dummyJson));
 

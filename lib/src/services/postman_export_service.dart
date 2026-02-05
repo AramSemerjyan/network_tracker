@@ -26,13 +26,6 @@ class PostmanExportService {
     );
 
     return collection;
-
-    // if (prettyPrint) {
-    //   const encoder = JsonEncoder.withIndent('  ');
-    //   return encoder.convert(collection);
-    // }
-
-    // return jsonEncode(collection);
   }
 
   /// Builds the Postman collection structure.
