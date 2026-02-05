@@ -15,7 +15,7 @@ class PostmanExportService {
   /// - [prettyPrint]: Whether to format the JSON output with indentation (default: true)
   ///
   /// Returns a JSON string that can be saved as a `.json` file and imported into Postman.
-  static Map<String, dynamic> exportToPostmanCollection({
+  static String exportToPostmanCollection({
     required List<NetworkRequest> requests,
     required String collectionName,
     bool prettyPrint = true,
@@ -24,8 +24,9 @@ class PostmanExportService {
       requests: requests,
       collectionName: collectionName,
     );
-
-    return collection;
+    return prettyPrint
+        ? const JsonEncoder.withIndent('  ').convert(collection)
+        : jsonEncode(collection);
   }
 
   /// Builds the Postman collection structure.

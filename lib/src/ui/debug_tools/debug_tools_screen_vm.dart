@@ -108,9 +108,9 @@ class DebugToolsScreenVM {
       selectedPingUrl.value =
           allPingHosts.value.isNotEmpty ? allPingHosts.value.first : '';
       selectedExportHost.value = urls.isNotEmpty ? urls.first : '';
-    } catch (e, s) {
+    } catch (e) {
       // Handle initialization errors if necessary
-      print('Error initializing DebugToolsScreenVM: $e\n$s');
+      // TODO: Consider logging this error using a logging package in development.
     }
   }
 

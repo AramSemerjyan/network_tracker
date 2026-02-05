@@ -26,7 +26,7 @@ class ExpandablePresetsSection extends StatefulWidget {
 
 /// State for [ExpandablePresetsSection].
 class ExpandablePresetsSectionState extends State<ExpandablePresetsSection> {
-  bool _expanded = false;
+  bool expanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class ExpandablePresetsSectionState extends State<ExpandablePresetsSection> {
           title:
               Text('Presets', style: Theme.of(context).textTheme.titleMedium),
           initiallyExpanded: false,
-          onExpansionChanged: (v) => setState(() => _expanded = v),
+          onExpansionChanged: (v) => setState(() => expanded = v),
           childrenPadding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
           children: [
             if (statusPresets.isNotEmpty) ...[
