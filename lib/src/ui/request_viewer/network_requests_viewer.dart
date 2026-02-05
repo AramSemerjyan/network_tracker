@@ -9,6 +9,14 @@ import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.
 import '../common/connection_status_view/connection_status_view.dart';
 import '../request_details_screen/request_details_screen.dart';
 
+enum _RequestsMenuAction {
+  debugTools,
+  repeatRequest,
+  toggleSearch,
+  toggleFilter,
+  clearAll,
+}
+
 class NetworkRequestsViewer extends StatefulWidget {
   static void showPage({
     required BuildContext context,
@@ -122,6 +130,25 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     );
   }
 
+  void _onMenuAction(_RequestsMenuAction action) {
+    switch (action) {
+      case _RequestsMenuAction.debugTools:
+        _moveToDebugTools();
+        break;
+      case _RequestsMenuAction.repeatRequest:
+        _moveToRepeat();
+        break;
+      case _RequestsMenuAction.toggleSearch:
+        _onSearchTap();
+        break;
+      case _RequestsMenuAction.toggleFilter:
+        _onFilterTap();
+        break;
+      case _RequestsMenuAction.clearAll:
+        _vm.clearRequestsList();
+    }
+  }
+
   Widget _buildSearchBar() {
     return ValueListenableBuilder<bool>(
       valueListenable: _showSearchBar,
@@ -214,19 +241,19 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     );
   }
 
-  Widget _buildActionButton({
-    VoidCallback? onTap,
-    required Widget child,
+  PopupMenuItem<_RequestsMenuAction> _buildMenuItem({
+    required _RequestsMenuAction value,
+    required IconData icon,
+    required String label,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: SizedBox(
-          height: 20,
-          width: 20,
-          child: child,
-        ),
+    return PopupMenuItem<_RequestsMenuAction>(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
       ),
     );
   }
@@ -299,37 +326,39 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         surfaceTintColor: Colors.transparent,
         leading: CloseButton(),
         actions: [
-          _buildActionButton(
-            onTap: _moveToDebugTools,
-            child: Icon(Icons.bug_report),
-          ),
-          _buildActionButton(
-            onTap: _moveToRepeat,
-            child: Icon(Icons.repeat),
-          ),
-          ValueListenableBuilder(
-            valueListenable: _showSearchBar,
-            builder: (c, v, w) {
-              return _buildActionButton(
-                onTap: _onSearchTap,
-                child: Icon(v ? Icons.close : Icons.search),
-              );
-            },
-          ),
-          ValueListenableBuilder(
-            valueListenable: _showFilterBar,
-            builder: (c, v, w) {
-              return _buildActionButton(
-                onTap: _onFilterTap,
-                child: Icon(
-                  v ? Icons.filter_alt_off : Icons.filter_alt,
+          PopupMenuButton<_RequestsMenuAction>(
+            onSelected: _onMenuAction,
+            itemBuilder: (context) {
+              final showSearch = _showSearchBar.value;
+              final showFilter = _showFilterBar.value;
+              return [
+                _buildMenuItem(
+                  value: _RequestsMenuAction.debugTools,
+                  icon: Icons.bug_report,
+                  label: 'Debug tools',
                 ),
-              );
+                _buildMenuItem(
+                  value: _RequestsMenuAction.repeatRequest,
+                  icon: Icons.repeat,
+                  label: 'Repeat request',
+                ),
+                _buildMenuItem(
+                  value: _RequestsMenuAction.toggleSearch,
+                  icon: showSearch ? Icons.close : Icons.search,
+                  label: showSearch ? 'Hide search' : 'Show search',
+                ),
+                _buildMenuItem(
+                  value: _RequestsMenuAction.toggleFilter,
+                  icon: showFilter ? Icons.filter_alt_off : Icons.filter_alt,
+                  label: showFilter ? 'Hide filters' : 'Show filters',
+                ),
+                _buildMenuItem(
+                  value: _RequestsMenuAction.clearAll,
+                  icon: Icons.delete_forever,
+                  label: 'Clear requests',
+                ),
+              ];
             },
-          ),
-          _buildActionButton(
-            onTap: _vm.clearRequestsList,
-            child: Icon(Icons.delete_forever),
           ),
         ],
       ),
