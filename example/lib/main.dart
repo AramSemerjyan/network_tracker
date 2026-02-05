@@ -17,6 +17,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.dark;
   static const Color _darkBackground = Color(0xFF1F2238);
+  static final Color _darkCard = Color.alphaBlend(
+    Colors.white.withAlpha(18),
+    _darkBackground,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +39,11 @@ class _MyAppState extends State<MyApp> {
           brightness: Brightness.dark,
         ).copyWith(
           surface: _darkBackground,
-          background: _darkBackground,
         ),
-        cardTheme: CardThemeData(
-          color: Color.alphaBlend(
-            Colors.white.withAlpha(18),
-            _darkBackground,
+        cardTheme: CardThemeData(color: _darkCard),
+        dropdownMenuTheme: DropdownMenuThemeData(
+          menuStyle: MenuStyle(
+            backgroundColor: WidgetStateProperty.all(_darkCard),
           ),
         ),
         scaffoldBackgroundColor: _darkBackground,
