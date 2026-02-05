@@ -63,13 +63,13 @@ class GradientButton extends StatelessWidget {
       ],
     );
 
-    final backgroundColor = isDark
-        ? (enabled ? null : scheme.surfaceContainerHighest)
-        : scheme.primary;
+    final backgroundColor = enabled
+        ? (isDark ? null : scheme.primaryContainer)
+        : scheme.surfaceContainerHighest;
 
-    final foregroundColor = isDark
-        ? (enabled ? Colors.white : scheme.onSurfaceVariant)
-        : scheme.onPrimary;
+    final foregroundColor = enabled
+        ? (isDark ? Colors.white : scheme.onPrimaryContainer)
+        : scheme.onSurfaceVariant;
 
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight, minWidth: minWidth),
