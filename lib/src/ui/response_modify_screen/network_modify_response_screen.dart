@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../model/network_request.dart';
 import '../../services/request_status.dart';
+import '../../services/network_request_service.dart';
+import '../../model/response_modification.dart';
 import 'expandable_json_section.dart';
 import 'expandable_presets_section.dart';
 import 'reponse_preset.dart';
@@ -77,13 +79,32 @@ class _NetworkModifyResponseScreenState
   void initState() {
     super.initState();
     final r = widget.originalRequest;
-    _statusController =
-        TextEditingController(text: r.statusCode?.toString() ?? '');
-    // _statusController.addListener(_onStatusCodeChanged);
-    _bodyController = TextEditingController(text: _formatBody(r.responseData));
-    _headersController =
-        TextEditingController(text: _formatHeaders(r.responseHeaders));
-    _delayController = TextEditingController();
+
+    // Try to get a saved response modification for this request
+    final ResponseModification? mod =
+        NetworkRequestService.instance.getResponseModification(
+      baseUrl: r.baseUrl,
+      path: r.path,
+      method: r.method,
+    );
+
+    // Prepopulate fields with modification if exists, else use request data
+    _statusController = TextEditingController(
+      text: (mod?.statusCode ?? r.statusCode)?.toString() ?? '',
+    );
+    _bodyController = TextEditingController(
+      text: mod?.responseData != null
+          ? _formatBody(mod!.responseData)
+          : _formatBody(r.responseData),
+    );
+    _headersController = TextEditingController(
+      text: mod?.headers != null
+          ? const JsonEncoder.withIndent('  ').convert(mod!.headers)
+          : _formatHeaders(r.responseHeaders),
+    );
+    _delayController = TextEditingController(
+      text: mod?.delay != null ? mod!.delay!.inMilliseconds.toString() : '',
+    );
     _availablePresets = ValueNotifier<List<ResponsePreset>>(
         List<ResponsePreset>.from([...kStatusPresets, ...kCustomPresets]));
     _selectedPresets = ValueNotifier<Set<ResponsePreset>>({});
@@ -250,6 +271,20 @@ class _NetworkModifyResponseScreenState
     });
   }
 
+  void _resetModifier() {
+    final r = widget.originalRequest;
+    NetworkRequestService.instance.clearResponseModification(
+      baseUrl: r.baseUrl,
+      path: r.path,
+      method: r.method,
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Response modification reset')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bodyJson = _tryDecodeJson(_bodyController.text);
@@ -261,6 +296,13 @@ class _NetworkModifyResponseScreenState
         title: const Text('Modify Response'),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reset Modifier',
+            onPressed: _resetModifier,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
