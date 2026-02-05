@@ -217,101 +217,194 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Select Dio client:'),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: DropdownButtonFormField<String>(
-              initialValue: _selectedClient.value,
-              isExpanded: true,
-              onChanged: (clientBaseUrl) => setState(() {
-                _selectedClient.value = clientBaseUrl!;
-              }),
-              items: _baseUrls
-                  .map((clientBaseUrl) => DropdownMenuItem(
-                        value: clientBaseUrl,
-                        child: Text(
-                          clientBaseUrl,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ))
-                  .toList(),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Dio client',
-              ),
-            ),
-          ),
-          ValueListenableBuilder(
-              valueListenable: _selectedClient,
-              builder: (_, baseUrl, __) {
-                if (baseUrl == _jsonPlaceholder) {
-                  return Column(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final theme = Theme.of(context);
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text('Select method and path:'),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _selectedMethod,
-                          onChanged: (value) => setState(() {
-                            _selectedMethod = value!;
-                          }),
-                          items: _methods
-                              .map((method) => DropdownMenuItem(
-                                    value: method,
-                                    child: Text(method),
-                                  ))
-                              .toList(),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'HTTP Method',
+                      Text(
+                        'Request Playground',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Try different clients and endpoints to generate traffic for the tracker.',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 20),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Client',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedClient.value,
+                                isExpanded: true,
+                                onChanged: (clientBaseUrl) => setState(() {
+                                  _selectedClient.value = clientBaseUrl!;
+                                }),
+                                items: _baseUrls
+                                    .map((clientBaseUrl) => DropdownMenuItem(
+                                          value: clientBaseUrl,
+                                          child: Text(
+                                            clientBaseUrl,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ))
+                                    .toList(),
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Dio client',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _selectedPath,
-                          onChanged: (value) => setState(() {
-                            _selectedPath = value!;
-                          }),
-                          items: filteredPaths
-                              .map((path) => DropdownMenuItem(
-                                    value: path,
-                                    child: Text(path),
-                                  ))
-                              .toList(),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Endpoint',
+                      const SizedBox(height: 16),
+                      ValueListenableBuilder(
+                        valueListenable: _selectedClient,
+                        builder: (_, baseUrl, __) {
+                          if (baseUrl != _jsonPlaceholder) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Request Setup',
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  DropdownButtonFormField<String>(
+                                    initialValue: _selectedMethod,
+                                    onChanged: (value) => setState(() {
+                                      _selectedMethod = value!;
+                                    }),
+                                    items: _methods
+                                        .map((method) => DropdownMenuItem(
+                                              value: method,
+                                              child: Text(method),
+                                            ))
+                                        .toList(),
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'HTTP Method',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  DropdownButtonFormField<String>(
+                                    initialValue: _selectedPath,
+                                    onChanged: (value) => setState(() {
+                                      _selectedPath = value!;
+                                    }),
+                                    items: filteredPaths
+                                        .map((path) => DropdownMenuItem(
+                                              value: path,
+                                              child: Text(path),
+                                            ))
+                                        .toList(),
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Endpoint',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Actions',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ValueListenableBuilder(
+                                valueListenable: _selectedClient,
+                                builder: (_, baseUrl, __) {
+                                  if (baseUrl == _jsonPlaceholder) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Colors.greenAccent.withAlpha(
+                                              180,
+                                            ),
+                                          ),
+                                          onPressed: _makeRequest,
+                                          child: const Text('Make Request'),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Colors.red.withAlpha(180),
+                                          ),
+                                          onPressed: _makeErrorRequest,
+                                          child:
+                                              const Text('Make Error Request'),
+                                        ),
+                                      ],
+                                    );
+                                  }
+
+                                  return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.greenAccent.withAlpha(180),
+                                    ),
+                                    onPressed: _makeRequest,
+                                    child: const Text('Make Request'),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.withAlpha(180),
-                        ),
-                        onPressed: _makeErrorRequest,
-                        child: const Text('Make Error Request'),
                       ),
                     ],
-                  );
-                }
-
-                return Container();
-              }),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.greenAccent.withAlpha(180),
-            ),
-            onPressed: _makeRequest,
-            child: const Text('Make Request'),
-          ),
-        ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
