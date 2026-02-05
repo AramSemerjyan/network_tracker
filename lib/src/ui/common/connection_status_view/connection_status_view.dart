@@ -27,13 +27,15 @@ class _ConnectionStatusViewState extends State<ConnectionStatusView> {
 
         if (result == null) return Container();
 
+        final scheme = Theme.of(context).colorScheme;
+
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
               padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: result.color,
+                color: result.color(scheme),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -43,11 +45,11 @@ class _ConnectionStatusViewState extends State<ConnectionStatusView> {
                   Text(
                     result.title,
                     style: TextStyle(
-                      color: result.tintColor,
+                      color: result.tintColor(scheme),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  Icon(result.icon, color: result.tintColor),
+                  Icon(result.icon, color: result.tintColor(scheme)),
                 ],
               ),
             ),

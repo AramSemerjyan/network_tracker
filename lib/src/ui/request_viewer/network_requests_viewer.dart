@@ -13,10 +13,11 @@ class NetworkRequestsViewer extends StatefulWidget {
   static void showPage({
     required BuildContext context,
   }) {
+    final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
+      barrierColor: scheme.scrim.withValues(alpha: 0.5),
       backgroundColor: Colors.transparent,
       builder: (c) {
         return ConstrainedBox(
@@ -31,7 +32,7 @@ class NetworkRequestsViewer extends StatefulWidget {
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(16),
                 topLeft: Radius.circular(16),
@@ -291,7 +292,7 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Center(child: const Text('Requests')),
         backgroundColor: Colors.transparent,

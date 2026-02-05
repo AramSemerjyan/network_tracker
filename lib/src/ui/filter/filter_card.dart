@@ -19,9 +19,10 @@ class FilterCard<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = value != null;
+    final scheme = Theme.of(context).colorScheme;
 
     return Card(
-      color: isSelected ? Colors.blue.shade50 : Colors.grey.shade200,
+      color: isSelected ? scheme.primaryContainer : scheme.surfaceVariant,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -68,14 +69,16 @@ class FilterCard<T> extends StatelessWidget {
                   Text(
                     '$title: ',
                     style: TextStyle(
-                      color: isSelected ? Colors.blue : Colors.black,
+                      color:
+                          isSelected ? scheme.onPrimaryContainer : scheme.onSurface,
                     ),
                   ),
                   Text(
                     value != null ? getLabel(value as T) : 'Any',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.blue : Colors.black,
+                      color:
+                          isSelected ? scheme.onPrimaryContainer : scheme.onSurface,
                     ),
                   ),
                   const Icon(Icons.arrow_drop_down),

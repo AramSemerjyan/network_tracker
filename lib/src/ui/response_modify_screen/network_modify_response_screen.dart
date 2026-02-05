@@ -6,6 +6,7 @@ import '../../model/network_request.dart';
 import '../../services/request_status.dart';
 import '../../services/network_request_service.dart';
 import '../../model/response_modification.dart';
+import '../common/gradient_button.dart';
 import 'expandable_json_section.dart';
 import 'expandable_presets_section.dart';
 import 'reponse_preset.dart';
@@ -291,7 +292,7 @@ class _NetworkModifyResponseScreenState
     final headersJson = _tryDecodeJson(_headersController.text);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Modify Response'),
         backgroundColor: Colors.transparent,
@@ -410,9 +411,9 @@ class _NetworkModifyResponseScreenState
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
+            GradientButton.icon(
               onPressed: _applyChanges,
-              icon: const Icon(Icons.check),
+              icon: Icons.check,
               label: const Text('Apply'),
             ),
           ],

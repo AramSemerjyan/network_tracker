@@ -67,7 +67,7 @@ class ExpandablePresetsSectionState extends State<ExpandablePresetsSection> {
                     return ActionChip(
                       label: Text(preset.label),
                       onPressed: () => widget.onSelect(preset),
-                      disabledColor: Colors.grey.shade300,
+                      disabledColor: Theme.of(context).disabledColor,
                     );
                   },
                 ),

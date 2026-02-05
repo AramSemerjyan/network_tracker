@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 
+enum RequestBadgeKind { repeated, modified }
+
 class RequestBadgeConfig {
   final String title;
-  final Color color;
+  final RequestBadgeKind kind;
 
   RequestBadgeConfig({
     required this.title,
-    required this.color,
+    required this.kind,
   });
 
   factory RequestBadgeConfig.repeated() {
     return RequestBadgeConfig(
       title: 'Repeated',
-      color: Colors.orange.shade300,
+      kind: RequestBadgeKind.repeated,
     );
   }
 
   factory RequestBadgeConfig.modified() {
     return RequestBadgeConfig(
       title: 'Modified',
-      color: Colors.purple.shade300,
+      kind: RequestBadgeKind.modified,
     );
   }
 }
@@ -34,16 +36,30 @@ class RequestBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    late final Color backgroundColor;
+    late final Color textColor;
+    switch (config.kind) {
+      case RequestBadgeKind.repeated:
+        backgroundColor = scheme.secondaryContainer;
+        textColor = scheme.onSecondaryContainer;
+        break;
+      case RequestBadgeKind.modified:
+        backgroundColor = scheme.tertiaryContainer;
+        textColor = scheme.onTertiaryContainer;
+        break;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: config.color,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         config.title,
         style: TextStyle(
-          color: Colors.white,
+          color: textColor,
           fontSize: 10,
           fontWeight: FontWeight.bold,
         ),

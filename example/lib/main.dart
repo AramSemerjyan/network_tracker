@@ -7,26 +7,65 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.dark;
+  static const Color _darkBackground = Color(0xFF1F2238);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Network tracker demo'),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ).copyWith(
+          surface: _darkBackground,
+          background: _darkBackground,
+        ),
+        scaffoldBackgroundColor: _darkBackground,
+        appBarTheme: const AppBarTheme(backgroundColor: _darkBackground),
+        useMaterial3: true,
+      ),
+      themeMode: _themeMode,
+      home: MyHomePage(
+        title: 'Network tracker demo',
+        isDarkMode: _themeMode == ThemeMode.dark,
+        onThemeModeChanged: (isDark) {
+          setState(() {
+            _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+          });
+        },
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+    required this.title,
+    required this.isDarkMode,
+    required this.onThemeModeChanged,
+  });
 
   final String title;
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeModeChanged;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -162,6 +201,15 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
+          Tooltip(
+            message: widget.isDarkMode ? 'Dark mode' : 'Light mode',
+            child: IconButton(
+              icon: Icon(
+                widget.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              ),
+              onPressed: () => widget.onThemeModeChanged(!widget.isDarkMode),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.list_alt),
             tooltip: 'Open tracker',

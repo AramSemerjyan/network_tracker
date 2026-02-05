@@ -35,15 +35,15 @@ extension ConnectivityResultExt on ConnectivityResult {
     }
   }
 
-  Color get tintColor {
+  Color tintColor(ColorScheme scheme) {
     switch (this) {
       case ConnectivityResult.none:
-        return Colors.red.shade800;
+        return scheme.onErrorContainer;
       case ConnectivityResult.vpn:
       case ConnectivityResult.other:
-        return Colors.orange.shade800;
+        return scheme.onTertiaryContainer;
       default:
-        return Colors.green.shade800;
+        return scheme.onSecondaryContainer;
     }
   }
 
@@ -66,16 +66,16 @@ extension ConnectivityResultExt on ConnectivityResult {
     }
   }
 
-  Color get color {
+  Color color(ColorScheme scheme) {
     switch (this) {
       case ConnectivityResult.none:
-        return Colors.red.shade300;
+        return scheme.errorContainer;
       case ConnectivityResult.vpn:
-        return Colors.amber.shade300;
+        return scheme.tertiaryContainer;
       case ConnectivityResult.other:
-        return Colors.amber.shade300;
+        return scheme.tertiaryContainer;
       default:
-        return Colors.green.shade300;
+        return scheme.secondaryContainer;
     }
   }
 }

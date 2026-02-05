@@ -5,6 +5,7 @@ import 'package:network_tracker/src/ui/repeat_request_screen/edit_request_screen
 
 import '../../../model/network_request.dart';
 import '../../../model/network_request_method.dart';
+import '../../common/gradient_button.dart';
 
 class NetworkEditRequestScreen extends StatefulWidget {
   final NetworkRequest originalRequest;
@@ -145,7 +146,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text("Edit & Repeat"),
         backgroundColor: Colors.transparent,
@@ -206,9 +207,9 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
             ),
 
             const SizedBox(height: 24),
-            ElevatedButton.icon(
+            GradientButton.icon(
               onPressed: _sendRequest,
-              icon: const Icon(Icons.send),
+              icon: Icons.send,
               label: const Text("Send"),
             )
           ],

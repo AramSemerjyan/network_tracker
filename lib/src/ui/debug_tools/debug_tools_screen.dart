@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
+import 'package:network_tracker/src/ui/common/gradient_button.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 
@@ -67,7 +68,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
       title: Row(
         children: [
           Expanded(child: title),
-          ElevatedButton(
+          GradientButton(
             onPressed: isInProgress ? null : onTap,
             child: Text(isStoppable ? 'Stop' : 'Run'),
           )
@@ -78,6 +79,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   }
 
   Widget _buildSpeedTestRow() {
+    final scheme = Theme.of(context).colorScheme;
     return ValueListenableBuilder(
       valueListenable: _vm.speedTestState,
       builder: (_, state, __) {
@@ -147,8 +149,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                               child: Text(
                                 iteration.toString(),
                                 overflow: TextOverflow.ellipsis,
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 12),
+                                style: TextStyle(
+                                  color: scheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],
@@ -184,8 +188,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                               child: Text(
                                 file.urlString,
                                 overflow: TextOverflow.ellipsis,
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 12),
+                                style: TextStyle(
+                                  color: scheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],
@@ -249,6 +255,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   }
 
   Widget _buildPingRow() {
+    final scheme = Theme.of(context).colorScheme;
     return ValueListenableBuilder(
       valueListenable: _vm.pingState,
       builder: (_, state, __) {
@@ -350,7 +357,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                               ? 'Error: ${r.error}'
                               : 'from ${r.response?.ip ?? 'unknown'}: time=${r.response?.time?.inMilliseconds ?? 'N/A'} ms: ',
                           style: r.error != null
-                              ? TextStyle(color: Colors.red)
+                              ? TextStyle(color: scheme.error)
                               : null,
                         );
                       }).toList(),
@@ -448,7 +455,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(

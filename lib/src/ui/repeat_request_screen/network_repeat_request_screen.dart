@@ -33,7 +33,7 @@ class _NetworkRepeatRequestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Repeat Network Request'),
         backgroundColor: Colors.transparent,
