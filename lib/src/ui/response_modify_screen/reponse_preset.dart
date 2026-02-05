@@ -1,16 +1,44 @@
 import '../../services/request_status.dart';
 
-enum PresetGroupType { status, custom }
+/// The group type for a response preset.
+///
+/// - [status]: Presets for HTTP status codes (e.g., 200 OK, 404 Not Found)
+/// - [custom]: User-defined or custom presets
+enum PresetGroupType {
+  /// Presets for HTTP status codes (e.g., 200 OK, 404 Not Found)
+  status,
 
+  /// User-defined or custom presets
+  custom,
+}
+
+/// Model for a response preset (status or custom) used in the modify response UI.
+///
+/// A [ResponsePreset] represents a quick-fill option for modifying a network response,
+/// such as a status code, body, headers, delay, and request status.
 class ResponsePreset {
+  /// The label to display for this preset (e.g., '200 OK').
   final String label;
+
+  /// The HTTP status code for this preset.
   final int? statusCode;
+
+  /// The response body for this preset (as a string).
   final String? body;
+
+  /// The headers for this preset.
   final Map<String, String>? headers;
+
+  /// The artificial delay to apply for this preset.
   final Duration? delay;
+
+  /// The group type (status/custom).
   final PresetGroupType group;
+
+  /// The request status (completed/failed/etc) for this preset.
   final RequestStatus? requestStatus;
 
+  /// Creates a [ResponsePreset].
   const ResponsePreset({
     required this.label,
     required this.group,

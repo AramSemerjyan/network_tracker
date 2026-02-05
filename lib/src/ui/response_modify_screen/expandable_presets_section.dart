@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'network_modify_response_screen.dart';
 import 'reponse_preset.dart';
 
+/// An expandable section for selecting response presets (status/custom).
+///
+/// Displays available status and custom presets as chips for quick selection.
 class ExpandablePresetsSection extends StatefulWidget {
+  /// Listenable list of available presets.
   final ValueNotifier<List<ResponsePreset>> availablePresets;
+
+  /// Callback when a preset is selected.
   final void Function(ResponsePreset) onSelect;
+
+  /// Creates an [ExpandablePresetsSection].
   const ExpandablePresetsSection({
     super.key,
     required this.availablePresets,
@@ -17,6 +24,7 @@ class ExpandablePresetsSection extends StatefulWidget {
       ExpandablePresetsSectionState();
 }
 
+/// State for [ExpandablePresetsSection].
 class ExpandablePresetsSectionState extends State<ExpandablePresetsSection> {
   bool _expanded = false;
 
