@@ -52,6 +52,7 @@ abstract class NetworkRequestStorageInterface {
     RequestStatus? status,
     DateTime? endDate,
     DioException? dioError,
+    bool? isModified,
   });
 
   /// Retrieves all requests made to a specific endpoint path.

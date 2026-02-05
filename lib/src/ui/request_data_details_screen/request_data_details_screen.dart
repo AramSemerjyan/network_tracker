@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
-import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
+import 'package:network_tracker/src/ui/common/request_actions_botton.dart';
 import 'package:network_tracker/src/ui/common/requiest_badge_row.dart';
 
 import '../../model/network_request.dart';
@@ -47,7 +47,7 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         actions: [
-          RepeatRequestButton(request: widget.request),
+          RequestActionsButton(request: widget.request),
         ],
       ),
       body: SafeArea(

@@ -111,6 +111,7 @@ class NetworkRequest {
     this.requestSizeBytes,
     this.responseSizeBytes,
     this.isRepeated,
+    this.isModified,
   });
 
   /// A human-readable name for the request, useful for display in UI or logs.
@@ -138,6 +139,7 @@ class NetworkRequest {
     int? requestSize,
     int? responseSize,
     bool? isRepeated,
+    bool? isModified,
   }) {
     return NetworkRequest(
       id: id ?? this.id,
@@ -157,6 +159,7 @@ class NetworkRequest {
       requestSizeBytes: requestSize ?? requestSizeBytes,
       responseSizeBytes: responseSize ?? responseSizeBytes,
       isRepeated: isRepeated ?? this.isRepeated,
+      isModified: isModified ?? this.isModified,
     );
   }
 
@@ -181,6 +184,7 @@ class NetworkRequest {
       'requestSizeBytes': requestSizeBytes,
       'responseSizeBytes': responseSizeBytes,
       'isRepeated': isRepeated == true ? 1 : 0,
+      'isModified': isModified == true ? 1 : 0,
     };
   }
 
@@ -226,6 +230,7 @@ class NetworkRequest {
       requestSizeBytes: json['requestSizeBytes'],
       responseSizeBytes: json['responseSizeBytes'],
       isRepeated: json['isRepeated'] == 1,
+      isModified: json['isModified'] == 1,
     );
   }
 }

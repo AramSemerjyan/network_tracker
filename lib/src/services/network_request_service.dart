@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:network_tracker/src/services/speed_test/network_speed_test_service.dart';
 
 import '../../network_tracker.dart';
+import '../model/network_request_method.dart';
+import '../model/response_modification.dart';
 import '../model/network_request_storage_interface.dart';
 import 'event_service.dart';
 import 'network_repeat_request_service.dart';
@@ -62,6 +64,8 @@ class NetworkRequestService {
   /// Defaults to [NetworkRequestLocalStorage] which keeps requests in memory.
   /// Can be changed via [setStorage] or [setStorageType].
   NetworkRequestStorageInterface _storageService = NetworkRequestLocalStorage();
+
+  final Map<String, ResponseModification> _responseModifications = {};
 
   /// Singleton instance holder.
   static NetworkRequestService? _instance;
@@ -136,5 +140,50 @@ class NetworkRequestService {
   /// ```
   void setDioClient(Dio client) {
     repeatRequestService.setCustomDio(client);
+  }
+
+  void setResponseModification({
+    required String baseUrl,
+    required String path,
+    required NetworkRequestMethod method,
+    required ResponseModification modification,
+  }) {
+    _responseModifications[_modKey(
+      baseUrl: baseUrl,
+      path: path,
+      method: method,
+    )] = modification;
+  }
+
+  ResponseModification? getResponseModification({
+    required String baseUrl,
+    required String path,
+    required NetworkRequestMethod method,
+  }) {
+    return _responseModifications[_modKey(
+      baseUrl: baseUrl,
+      path: path,
+      method: method,
+    )];
+  }
+
+  void clearResponseModification({
+    required String baseUrl,
+    required String path,
+    required NetworkRequestMethod method,
+  }) {
+    _responseModifications.remove(_modKey(
+      baseUrl: baseUrl,
+      path: path,
+      method: method,
+    ));
+  }
+
+  String _modKey({
+    required String baseUrl,
+    required String path,
+    required NetworkRequestMethod method,
+  }) {
+    return '${method.value}::$baseUrl::$path';
   }
 }

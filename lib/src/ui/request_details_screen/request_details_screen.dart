@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
+import 'package:network_tracker/src/ui/common/request_actions_botton.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
 import '../../model/network_request.dart';
@@ -94,7 +94,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
             ],
           ),
-          trailing: RepeatRequestButton(request: request),
+          trailing: RequestActionsButton(request: request),
           onTap: () => _moveToDetails(request),
         );
       },

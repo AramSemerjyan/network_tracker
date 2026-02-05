@@ -42,6 +42,7 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
     RequestStatus? status,
     DateTime? endDate,
     DioException? dioError,
+    bool? isModified,
   }) async {
     final requests = _requests[requestOptions.baseUrl] ?? {};
 
@@ -57,6 +58,7 @@ class NetworkRequestLocalStorage implements NetworkRequestStorageInterface {
           endDate: endDate,
           dioError: dioError,
           responseSize: Utils.estimateSize(response?.data),
+          isModified: isModified ?? request.isModified,
         );
         return;
       }

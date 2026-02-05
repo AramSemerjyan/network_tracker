@@ -1,28 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:json_view/json_view.dart';
 
 import '../../model/network_request.dart';
-
-enum PresetGroupType { status, custom }
-
-class ResponsePreset {
-  final String label;
-  final int? statusCode;
-  final String? body;
-  final Map<String, String>? headers;
-  final Duration? delay;
-  final PresetGroupType group;
-  const ResponsePreset({
-    required this.label,
-    required this.group,
-    this.statusCode,
-    this.body,
-    this.headers,
-    this.delay,
-  });
-}
+import 'expandable_json_section.dart';
+import 'expandable_presets_section.dart';
+import 'reponse_preset.dart';
 
 const List<ResponsePreset> kStatusPresets = [
   ResponsePreset(
@@ -76,7 +59,7 @@ class _NetworkModifyResponseScreenState
     extends State<NetworkModifyResponseScreen> {
   static const double _jsonSectionMaxHeight = 300;
 
-  late final ValueNotifier<List<ResponsePreset>> _selectedPresets;
+  late final ValueNotifier<Set<ResponsePreset>> _selectedPresets;
   late final ValueNotifier<List<ResponsePreset>> _availablePresets;
   late final TextEditingController _headersController;
   late final TextEditingController _delayController;
@@ -89,17 +72,19 @@ class _NetworkModifyResponseScreenState
     final r = widget.originalRequest;
     _statusController =
         TextEditingController(text: r.statusCode?.toString() ?? '');
+    // _statusController.addListener(_onStatusCodeChanged);
     _bodyController = TextEditingController(text: _formatBody(r.responseData));
     _headersController =
         TextEditingController(text: _formatHeaders(r.responseHeaders));
     _delayController = TextEditingController();
     _availablePresets = ValueNotifier<List<ResponsePreset>>(
         List<ResponsePreset>.from([...kStatusPresets, ...kCustomPresets]));
-    _selectedPresets = ValueNotifier<List<ResponsePreset>>([]);
+    _selectedPresets = ValueNotifier<Set<ResponsePreset>>({});
   }
 
   @override
   void dispose() {
+    // _statusController.removeListener(_onStatusCodeChanged);
     _statusController.dispose();
     _bodyController.dispose();
     _headersController.dispose();
@@ -109,15 +94,37 @@ class _NetworkModifyResponseScreenState
     super.dispose();
   }
 
-  void _selectPreset(ResponsePreset preset) {
+  void _onStatusCodeChanged() {
+    // If a status preset is selected, remove it if user edits status code
     final selected = List<ResponsePreset>.from(_selectedPresets.value);
+    final statusPreset =
+        selected.where((p) => p.group == PresetGroupType.status).toList();
+    if (statusPreset.isNotEmpty) {
+      for (final preset in statusPreset) {
+        _removePreset(preset);
+      }
+    }
+  }
+
+  void _selectPreset(ResponsePreset preset) {
+    final selected = Set<ResponsePreset>.from(_selectedPresets.value);
     final available = List<ResponsePreset>.from(_availablePresets.value);
+    // Prevent multiple status presets
+    if (preset.group == PresetGroupType.status) {
+      final existingStatus =
+          selected.where((p) => p.group == PresetGroupType.status).toList();
+      for (final item in existingStatus) {
+        selected.remove(item);
+        if (!available.contains(item)) {
+          available.add(item);
+        }
+      }
+    }
     selected.add(preset);
-    available.remove(preset);
     _selectedPresets.value = selected;
     _availablePresets.value = available;
     // Apply preset values to fields
-    _statusController.text = preset.statusCode.toString();
+    _statusController.text = preset.statusCode?.toString() ?? '';
     if (preset.body != null) _bodyController.text = preset.body!;
     if (preset.headers != null) {
       _headersController.text = jsonEncode(preset.headers);
@@ -128,12 +135,9 @@ class _NetworkModifyResponseScreenState
   }
 
   void _removePreset(ResponsePreset preset) {
-    final selected = List<ResponsePreset>.from(_selectedPresets.value);
-    final available = List<ResponsePreset>.from(_availablePresets.value);
+    final selected= Set<ResponsePreset>.from(_selectedPresets.value);
     selected.remove(preset);
-    available.add(preset);
     _selectedPresets.value = selected;
-    _availablePresets.value = available;
   }
 
   String _formatBody(dynamic body) {
@@ -256,16 +260,16 @@ class _NetworkModifyResponseScreenState
         child: ListView(
           children: [
             // Presets section (expandable)
-            _ExpandablePresetsSection(
+            ExpandablePresetsSection(
               availablePresets: _availablePresets,
               onSelect: _selectPreset,
             ),
             const SizedBox(height: 8),
             // Selected presets wrap
-            ValueListenableBuilder<List<ResponsePreset>>(
-              valueListenable: _selectedPresets,
-              builder: (context, selectedPresets, _) =>
-                  selectedPresets.isNotEmpty
+            ValueListenableBuilder<Set<ResponsePreset>>(
+                valueListenable: _selectedPresets,
+                builder: (context, selectedPresets, _) {
+                  return selectedPresets.isNotEmpty
                       ? Wrap(
                           spacing: 8,
                           runSpacing: 4,
@@ -276,9 +280,9 @@ class _NetworkModifyResponseScreenState
                                   ))
                               .toList(),
                         )
-                      : const SizedBox.shrink(),
-            ),
-            ValueListenableBuilder<List<ResponsePreset>>(
+                      : const SizedBox.shrink();
+                }),
+            ValueListenableBuilder<Set<ResponsePreset>>(
               valueListenable: _selectedPresets,
               builder: (context, selectedPresets, _) =>
                   selectedPresets.isNotEmpty
@@ -297,9 +301,12 @@ class _NetworkModifyResponseScreenState
                 labelText: 'Status code',
                 border: OutlineInputBorder(),
               ),
+              onChanged: (_) {
+                _onStatusCodeChanged();
+              },
             ),
             const SizedBox(height: 16),
-            _ExpandableJsonSection(
+            ExpandableJsonSection(
               title: 'Response body',
               maxHeight: _jsonSectionMaxHeight,
               onAdd: () => _addJsonEntry(
@@ -319,7 +326,7 @@ class _NetworkModifyResponseScreenState
               ),
             ),
             const SizedBox(height: 16),
-            _ExpandableJsonSection(
+            ExpandableJsonSection(
               title: 'Headers',
               maxHeight: _jsonSectionMaxHeight,
               onAdd: () => _addJsonEntry(
@@ -339,6 +346,20 @@ class _NetworkModifyResponseScreenState
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Delay (ms)',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _delayController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Delay (ms)',
+                border: OutlineInputBorder(),
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _applyChanges,
@@ -348,176 +369,6 @@ class _NetworkModifyResponseScreenState
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ExpandableJsonSection extends StatelessWidget {
-  final String title;
-  final double maxHeight;
-  final VoidCallback onAdd;
-  final dynamic jsonView;
-  final Widget editor;
-
-  const _ExpandableJsonSection({
-    required this.title,
-    required this.maxHeight,
-    required this.onAdd,
-    required this.jsonView,
-    required this.editor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Row(
-        children: [
-          Text(title),
-          const Spacer(),
-          IconButton(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add),
-            tooltip: 'Add key/value',
-          ),
-        ],
-      ),
-      childrenPadding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _JsonPreviewTile(jsonView: jsonView),
-                const SizedBox(height: 8),
-                editor,
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _JsonPreviewTile extends StatelessWidget {
-  final dynamic jsonView;
-
-  const _JsonPreviewTile({required this.jsonView});
-
-  @override
-  Widget build(BuildContext context) {
-    final canRenderJson = jsonView is Map || jsonView is List;
-
-    return ExpansionTile(
-      title: const Text('Preview JSON'),
-      initiallyExpanded: false,
-      tilePadding: EdgeInsets.zero,
-      childrenPadding: const EdgeInsets.only(bottom: 8),
-      children: [
-        if (canRenderJson)
-          JsonView(
-            json: jsonView,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-          )
-        else
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Not a JSON object'),
-          ),
-      ],
-    );
-  }
-}
-
-class _ExpandablePresetsSection extends StatefulWidget {
-  final ValueNotifier<List<ResponsePreset>> availablePresets;
-  final void Function(ResponsePreset) onSelect;
-  const _ExpandablePresetsSection({
-    required this.availablePresets,
-    required this.onSelect,
-  });
-
-  @override
-  State<_ExpandablePresetsSection> createState() =>
-      _ExpandablePresetsSectionState();
-}
-
-class _ExpandablePresetsSectionState extends State<_ExpandablePresetsSection> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Text('Presets', style: Theme.of(context).textTheme.titleMedium),
-      initiallyExpanded: false,
-      onExpansionChanged: (v) => setState(() => _expanded = v),
-      childrenPadding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
-      children: [
-        ValueListenableBuilder<List<ResponsePreset>>(
-          valueListenable: widget.availablePresets,
-          builder: (context, availablePresets, _) {
-            final statusPresets = availablePresets
-                .where((p) => p.group == PresetGroupType.status)
-                .toList();
-            final customPresets = availablePresets
-                .where((p) => p.group == PresetGroupType.custom)
-                .toList();
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (statusPresets.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, bottom: 2),
-                    child: Text('Status codes',
-                        style: Theme.of(context).textTheme.bodySmall),
-                  ),
-                  SizedBox(
-                    height: 48,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: statusPresets.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, i) {
-                        final preset = statusPresets[i];
-                        return ActionChip(
-                          label: Text(preset.label),
-                          onPressed: () => widget.onSelect(preset),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (customPresets.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, bottom: 2),
-                    child: Text('Custom',
-                        style: Theme.of(context).textTheme.bodySmall),
-                  ),
-                  SizedBox(
-                    height: 48,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: customPresets.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, i) {
-                        final preset = customPresets[i];
-                        return ActionChip(
-                          label: Text(preset.label),
-                          onPressed: () => widget.onSelect(preset),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ],
-            );
-          },
-        ),
-      ],
     );
   }
 }

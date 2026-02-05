@@ -65,6 +65,8 @@ class NetworkTrackerInterceptor extends Interceptor {
       endDate: DateTime.now(),
     );
 
+    print('from main interceptor');
+
     super.onResponse(response, handler);
   }
 

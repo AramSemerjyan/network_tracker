@@ -30,6 +30,7 @@ extension DbTablesExt on DBTables {
           requestSize INTEGER,
           responseSize INTEGER,
           isRepeated INTEGER,
+          isModified INTEGER,
           requestSizeBytes INTEGER,
           responseSizeBytes INTEGER
         )

@@ -29,10 +29,17 @@ class NetworkRequestPersistentStorage
   Future<void> initDb() async {
     _db = await openDatabase(
       join(await getDatabasesPath(), 'network_tracker.db'),
-      version: 1,
+      version: 2,
       onCreate: (Database db, int version) async {
         for (var t in DBTables.values) {
           await db.execute(t.struct);
+        }
+      },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+            'ALTER TABLE ${DBTables.requests.key} ADD COLUMN isModified INTEGER',
+          );
         }
       },
     );
@@ -116,6 +123,7 @@ class NetworkRequestPersistentStorage
     RequestStatus? status,
     DateTime? endDate,
     DioException? dioError,
+    bool? isModified,
   }) async {
     await _db.update(
       DBTables.requests.key,
@@ -131,6 +139,7 @@ class NetworkRequestPersistentStorage
           'responseSize': Utils.estimateSize(response.data),
         if (requestOptions.baseUrl.isNotEmpty)
           'baseUrl': requestOptions.baseUrl,
+        if (isModified != null) 'isModified': isModified == true ? 1 : 0,
       },
       where: 'id = ?',
       whereArgs: [id],
