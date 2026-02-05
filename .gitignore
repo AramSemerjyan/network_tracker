@@ -21,10 +21,6 @@ migrate_working_dir/
 # is commented out by default.
 .vscode/
 
-# DevTools (local)
-devtools_options.yaml
-**/devtools_options.yaml
-
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
