@@ -1,13 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:network_tracker/src/model/network_request_method.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
+import 'package:network_tracker/src/services/request_status.dart';
 
 class NetworkTrackerRequestModifierInterceptor extends Interceptor {
+  final _storage = NetworkRequestService.instance.storageService;
+
   @override
   void onResponse(
       Response<dynamic> response, ResponseInterceptorHandler handler) async {
-    print('from modifier interceptor');
-
     final alreadyModified =
         response.requestOptions.extra['network_tracker_modified_response'] ==
             true;
@@ -27,8 +28,46 @@ class NetworkTrackerRequestModifierInterceptor extends Interceptor {
         final modified = modification.applyTo(response);
         modified.requestOptions.extra['network_tracker_modified_response'] =
             true;
-        // handler.next(modified);
-        super.onResponse(modified, handler);
+
+        if (modification.isFailure(modified)) {
+          final statusCode = modification.effectiveStatusCode(modified) ??
+              modified.statusCode ??
+              500;
+          final error = DioException.badResponse(
+            statusCode: statusCode,
+            requestOptions: modified.requestOptions,
+            response: modified,
+          );
+          final requestId = modified.requestOptions.extra['network_tracker_id'];
+          if (requestId is String) {
+            _storage.updateRequest(
+              requestId,
+              requestOptions: modified.requestOptions,
+              response: modified,
+              status: resolveRequestStatus(
+                statusCode: statusCode,
+                error: error,
+              ),
+              endDate: DateTime.now(),
+              dioError: error,
+              isModified: true,
+            );
+          }
+          handler.reject(error);
+          return;
+        }
+        final requestId = modified.requestOptions.extra['network_tracker_id'];
+        if (requestId is String) {
+          _storage.updateRequest(
+            requestId,
+            requestOptions: modified.requestOptions,
+            response: modified,
+            status: resolveRequestStatus(statusCode: modified.statusCode),
+            endDate: DateTime.now(),
+            isModified: true,
+          );
+        }
+        handler.next(modified);
         return;
       }
     }

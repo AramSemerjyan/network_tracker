@@ -1,3 +1,5 @@
+import '../../services/request_status.dart';
+
 enum PresetGroupType { status, custom }
 
 class ResponsePreset {
@@ -7,6 +9,8 @@ class ResponsePreset {
   final Map<String, String>? headers;
   final Duration? delay;
   final PresetGroupType group;
+  final RequestStatus? requestStatus;
+
   const ResponsePreset({
     required this.label,
     required this.group,
@@ -14,6 +18,7 @@ class ResponsePreset {
     this.body,
     this.headers,
     this.delay,
+    this.requestStatus,
   });
 
   @override
@@ -25,7 +30,8 @@ class ResponsePreset {
         other.body == body &&
         other.group == group &&
         _mapEquals(other.headers, headers) &&
-        other.delay == delay;
+        other.delay == delay &&
+        other.requestStatus == requestStatus;
   }
 
   @override
@@ -36,6 +42,7 @@ class ResponsePreset {
         group,
         _mapHash(headers),
         delay,
+        requestStatus,
       );
 
   static bool _mapEquals(

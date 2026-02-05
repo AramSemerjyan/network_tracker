@@ -3,7 +3,6 @@ import 'package:network_tracker/src/ui/common/request_actions_botton.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
 import '../../model/network_request.dart';
-import '../common/repeat_request_badge.dart';
 import '../common/requiest_badge_row.dart';
 import '../filter/filter_bar.dart';
 import '../request_data_details_screen/request_data_details_screen.dart';
@@ -26,6 +25,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   late final _vm = RequestDetailsScreenVM(widget.baseUrl, widget.path);
 
   final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
+
+  String _formatDate(DateTime date) {
+    // Format as yyyy-MM-dd HH:mm:ss
+    final y = date.year.toString().padLeft(4, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    final h = date.hour.toString().padLeft(2, '0');
+    final min = date.minute.toString().padLeft(2, '0');
+    final s = date.second.toString().padLeft(2, '0');
+    return '$y-$m-$d $h:$min:$s';
+  }
 
   void _moveToDetails(NetworkRequest request) {
     Navigator.push(
@@ -71,7 +81,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             children: [
               RequestBadgeRow(request: request),
               Text(
-                  '${request.method.value} ${request.method.symbol} - ${request.startDate}')
+                '${request.method.value} ${request.method.symbol} - ${_formatDate(request.startDate)}',
+              ),
             ],
           ),
           subtitle: Column(

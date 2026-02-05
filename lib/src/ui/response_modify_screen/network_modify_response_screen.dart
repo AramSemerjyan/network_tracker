@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../model/network_request.dart';
+import '../../services/request_status.dart';
 import 'expandable_json_section.dart';
 import 'expandable_presets_section.dart';
 import 'reponse_preset.dart';
@@ -12,31 +13,37 @@ const List<ResponsePreset> kStatusPresets = [
       label: '200 OK',
       group: PresetGroupType.status,
       statusCode: 200,
+      requestStatus: RequestStatus.completed,
       body: '{"message": "Success"}'),
   ResponsePreset(
       label: '400 Bad Request',
       group: PresetGroupType.status,
       statusCode: 400,
+      requestStatus: RequestStatus.failed,
       body: '{"error": "Bad Request"}'),
   ResponsePreset(
       label: '401 Unauthorized',
       group: PresetGroupType.status,
       statusCode: 401,
+      requestStatus: RequestStatus.failed,
       body: '{"error": "Unauthorized"}'),
   ResponsePreset(
       label: '403 Forbidden',
       group: PresetGroupType.status,
       statusCode: 403,
+      requestStatus: RequestStatus.failed,
       body: '{"error": "Forbidden"}'),
   ResponsePreset(
       label: '404 Not Found',
       group: PresetGroupType.status,
       statusCode: 404,
+      requestStatus: RequestStatus.failed,
       body: '{"error": "Not Found"}'),
   ResponsePreset(
       label: '500 Internal Error',
       group: PresetGroupType.status,
       statusCode: 500,
+      requestStatus: RequestStatus.failed,
       body: '{"error": "Internal Server Error"}'),
 ];
 
@@ -135,7 +142,7 @@ class _NetworkModifyResponseScreenState
   }
 
   void _removePreset(ResponsePreset preset) {
-    final selected= Set<ResponsePreset>.from(_selectedPresets.value);
+    final selected = Set<ResponsePreset>.from(_selectedPresets.value);
     selected.remove(preset);
     _selectedPresets.value = selected;
   }

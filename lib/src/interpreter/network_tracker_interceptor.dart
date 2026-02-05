@@ -57,15 +57,14 @@ class NetworkTrackerInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
     final requestId = response.requestOptions.extra['network_tracker_id'];
+    final status = resolveRequestStatus(statusCode: response.statusCode);
     storage.updateRequest(
       requestId,
       requestOptions: response.requestOptions,
       response: response,
-      status: RequestStatus.completed,
+      status: status,
       endDate: DateTime.now(),
     );
-
-    print('from main interceptor');
 
     super.onResponse(response, handler);
   }
@@ -74,11 +73,15 @@ class NetworkTrackerInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final requestId = err.requestOptions.extra['network_tracker_id'];
+    final status = resolveRequestStatus(
+      statusCode: err.response?.statusCode,
+      error: err,
+    );
     storage.updateRequest(
       requestId,
       response: err.response,
       requestOptions: err.requestOptions,
-      status: RequestStatus.failed,
+      status: status,
       endDate: DateTime.now(),
       dioError: err,
     );

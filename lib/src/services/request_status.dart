@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 /// Represents the status of a network request during its lifecycle.
 enum RequestStatus {
   /// Request is created but not yet sent.
@@ -20,4 +22,20 @@ enum RequestStatus {
 
   /// Creates a new [RequestStatus] with an associated [symbol].
   const RequestStatus(this.symbol);
+}
+
+RequestStatus resolveRequestStatus({
+  int? statusCode,
+  DioException? error,
+}) {
+  if (error?.type == DioExceptionType.cancel) {
+    return RequestStatus.cancelled;
+  }
+  if (statusCode == null) {
+    return RequestStatus.failed;
+  }
+  if (statusCode >= 200 && statusCode < 400) {
+    return RequestStatus.completed;
+  }
+  return RequestStatus.failed;
 }

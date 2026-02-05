@@ -13,6 +13,15 @@ class ResponseModification {
     this.delay,
   });
 
+  int? effectiveStatusCode(Response<dynamic> response) {
+    return statusCode ?? response.statusCode;
+  }
+
+  bool isFailure(Response<dynamic> response) {
+    final code = effectiveStatusCode(response);
+    return code != null && code >= 400;
+  }
+
   Response<dynamic> applyTo(Response<dynamic> response) {
     final mergedHeaders = headers != null
         ? Headers.fromMap(
