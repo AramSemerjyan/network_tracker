@@ -35,7 +35,12 @@ class _MyAppState extends State<MyApp> {
           brightness: Brightness.dark,
         ).copyWith(
           surface: _darkBackground,
-          background: _darkBackground,
+        ),
+        cardTheme: CardThemeData(
+          color: Color.alphaBlend(
+            Colors.white.withAlpha(18),
+            _darkBackground,
+          ),
         ),
         scaffoldBackgroundColor: _darkBackground,
         appBarTheme: const AppBarTheme(backgroundColor: _darkBackground),
@@ -294,7 +299,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   Text(
                                     'Request Setup',
-                                    style: theme.textTheme.titleMedium?.copyWith(
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
