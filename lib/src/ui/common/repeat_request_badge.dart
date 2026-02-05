@@ -15,6 +15,13 @@ class RequestBadgeConfig {
       color: Colors.orange.shade300,
     );
   }
+
+  factory RequestBadgeConfig.modified() {
+    return RequestBadgeConfig(
+      title: 'Modified',
+      color: Colors.purple.shade300,
+    );
+  }
 }
 
 class RequestBadge extends StatelessWidget {

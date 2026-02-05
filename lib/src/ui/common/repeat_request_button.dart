@@ -62,11 +62,8 @@ class _RepeatRequestButtonState extends State<RepeatRequestButton> {
   Widget build(BuildContext context) {
     return PopupMenuButton<_ActionType>(
       icon: Container(
-        padding: const EdgeInsets.all(12), // Increase tap area
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
-        child: Icon(Icons.more_vert, size: 28),
+        padding: const EdgeInsets.only(left: 8),
+        child: Icon(Icons.more_vert, size: 25),
       ),
       onSelected: (action) {
         switch (action) {
@@ -115,7 +112,7 @@ class _RepeatRequestButtonState extends State<RepeatRequestButton> {
             children: const [
               Icon(Icons.edit_note, size: 20),
               SizedBox(width: 8),
-              Text('Modify Response'),
+              Text('Intercept Response'),
             ],
           ),
         ),

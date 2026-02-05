@@ -81,6 +81,8 @@ class NetworkRequest {
   /// Useful for distinguishing between original requests and user-triggered retries.
   bool? isRepeated;
 
+  bool? isModified;
+
   /// The total execution time of the request, computed as a timestamp delta.
   Duration? get duration {
     final endDate = this.endDate;

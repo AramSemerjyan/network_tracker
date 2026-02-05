@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_badge.dart';
 import 'package:network_tracker/src/ui/common/repeat_request_button.dart';
+import 'package:network_tracker/src/ui/common/requiest_badge_row.dart';
 
 import '../../model/network_request.dart';
 import 'request_data_details_screen_vm.dart';
@@ -34,20 +35,6 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
     return Text(response.toString());
   }
 
-  Widget _buildBadgesRow(NetworkRequest request) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 5,
-        children: [
-          if (request.isRepeated ?? false)
-            RequestBadge(config: RequestBadgeConfig.repeated()),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +55,10 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildBadgesRow(widget.request),
+              Padding(
+                padding: EdgeInsets.only(left: 16),
+                child: RequestBadgeRow(request: widget.request),
+              ),
               if (widget.request.requestData != null)
                 ListTile(
                   title: const Text('Request Data:'),

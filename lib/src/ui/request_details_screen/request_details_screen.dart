@@ -4,6 +4,7 @@ import 'package:network_tracker/src/ui/request_details_screen/request_details_sc
 
 import '../../model/network_request.dart';
 import '../common/repeat_request_badge.dart';
+import '../common/requiest_badge_row.dart';
 import '../filter/filter_bar.dart';
 import '../request_data_details_screen/request_data_details_screen.dart';
 
@@ -26,6 +27,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   final ValueNotifier<bool> _showFilterBar = ValueNotifier(false);
 
+  void _moveToDetails(NetworkRequest request) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestDataDetailsScreen(
+          request: request,
+        ),
+      ),
+    );
+  }
+
   void _onFilterTap() {
     _showFilterBar.value = !_showFilterBar.value;
   }
@@ -43,17 +55,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     );
   }
 
-  Widget _buildBadgesRow(NetworkRequest request) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      spacing: 5,
-      children: [
-        if (request.isRepeated ?? false)
-          RequestBadge(config: RequestBadgeConfig.repeated()),
-      ],
-    );
-  }
-
   Widget _buildList(List<NetworkRequest> list) {
     return ListView.separated(
       itemCount: list.length,
@@ -66,22 +67,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         return ListTile(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
             children: [
-              _buildBadgesRow(request),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                        '${request.method.value} ${request.method.symbol} - ${request.startDate}'),
-                  ),
-                  RepeatRequestButton(request: request),
-                ],
-              )
+              RequestBadgeRow(request: request),
+              Text(
+                  '${request.method.value} ${request.method.symbol} - ${request.startDate}')
             ],
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
+            spacing: 8,
             children: [
               _buildValueRow(
                 'Status',
@@ -98,16 +94,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
             ],
           ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => RequestDataDetailsScreen(
-                  request: request,
-                ),
-              ),
-            );
-          },
+          trailing: RepeatRequestButton(request: request),
+          onTap: () => _moveToDetails(request),
         );
       },
     );
