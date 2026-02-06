@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_ping/dart_ping.dart';
@@ -286,7 +287,9 @@ class DebugToolsScreenVM {
         collectionName: 'Network Tracker Export - $host',
       );
 
-      await Utils.shareFile(postmanJson);
+      // Always decode the JSON string to a Map before sharing, so Utils.exportFile re-encodes it as valid JSON
+      final decoded = json.decode(postmanJson);
+      await Utils.shareFile(decoded);
 
       exportCollectionState.value = LoadingState(
         loadingProgress: LoadingProgressState.completed,

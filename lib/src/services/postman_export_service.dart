@@ -61,7 +61,6 @@ class PostmanExportService {
         'url': parsedUrl,
         'description': _buildDescription(request),
       },
-      'response': _buildResponseExamples(request),
     };
   }
 
@@ -131,25 +130,44 @@ class PostmanExportService {
     final method = request.method.name.toUpperCase();
     if (method == 'GET' || method == 'HEAD') return null;
 
-    try {
-      // Try to encode as JSON
-      final jsonData = jsonEncode(request.requestData);
-      return {
-        'mode': 'raw',
-        'raw': jsonData,
-        'options': {
-          'raw': {
-            'language': 'json',
-          }
+    // Determine content type
+    final contentType =
+        (request.headers?['content-type'] ?? request.headers?['Content-Type'])
+            ?.toString()
+            .toLowerCase();
+    String rawString;
+    Map<String, dynamic>? options;
+
+    if (contentType == 'application/x-www-form-urlencoded' &&
+        request.requestData is Map) {
+      // Encode as URL-encoded string
+      rawString = (request.requestData as Map)
+          .entries
+          .map((e) =>
+              '${Uri.encodeQueryComponent(e.key.toString())}=${Uri.encodeQueryComponent(e.value.toString())}')
+          .join('&');
+      options = null;
+    } else if (request.requestData is Map || request.requestData is List) {
+      // Encode as JSON string
+      rawString = jsonEncode(request.requestData);
+      options = {
+        'raw': {
+          'language': 'json',
         }
       };
-    } catch (_) {
-      // Fallback to string representation
-      return {
-        'mode': 'raw',
-        'raw': request.requestData.toString(),
-      };
+    } else {
+      rawString = request.requestData.toString();
+      options = null;
     }
+
+    final Map<String, dynamic> body = {
+      'mode': 'raw',
+      'raw': rawString,
+    };
+    if (options != null) {
+      body['options'] = options;
+    }
+    return body;
   }
 
   /// Builds a description for the request including metadata.
@@ -181,65 +199,6 @@ class PostmanExportService {
     }
 
     return buffer.toString();
-  }
-
-  /// Builds response examples if response data is available.
-  static List<Map<String, dynamic>> _buildResponseExamples(
-      NetworkRequest request) {
-    if (request.responseData == null) return [];
-
-    try {
-      final responseBody = jsonEncode(request.responseData);
-
-      return [
-        {
-          'name': 'Example Response',
-          'originalRequest': {
-            'method': request.method.name.toUpperCase(),
-            'header': _buildHeaders(request.headers),
-            'url': _parseUrl(_buildFullUrl(request)),
-          },
-          'status': _getStatusText(request.statusCode),
-          'code': request.statusCode ?? 200,
-          '_postman_previewlanguage': 'json',
-          'header': _buildHeaders(request.responseHeaders),
-          'cookie': [],
-          'body': responseBody,
-        }
-      ];
-    } catch (_) {
-      return [];
-    }
-  }
-
-  /// Gets HTTP status text from status code.
-  static String _getStatusText(int? statusCode) {
-    if (statusCode == null) return 'Unknown';
-
-    switch (statusCode) {
-      case 200:
-        return 'OK';
-      case 201:
-        return 'Created';
-      case 204:
-        return 'No Content';
-      case 400:
-        return 'Bad Request';
-      case 401:
-        return 'Unauthorized';
-      case 403:
-        return 'Forbidden';
-      case 404:
-        return 'Not Found';
-      case 500:
-        return 'Internal Server Error';
-      case 502:
-        return 'Bad Gateway';
-      case 503:
-        return 'Service Unavailable';
-      default:
-        return statusCode.toString();
-    }
   }
 
   /// Generates a simple UUID for the collection.
