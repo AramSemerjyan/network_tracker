@@ -8,10 +8,15 @@ import '../common/requiest_badge_row.dart';
 import '../filter/filter_bar.dart';
 import '../request_data_details_screen/request_data_details_screen.dart';
 
+/// Screen that shows all tracked calls for a specific endpoint path.
 class RequestDetailsScreen extends StatefulWidget {
+  /// Endpoint path to display.
   final String path;
+
+  /// Base URL that owns the endpoint path.
   final String baseUrl;
 
+  /// Creates a [RequestDetailsScreen] instance.
   const RequestDetailsScreen({
     super.key,
     required this.path,

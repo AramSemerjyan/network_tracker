@@ -1,16 +1,23 @@
+/// Bandwidth preset used to throttle repeated requests.
 class SpeedThrottle {
+  /// Display name shown in the throttle selector.
   final String name;
+
+  /// Max bytes-per-second limit. `null` means no throttling.
   final int? value;
 
+  /// Creates a [SpeedThrottle] instance.
   SpeedThrottle({
     required this.name,
     this.value,
   });
 
+  /// Preset with no bandwidth limits.
   factory SpeedThrottle.unlimited() {
     return SpeedThrottle(name: 'Unlimited');
   }
 
+  /// Preset approximating 3G throughput.
   factory SpeedThrottle.throttle3G() {
     return SpeedThrottle(
       name: '3G (~750 Kbps)',
@@ -18,6 +25,7 @@ class SpeedThrottle {
     );
   }
 
+  /// Preset approximating 2G throughput.
   factory SpeedThrottle.throttle2G() {
     return SpeedThrottle(
       name: '2G (~250 Kbps)',
@@ -25,6 +33,7 @@ class SpeedThrottle {
     );
   }
 
+  /// Preset approximating EDGE throughput.
   factory SpeedThrottle.throttleEdge() {
     return SpeedThrottle(
       name: 'Edge (~100 Kbps)',
@@ -32,6 +41,7 @@ class SpeedThrottle {
     );
   }
 
+  /// All built-in throttle presets.
   static List<SpeedThrottle> allCases() => [
         SpeedThrottle.unlimited(),
         SpeedThrottle.throttle3G(),
@@ -50,11 +60,13 @@ class SpeedThrottle {
   @override
   int get hashCode => name.hashCode ^ value.hashCode;
 
+  /// Serializes this throttle preset to JSON.
   Map<String, dynamic> toJson() => {
         'name': name,
         'value': value,
       };
 
+  /// Deserializes a throttle preset from JSON.
   factory SpeedThrottle.fromJson(Map<String, dynamic> json) => SpeedThrottle(
         name: json['name'] as String,
         value: json['value'] as int?,

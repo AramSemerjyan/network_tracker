@@ -12,6 +12,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../../model/network_request_storage_interface.dart';
 
+/// SQLite-backed implementation of [NetworkRequestStorageInterface].
 class NetworkRequestPersistentStorage
     implements NetworkRequestStorageInterface {
   late final Database _db;
@@ -26,6 +27,7 @@ class NetworkRequestPersistentStorage
         .toList();
   }
 
+  /// Initializes the SQLite database and applies schema migrations.
   Future<void> initDb() async {
     _db = await openDatabase(
       join(await getDatabasesPath(), 'network_tracker.db'),

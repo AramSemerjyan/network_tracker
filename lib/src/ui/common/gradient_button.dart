@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
 
+/// Button widget with optional gradient styling and unified text/icon theming.
 class GradientButton extends StatelessWidget {
+  /// Called when the button is tapped. `null` disables the button.
   final VoidCallback? onPressed;
+
+  /// Content displayed inside the button.
   final Widget child;
+
+  /// Internal padding of the button content.
   final EdgeInsetsGeometry padding;
+
+  /// Corner radius used by the button container.
   final BorderRadius borderRadius;
+
+  /// Minimum height constraint.
   final double minHeight;
+
+  /// Minimum width constraint.
   final double minWidth;
 
+  /// Creates a [GradientButton] instance.
   const GradientButton({
     super.key,
     required this.onPressed,
@@ -18,6 +31,7 @@ class GradientButton extends StatelessWidget {
     this.minWidth = 64,
   });
 
+  /// Creates a [GradientButton] with a leading icon and label row.
   factory GradientButton.icon({
     Key? key,
     required VoidCallback? onPressed,

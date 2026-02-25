@@ -48,6 +48,8 @@ class DebugToolsScreenVM {
   /// State of the speed test operation (idle, in progress, completed, error)
   late final ValueNotifier<LoadingState<String?>> speedTestState =
       ValueNotifier(LoadingState());
+
+  /// Current download progress text shown during speed tests.
   late final ValueNotifier<String?> downloadProgress = ValueNotifier(null);
 
   // Network Info State

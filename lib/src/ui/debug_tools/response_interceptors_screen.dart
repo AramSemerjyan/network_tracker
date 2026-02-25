@@ -6,7 +6,9 @@ import 'package:network_tracker/src/services/request_status.dart';
 import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/response_modify_screen/network_modify_response_screen.dart';
 
+/// Screen listing all saved response interceptors/modifications.
 class ResponseInterceptorsScreen extends StatefulWidget {
+  /// Creates a [ResponseInterceptorsScreen] instance.
   const ResponseInterceptorsScreen({super.key});
 
   @override

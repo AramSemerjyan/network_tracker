@@ -4,19 +4,25 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:network_tracker/src/services/connectivity/network_connectivity_service.dart';
 
+/// View model that exposes connectivity updates for the status badge.
 class ConnectionStatusViewVM {
+  /// Connectivity service that produces connection state updates.
   final NetworkConnectivityService connectivityService =
       NetworkConnectivityService();
 
+  /// Handles connection update events.
   late final StreamController<ConnectivityResult> onConnectionUpdate =
       connectivityService.onConnectionStatusChanged;
 
+  /// Releases resources held by this instance.
   void dispose() {
     connectivityService.dispose();
   }
 }
 
+/// ConnectivityResultExt extension.
 extension ConnectivityResultExt on ConnectivityResult {
+  /// Icon representing this connectivity state.
   IconData get icon {
     switch (this) {
       case ConnectivityResult.wifi:
@@ -35,6 +41,7 @@ extension ConnectivityResultExt on ConnectivityResult {
     }
   }
 
+  /// Foreground color used for text/icon over the connectivity badge.
   Color tintColor(ColorScheme scheme) {
     switch (this) {
       case ConnectivityResult.none:
@@ -47,6 +54,7 @@ extension ConnectivityResultExt on ConnectivityResult {
     }
   }
 
+  /// Human-readable label for this connectivity state.
   String get title {
     switch (this) {
       case ConnectivityResult.wifi:
@@ -66,6 +74,7 @@ extension ConnectivityResultExt on ConnectivityResult {
     }
   }
 
+  /// Background color used for the connectivity badge.
   Color color(ColorScheme scheme) {
     switch (this) {
       case ConnectivityResult.none:

@@ -21,6 +21,7 @@ class ExpandableJsonSection extends StatelessWidget {
   /// The editor widget for editing the JSON data.
   final Widget editor;
 
+  /// Creates a [ExpandableJsonSection] instance.
   const ExpandableJsonSection({
     super.key,
     required this.title,

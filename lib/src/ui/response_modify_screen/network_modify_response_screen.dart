@@ -12,6 +12,7 @@ import 'expandable_json_section.dart';
 import 'expandable_presets_section.dart';
 import 'reponse_preset.dart';
 
+/// The k Status Presets.
 const List<ResponsePreset> kStatusPresets = [
   ResponsePreset(
       label: '200 OK',
@@ -51,11 +52,15 @@ const List<ResponsePreset> kStatusPresets = [
       body: '{"error": "Internal Server Error"}'),
 ];
 
+/// The k Custom Presets.
 const List<ResponsePreset> kCustomPresets = [];
 
+/// NetworkModifyResponseScreen.
 class NetworkModifyResponseScreen extends StatefulWidget {
+  /// The original Request.
   final NetworkRequest originalRequest;
 
+  /// Creates a [NetworkModifyResponseScreen] instance.
   const NetworkModifyResponseScreen({
     super.key,
     required this.originalRequest,

@@ -16,10 +16,15 @@ enum _ActionType {
   modifyResponse,
 }
 
+/// Overflow menu with actions for a tracked request.
 class RequestActionsButton extends StatefulWidget {
+  /// If true, "Repeat" opens edit screen before sending.
   final bool shouldEditFirst;
+
+  /// Request that menu actions operate on.
   final NetworkRequest request;
 
+  /// Creates a [RequestActionsButton] instance.
   const RequestActionsButton({
     super.key,
     required this.request,

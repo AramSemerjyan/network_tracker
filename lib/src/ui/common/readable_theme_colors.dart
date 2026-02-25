@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 /// Resolves background/foreground pairs that stay readable even when host apps
 /// provide inconsistent surface and text colors.
 class ReadableThemeColors {
+  /// Performs resolve Background.
   static Color resolveBackground(BuildContext context) {
     final theme = Theme.of(context);
     final scaffoldBackground = theme.scaffoldBackgroundColor;
@@ -25,6 +26,7 @@ class ReadableThemeColors {
         : Colors.white;
   }
 
+  /// Performs resolve Foreground.
   static Color resolveForeground(BuildContext context, Color background) {
     final theme = Theme.of(context);
     final preferredForeground =
@@ -39,10 +41,12 @@ class ReadableThemeColors {
     return whiteContrast >= blackContrast ? Colors.white : Colors.black;
   }
 
+  /// Performs resolve Muted Foreground.
   static Color resolveMutedForeground(Color foreground) {
     return foreground.withValues(alpha: 0.75);
   }
 
+  /// Performs screen Theme.
   static ThemeData screenTheme(BuildContext context) {
     final baseTheme = Theme.of(context);
     final background = resolveBackground(context);

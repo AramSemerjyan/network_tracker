@@ -142,6 +142,7 @@ class NetworkRequestService {
     repeatRequestService.setCustomDio(client);
   }
 
+  /// Sets response modification.
   void setResponseModification({
     required String baseUrl,
     required String path,
@@ -155,6 +156,7 @@ class NetworkRequestService {
     )] = modification;
   }
 
+  /// Returns response modification.
   ResponseModification? getResponseModification({
     required String baseUrl,
     required String path,
@@ -167,6 +169,7 @@ class NetworkRequestService {
     )];
   }
 
+  /// Clears response modification.
   void clearResponseModification({
     required String baseUrl,
     required String path,
@@ -179,8 +182,10 @@ class NetworkRequestService {
     ));
   }
 
+  /// Number of active response modifications currently registered.
   int get responseModificationCount => _responseModifications.length;
 
+  /// Returns all response modifications.
   List<ResponseModificationEntry> getAllResponseModifications() {
     final entries = <ResponseModificationEntry>[];
 

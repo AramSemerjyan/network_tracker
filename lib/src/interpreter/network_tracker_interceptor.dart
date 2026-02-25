@@ -12,8 +12,8 @@ import '../services/storage/network_request_local_storage.dart';
 ///
 /// This interceptor records metadata such as method, path, headers,
 /// status code, response body, and any errors. The data is stored in
-/// [NetworkRequestLocalStorage] and can be visualized using a UI like
-/// `NetworkRequestsViewer`.
+/// [NetworkRequestLocalStorage] and can be visualized using
+/// [NetworkRequestsViewer].
 ///
 /// To use:
 /// ```dart

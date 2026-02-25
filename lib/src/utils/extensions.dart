@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
+/// DioExceptionExt extension.
 extension DioExceptionExt on DioException {
   /// Converts this [DioException] to a JSON string representation.
   String dioExceptionToJsonString() {

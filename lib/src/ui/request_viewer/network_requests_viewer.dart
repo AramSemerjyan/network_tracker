@@ -19,7 +19,9 @@ enum _RequestsMenuAction {
   clearAll,
 }
 
+/// Main request viewer shown as a bottom sheet.
 class NetworkRequestsViewer extends StatefulWidget {
+  /// Opens the request viewer in a themed modal bottom sheet.
   static void showPage({
     required BuildContext context,
   }) {
@@ -63,6 +65,7 @@ class NetworkRequestsViewer extends StatefulWidget {
     );
   }
 
+  /// Creates a [NetworkRequestsViewer] instance.
   const NetworkRequestsViewer({
     super.key,
   });

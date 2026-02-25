@@ -24,6 +24,7 @@ enum RequestStatus {
   const RequestStatus(this.symbol);
 }
 
+/// Resolves [RequestStatus] from a response code and optional Dio error.
 RequestStatus resolveRequestStatus({
   int? statusCode,
   DioException? error,

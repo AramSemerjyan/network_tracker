@@ -5,12 +5,21 @@ import '../../model/network_request_method.dart';
 import '../../services/request_status.dart';
 import 'filter_card.dart';
 
+/// Horizontal filter controls for request method/status/repeat flags.
 class FilterBar extends StatelessWidget {
+  /// Whether the repeated/not-repeated filter chip is shown.
   final bool shouldShowRepeated;
+
+  /// Currently selected filter values.
   final NetworkRequestFilter filter;
+
+  /// Called when any filter value changes.
   final Function(NetworkRequestFilter)? onChange;
+
+  /// Called when the user taps the clear action.
   final VoidCallback? onClear;
 
+  /// Creates a [FilterBar] instance.
   const FilterBar({
     super.key,
     required this.filter,

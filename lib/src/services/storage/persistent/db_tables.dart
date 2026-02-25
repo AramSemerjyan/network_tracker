@@ -1,6 +1,12 @@
-enum DBTables { requests }
+/// Database tables used by persistent request storage.
+enum DBTables {
+  /// Stores tracked network requests.
+  requests,
+}
 
+/// DbTablesExt extension.
 extension DbTablesExt on DBTables {
+  /// SQL table name for this enum value.
   String get key {
     switch (this) {
       case DBTables.requests:
@@ -8,6 +14,7 @@ extension DbTablesExt on DBTables {
     }
   }
 
+  /// SQL `CREATE TABLE` statement for this table.
   String get struct {
     switch (this) {
       case DBTables.requests:

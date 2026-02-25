@@ -22,7 +22,7 @@ class NetworkRequest {
   /// The request path, e.g. `/users/1`.
   final String path;
 
-  /// Base url for request;
+  /// Base URL that the request was sent to.
   final String baseUrl;
 
   /// The HTTP method, e.g. `GET`, `POST`, `PUT`, etc.
@@ -81,6 +81,7 @@ class NetworkRequest {
   /// Useful for distinguishing between original requests and user-triggered retries.
   bool? isRepeated;
 
+  /// Whether the response for this request was modified/intercepted.
   bool? isModified;
 
   /// The total execution time of the request, computed as a timestamp delta.
@@ -188,6 +189,7 @@ class NetworkRequest {
     };
   }
 
+  /// Deserializes a [NetworkRequest] from persisted JSON data.
   static NetworkRequest fromJson(Map<String, dynamic> json) {
     Map<String, dynamic>? tryDecodeMap(String? source) {
       if (source == null) return null;
@@ -235,7 +237,9 @@ class NetworkRequest {
   }
 }
 
+/// CurlExporter extension.
 extension CurlExporter on NetworkRequest {
+  /// Converts this request into an equivalent `curl` command.
   String toCurl() {
     final buffer = StringBuffer();
 

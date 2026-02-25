@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+/// Animated text label used while an operation is in progress.
 class LoadingLabel extends StatefulWidget {
+  /// Prefix text shown before animated dots.
   final String title;
 
+  /// Creates a [LoadingLabel] instance.
   const LoadingLabel({super.key, this.title = 'Running'});
 
   @override

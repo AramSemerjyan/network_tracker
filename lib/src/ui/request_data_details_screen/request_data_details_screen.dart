@@ -7,9 +7,12 @@ import 'package:network_tracker/src/ui/common/requiest_badge_row.dart';
 import '../../model/network_request.dart';
 import 'request_data_details_screen_vm.dart';
 
+/// Screen with full request/response payload details for one call.
 class RequestDataDetailsScreen extends StatefulWidget {
+  /// Request entry being inspected.
   final NetworkRequest request;
 
+  /// Creates a [RequestDataDetailsScreen] instance.
   const RequestDataDetailsScreen({super.key, required this.request});
 
   @override

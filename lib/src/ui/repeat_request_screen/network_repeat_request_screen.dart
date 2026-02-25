@@ -5,9 +5,12 @@ import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_requ
 
 import '../../model/network_request.dart';
 
+/// Screen that lists repeatable requests for a selected base URL.
 class NetworkRepeatRequestScreen extends StatefulWidget {
+  /// Base URL used to load repeatable requests.
   final String baseUrl;
 
+  /// Creates a [NetworkRepeatRequestScreen] instance.
   const NetworkRepeatRequestScreen({
     super.key,
     required this.baseUrl,

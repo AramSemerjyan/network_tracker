@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:network_tracker/src/ui/common/connection_status_view/connection_status_view_vm.dart';
 
+/// Small widget that shows current connectivity type and status color.
 class ConnectionStatusView extends StatefulWidget {
+  /// Creates a [ConnectionStatusView] instance.
   const ConnectionStatusView({super.key});
 
   @override

@@ -8,9 +8,12 @@ import '../../../model/network_request.dart';
 import '../../../model/network_request_method.dart';
 import '../../common/gradient_button.dart';
 
+/// Screen for editing a captured request before resending it.
 class NetworkEditRequestScreen extends StatefulWidget {
+  /// Original request values used to prefill editable fields.
   final NetworkRequest originalRequest;
 
+  /// Creates a [NetworkEditRequestScreen] instance.
   const NetworkEditRequestScreen({super.key, required this.originalRequest});
 
   @override

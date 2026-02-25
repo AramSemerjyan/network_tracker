@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 
+/// Reusable compact dropdown card used by request filters.
 class FilterCard<T> extends StatelessWidget {
+  /// Label shown before the selected value.
   final String title;
+
+  /// Currently selected value. `null` means "Any".
   final T? value;
+
+  /// Available options shown in the popup menu.
   final List<T> options;
+
+  /// Converts an option into display text.
   final String Function(T) getLabel;
+
+  /// Called when a new option (or clear) is selected.
   final ValueChanged<T?> onChanged;
 
+  /// Creates a [FilterCard] instance.
   const FilterCard({
     super.key,
     required this.title,

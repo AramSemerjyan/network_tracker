@@ -3,6 +3,7 @@ import 'package:network_tracker/src/model/network_request_method.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:network_tracker/src/services/request_status.dart';
 
+/// NetworkTrackerRequestModifierInterceptor.
 class NetworkTrackerRequestModifierInterceptor extends Interceptor {
   /// Reference to the storage service for updating request records.
   final _storage = NetworkRequestService.instance.storageService;

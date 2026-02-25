@@ -8,7 +8,9 @@ import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 
 import '../common/loading_label/loading_state.dart';
 
+/// Screen with connectivity, speed test, ping, and export diagnostics.
 class DebugToolsScreen extends StatefulWidget {
+  /// Creates a [DebugToolsScreen] instance.
   const DebugToolsScreen({super.key});
 
   @override
