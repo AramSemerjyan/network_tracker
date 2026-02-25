@@ -12,7 +12,7 @@ import 'expandable_json_section.dart';
 import 'expandable_presets_section.dart';
 import 'reponse_preset.dart';
 
-/// The k Status Presets.
+/// Built-in status-code presets for quick response mocking.
 const List<ResponsePreset> kStatusPresets = [
   ResponsePreset(
       label: '200 OK',
@@ -52,12 +52,12 @@ const List<ResponsePreset> kStatusPresets = [
       body: '{"error": "Internal Server Error"}'),
 ];
 
-/// The k Custom Presets.
+/// Custom presets bundled with the package (currently empty by default).
 const List<ResponsePreset> kCustomPresets = [];
 
-/// NetworkModifyResponseScreen.
+/// Screen for editing a mocked response for a specific endpoint.
 class NetworkModifyResponseScreen extends StatefulWidget {
-  /// The original Request.
+  /// Request used to prefill status/body/headers before editing.
   final NetworkRequest originalRequest;
 
   /// Creates a [NetworkModifyResponseScreen] instance.

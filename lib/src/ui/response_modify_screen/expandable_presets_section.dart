@@ -26,7 +26,7 @@ class ExpandablePresetsSection extends StatefulWidget {
 
 /// State for [ExpandablePresetsSection].
 class ExpandablePresetsSectionState extends State<ExpandablePresetsSection> {
-  /// Whether expanded is enabled.
+  /// Whether the presets expansion tile is currently open.
   bool expanded = false;
 
   @override

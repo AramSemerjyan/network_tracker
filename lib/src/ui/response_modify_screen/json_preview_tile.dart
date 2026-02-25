@@ -6,7 +6,7 @@ import 'package:json_view/json_view.dart';
 /// Uses the [json_view] package to render JSON objects and arrays.
 
 class JsonPreviewTile extends StatelessWidget {
-  /// The json View.
+  /// JSON object/array to preview.
   final dynamic jsonView;
 
   /// Creates a [JsonPreviewTile] instance.

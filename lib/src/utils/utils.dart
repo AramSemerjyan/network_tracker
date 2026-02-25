@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
-/// Utils.
+/// Utility helpers for export/share and byte-size formatting.
 class Utils {
   /// Exports the provided [data] to a temporary `.json` file.
   ///
@@ -86,7 +86,7 @@ class Utils {
     return '${size.toStringAsFixed(decimals)}${suffixes[i]}';
   }
 
-  /// Performs estimate Size.
+  /// Estimates JSON-encoded byte size of [data].
   static int estimateSize(dynamic data) {
     if (data == null) return 0;
     try {
