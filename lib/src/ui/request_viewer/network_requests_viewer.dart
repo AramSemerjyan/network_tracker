@@ -16,8 +16,6 @@ enum _RequestsMenuAction {
   debugTools,
   responseInterceptors,
   repeatRequest,
-  toggleSearch,
-  toggleFilter,
   clearAll,
 }
 
@@ -154,12 +152,6 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
         break;
       case _RequestsMenuAction.repeatRequest:
         _moveToRepeat();
-        break;
-      case _RequestsMenuAction.toggleSearch:
-        _onSearchTap();
-        break;
-      case _RequestsMenuAction.toggleFilter:
-        _onFilterTap();
         break;
       case _RequestsMenuAction.clearAll:
         _vm.clearRequestsList();
@@ -373,13 +365,33 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           surfaceTintColor: Colors.transparent,
           leading: CloseButton(),
           actions: [
+            ValueListenableBuilder<bool>(
+              valueListenable: _showSearchBar,
+              builder: (context, showSearch, _) {
+                return IconButton(
+                  onPressed: _onSearchTap,
+                  icon: Icon(showSearch ? Icons.close : Icons.search),
+                  tooltip: showSearch ? 'Hide search' : 'Show search',
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: _showFilterBar,
+              builder: (context, showFilter, _) {
+                return IconButton(
+                  onPressed: _onFilterTap,
+                  icon: Icon(
+                    showFilter ? Icons.filter_alt_off : Icons.filter_alt,
+                  ),
+                  tooltip: showFilter ? 'Hide filters' : 'Show filters',
+                );
+              },
+            ),
             PopupMenuButton<_RequestsMenuAction>(
               color: backgroundColor,
               icon: Icon(Icons.more_vert, color: foregroundColor),
               onSelected: _onMenuAction,
               itemBuilder: (context) {
-                final showSearch = _showSearchBar.value;
-                final showFilter = _showFilterBar.value;
                 final interceptorsCount =
                     NetworkRequestService.instance.responseModificationCount;
                 return [
@@ -399,18 +411,6 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                     value: _RequestsMenuAction.repeatRequest,
                     icon: Icons.repeat,
                     label: 'Repeat request',
-                    foregroundColor: foregroundColor,
-                  ),
-                  _buildMenuItem(
-                    value: _RequestsMenuAction.toggleSearch,
-                    icon: showSearch ? Icons.close : Icons.search,
-                    label: showSearch ? 'Hide search' : 'Show search',
-                    foregroundColor: foregroundColor,
-                  ),
-                  _buildMenuItem(
-                    value: _RequestsMenuAction.toggleFilter,
-                    icon: showFilter ? Icons.filter_alt_off : Icons.filter_alt,
-                    label: showFilter ? 'Hide filters' : 'Show filters',
                     foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
