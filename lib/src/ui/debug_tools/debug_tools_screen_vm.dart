@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dart_ping_ios/dart_ping_ios.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:network_tracker/network_tracker.dart';
 import 'package:network_tracker/src/model/network_request.dart';

@@ -179,6 +179,45 @@ class NetworkRequestService {
     ));
   }
 
+  int get responseModificationCount => _responseModifications.length;
+
+  List<ResponseModificationEntry> getAllResponseModifications() {
+    final entries = <ResponseModificationEntry>[];
+
+    _responseModifications.forEach((key, modification) {
+      final parts = key.split('::');
+      if (parts.length < 3) return;
+
+      final methodRaw = parts.first;
+      final baseUrl = parts[1];
+      final path = parts.sublist(2).join('::');
+
+      try {
+        final method = NetworkRequestMethod.fromString(methodRaw);
+        entries.add(
+          ResponseModificationEntry(
+            baseUrl: baseUrl,
+            path: path,
+            method: method,
+            modification: modification,
+          ),
+        );
+      } catch (_) {
+        return;
+      }
+    });
+
+    entries.sort((a, b) {
+      final byHost = a.baseUrl.compareTo(b.baseUrl);
+      if (byHost != 0) return byHost;
+      final byPath = a.path.compareTo(b.path);
+      if (byPath != 0) return byPath;
+      return a.method.value.compareTo(b.method.value);
+    });
+
+    return entries;
+  }
+
   String _modKey({
     required String baseUrl,
     required String path,

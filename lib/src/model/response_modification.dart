@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_tracker/src/model/network_request_method.dart';
 
 class ResponseModification {
   final int? statusCode;
@@ -40,4 +41,18 @@ class ResponseModification {
       isRedirect: response.isRedirect,
     );
   }
+}
+
+class ResponseModificationEntry {
+  final String baseUrl;
+  final String path;
+  final NetworkRequestMethod method;
+  final ResponseModification modification;
+
+  const ResponseModificationEntry({
+    required this.baseUrl,
+    required this.path,
+    required this.method,
+    required this.modification,
+  });
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/services/network_request_service.dart';
 import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen.dart';
+import 'package:network_tracker/src/ui/debug_tools/response_interceptors_screen.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen.dart';
 import 'package:network_tracker/src/ui/request_viewer/network_request_viewer_vm.dart';
@@ -12,6 +14,7 @@ import '../request_details_screen/request_details_screen.dart';
 
 enum _RequestsMenuAction {
   debugTools,
+  responseInterceptors,
   repeatRequest,
   toggleSearch,
   toggleFilter,
@@ -132,10 +135,22 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     );
   }
 
+  void _moveToResponseInterceptors() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ResponseInterceptorsScreen(),
+      ),
+    );
+  }
+
   void _onMenuAction(_RequestsMenuAction action) {
     switch (action) {
       case _RequestsMenuAction.debugTools:
         _moveToDebugTools();
+        break;
+      case _RequestsMenuAction.responseInterceptors:
+        _moveToResponseInterceptors();
         break;
       case _RequestsMenuAction.repeatRequest:
         _moveToRepeat();
@@ -365,11 +380,19 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
               itemBuilder: (context) {
                 final showSearch = _showSearchBar.value;
                 final showFilter = _showFilterBar.value;
+                final interceptorsCount =
+                    NetworkRequestService.instance.responseModificationCount;
                 return [
                   _buildMenuItem(
                     value: _RequestsMenuAction.debugTools,
                     icon: Icons.bug_report,
                     label: 'Debug tools',
+                    foregroundColor: foregroundColor,
+                  ),
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.responseInterceptors,
+                    icon: Icons.edit_note,
+                    label: 'Response interceptors ($interceptorsCount)',
                     foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
