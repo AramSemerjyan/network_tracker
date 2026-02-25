@@ -191,8 +191,12 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (_selectedClient.value) {
       case _jsonPlaceholder:
         _makeJsonPlaceholderRequest();
+        break;
       case _dummyJson:
         _makeDummyJsonRequest();
+        break;
+    default:
+        return;
     }
   }
 
