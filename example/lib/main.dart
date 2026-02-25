@@ -195,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case _dummyJson:
         _makeDummyJsonRequest();
         break;
-    default:
+      default:
         return;
     }
   }
