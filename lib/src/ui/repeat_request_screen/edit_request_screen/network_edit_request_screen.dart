@@ -65,6 +65,16 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
     );
 
     _vm.send(modified);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Request sent'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   Map<String, dynamic>? convertLooseJsonToMap(String input) {
@@ -102,6 +112,7 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
     final keys = map.keys.toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
       children: [
         Text(label, style: Theme.of(context).textTheme.titleMedium),
         ...List.generate(keys.length, (i) {

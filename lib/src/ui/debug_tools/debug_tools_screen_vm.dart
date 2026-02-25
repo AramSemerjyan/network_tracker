@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:network_tracker/network_tracker.dart';
 import 'package:network_tracker/src/model/network_request.dart';
 import 'package:network_tracker/src/model/network_request_filter.dart';
@@ -110,8 +111,9 @@ class DebugToolsScreenVM {
           allPingHosts.value.isNotEmpty ? allPingHosts.value.first : '';
       selectedExportHost.value = urls.isNotEmpty ? urls.first : '';
     } catch (e) {
-      // Handle initialization errors if necessary
-      // TODO: Consider logging this error using a logging package in development.
+      if (kDebugMode) {
+        print('Error loading URLs from storage: $e');
+      }
     }
   }
 

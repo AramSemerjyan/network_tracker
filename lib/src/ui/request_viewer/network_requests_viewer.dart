@@ -258,14 +258,18 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
     required _RequestsMenuAction value,
     required IconData icon,
     required String label,
+    required Color foregroundColor,
   }) {
     return PopupMenuItem<_RequestsMenuAction>(
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 18),
+          Icon(icon, size: 18, color: foregroundColor),
           const SizedBox(width: 8),
-          Text(label),
+          Text(
+            label,
+            style: TextStyle(color: foregroundColor),
+          ),
         ],
       ),
     );
@@ -342,6 +346,8 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   Widget build(BuildContext context) {
     final screenTheme = ReadableThemeColors.screenTheme(context);
     final backgroundColor = screenTheme.scaffoldBackgroundColor;
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
     return Theme(
       data: screenTheme,
       child: Scaffold(
@@ -353,6 +359,8 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
           leading: CloseButton(),
           actions: [
             PopupMenuButton<_RequestsMenuAction>(
+              color: backgroundColor,
+              icon: Icon(Icons.more_vert, color: foregroundColor),
               onSelected: _onMenuAction,
               itemBuilder: (context) {
                 final showSearch = _showSearchBar.value;
@@ -362,26 +370,31 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                     value: _RequestsMenuAction.debugTools,
                     icon: Icons.bug_report,
                     label: 'Debug tools',
+                    foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
                     value: _RequestsMenuAction.repeatRequest,
                     icon: Icons.repeat,
                     label: 'Repeat request',
+                    foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
                     value: _RequestsMenuAction.toggleSearch,
                     icon: showSearch ? Icons.close : Icons.search,
                     label: showSearch ? 'Hide search' : 'Show search',
+                    foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
                     value: _RequestsMenuAction.toggleFilter,
                     icon: showFilter ? Icons.filter_alt_off : Icons.filter_alt,
                     label: showFilter ? 'Hide filters' : 'Show filters',
+                    foregroundColor: foregroundColor,
                   ),
                   _buildMenuItem(
                     value: _RequestsMenuAction.clearAll,
                     icon: Icons.delete_forever,
                     label: 'Clear requests',
+                    foregroundColor: foregroundColor,
                   ),
                 ];
               },
