@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 
 import '../../model/network_request.dart';
 import '../../services/request_status.dart';
@@ -290,133 +291,138 @@ class _NetworkModifyResponseScreenState
   Widget build(BuildContext context) {
     final bodyJson = _tryDecodeJson(_bodyController.text);
     final headersJson = _tryDecodeJson(_headersController.text);
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    final backgroundColor = screenTheme.scaffoldBackgroundColor;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Modify Response'),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reset Modifier',
-            onPressed: _resetModifier,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            // Presets section (expandable)
-            ExpandablePresetsSection(
-              availablePresets: _availablePresets,
-              onSelect: _selectPreset,
-            ),
-            const SizedBox(height: 8),
-            // Selected presets wrap
-            ValueListenableBuilder<Set<ResponsePreset>>(
-                valueListenable: _selectedPresets,
-                builder: (context, selectedPresets, _) {
-                  return selectedPresets.isNotEmpty
-                      ? Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: selectedPresets
-                              .map((preset) => Chip(
-                                    label: Text(preset.label),
-                                    onDeleted: () => _removePreset(preset),
-                                  ))
-                              .toList(),
-                        )
-                      : const SizedBox.shrink();
-                }),
-            ValueListenableBuilder<Set<ResponsePreset>>(
-              valueListenable: _selectedPresets,
-              builder: (context, selectedPresets, _) =>
-                  selectedPresets.isNotEmpty
-                      ? const SizedBox(height: 16)
-                      : const SizedBox.shrink(),
-            ),
-            Text(
-              '${widget.originalRequest.method.value} ${widget.originalRequest.path}',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _statusController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Status code',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (_) {
-                _onStatusCodeChanged();
-              },
-            ),
-            const SizedBox(height: 16),
-            ExpandableJsonSection(
-              title: 'Response body',
-              maxHeight: _jsonSectionMaxHeight,
-              onAdd: () => _addJsonEntry(
-                title: 'response body',
-                controller: _bodyController,
-              ),
-              jsonView: bodyJson,
-              editor: TextFormField(
-                controller: _bodyController,
-                minLines: 4,
-                maxLines: 8,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  labelText: 'JSON or text',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ExpandableJsonSection(
-              title: 'Headers',
-              maxHeight: _jsonSectionMaxHeight,
-              onAdd: () => _addJsonEntry(
-                title: 'header',
-                controller: _headersController,
-              ),
-              jsonView: headersJson,
-              editor: TextFormField(
-                controller: _headersController,
-                minLines: 3,
-                maxLines: 6,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  labelText: 'JSON',
-                  border: OutlineInputBorder(),
-                  hintText: '{"X-Debug": "QA"}',
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Delay (ms)',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _delayController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Delay (ms)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            GradientButton.icon(
-              onPressed: _applyChanges,
-              icon: Icons.check,
-              label: const Text('Apply'),
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          title: const Text('Modify Response'),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Reset Modifier',
+              onPressed: _resetModifier,
             ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            children: [
+              // Presets section (expandable)
+              ExpandablePresetsSection(
+                availablePresets: _availablePresets,
+                onSelect: _selectPreset,
+              ),
+              const SizedBox(height: 8),
+              // Selected presets wrap
+              ValueListenableBuilder<Set<ResponsePreset>>(
+                  valueListenable: _selectedPresets,
+                  builder: (context, selectedPresets, _) {
+                    return selectedPresets.isNotEmpty
+                        ? Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: selectedPresets
+                                .map((preset) => Chip(
+                                      label: Text(preset.label),
+                                      onDeleted: () => _removePreset(preset),
+                                    ))
+                                .toList(),
+                          )
+                        : const SizedBox.shrink();
+                  }),
+              ValueListenableBuilder<Set<ResponsePreset>>(
+                valueListenable: _selectedPresets,
+                builder: (context, selectedPresets, _) =>
+                    selectedPresets.isNotEmpty
+                        ? const SizedBox(height: 16)
+                        : const SizedBox.shrink(),
+              ),
+              Text(
+                '${widget.originalRequest.method.value} ${widget.originalRequest.path}',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _statusController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Status code',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (_) {
+                  _onStatusCodeChanged();
+                },
+              ),
+              const SizedBox(height: 16),
+              ExpandableJsonSection(
+                title: 'Response body',
+                maxHeight: _jsonSectionMaxHeight,
+                onAdd: () => _addJsonEntry(
+                  title: 'response body',
+                  controller: _bodyController,
+                ),
+                jsonView: bodyJson,
+                editor: TextFormField(
+                  controller: _bodyController,
+                  minLines: 4,
+                  maxLines: 8,
+                  onChanged: (_) => setState(() {}),
+                  decoration: const InputDecoration(
+                    labelText: 'JSON or text',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ExpandableJsonSection(
+                title: 'Headers',
+                maxHeight: _jsonSectionMaxHeight,
+                onAdd: () => _addJsonEntry(
+                  title: 'header',
+                  controller: _headersController,
+                ),
+                jsonView: headersJson,
+                editor: TextFormField(
+                  controller: _headersController,
+                  minLines: 3,
+                  maxLines: 6,
+                  onChanged: (_) => setState(() {}),
+                  decoration: const InputDecoration(
+                    labelText: 'JSON',
+                    border: OutlineInputBorder(),
+                    hintText: '{"X-Debug": "QA"}',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Delay (ms)',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _delayController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Delay (ms)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              GradientButton.icon(
+                onPressed: _applyChanges,
+                icon: Icons.check,
+                label: const Text('Apply'),
+              ),
+            ],
+          ),
         ),
       ),
     );

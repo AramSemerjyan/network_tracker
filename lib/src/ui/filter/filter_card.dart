@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 
 class FilterCard<T> extends StatelessWidget {
   final String title;
@@ -20,10 +21,12 @@ class FilterCard<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = value != null;
     final scheme = Theme.of(context).colorScheme;
+    final cardColor =
+        isSelected ? scheme.primaryContainer : scheme.surfaceContainerHighest;
+    final textColor = ReadableThemeColors.resolveForeground(context, cardColor);
 
     return Card(
-      color:
-          isSelected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+      color: cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -70,21 +73,17 @@ class FilterCard<T> extends StatelessWidget {
                   Text(
                     '$title: ',
                     style: TextStyle(
-                      color: isSelected
-                          ? scheme.onPrimaryContainer
-                          : scheme.onSurface,
+                      color: textColor,
                     ),
                   ),
                   Text(
                     value != null ? getLabel(value as T) : 'Any',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: isSelected
-                          ? scheme.onPrimaryContainer
-                          : scheme.onSurface,
+                      color: textColor,
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_down),
+                  Icon(Icons.arrow_drop_down, color: textColor),
                 ],
               ),
             ),
@@ -93,9 +92,13 @@ class FilterCard<T> extends StatelessWidget {
               InkWell(
                 onTap: () => onChanged(null),
                 borderRadius: BorderRadius.circular(20),
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.all(4),
-                  child: Icon(Icons.clear, size: 18),
+                  child: Icon(
+                    Icons.clear,
+                    size: 18,
+                    color: textColor,
+                  ),
                 ),
               ),
             ],

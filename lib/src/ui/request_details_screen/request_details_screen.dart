@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/common/request_actions_botton.dart';
 import 'package:network_tracker/src/ui/request_details_screen/request_details_screen_vm.dart';
 
@@ -150,39 +151,43 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(widget.path),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          ValueListenableBuilder(
-            valueListenable: _showFilterBar,
-            builder: (c, v, w) {
-              return IconButton(
-                onPressed: _onFilterTap,
-                icon: Icon(
-                  v ? Icons.filter_alt_off : Icons.filter_alt,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilterBar(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: _vm.requestsNotifier,
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        backgroundColor: screenTheme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          title: Text(widget.path),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          actions: [
+            ValueListenableBuilder(
+              valueListenable: _showFilterBar,
               builder: (c, v, w) {
-                return v.isEmpty ? _buildEmptyState() : _buildList(v);
+                return IconButton(
+                  onPressed: _onFilterTap,
+                  icon: Icon(
+                    v ? Icons.filter_alt_off : Icons.filter_alt,
+                  ),
+                );
               },
             ),
-          ),
-        ],
+          ],
+        ),
+        body: Column(
+          children: [
+            _buildFilterBar(),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ValueListenableBuilder(
+                valueListenable: _vm.requestsNotifier,
+                builder: (c, v, w) {
+                  return v.isEmpty ? _buildEmptyState() : _buildList(v);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

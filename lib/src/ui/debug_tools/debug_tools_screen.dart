@@ -3,6 +3,7 @@ import 'package:json_view/json_view.dart';
 import 'package:network_tracker/src/services/speed_test/speet_test_file.dart';
 import 'package:network_tracker/src/ui/common/gradient_button.dart';
 import 'package:network_tracker/src/ui/common/loading_label/loadin_label.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen_vm.dart';
 
 import '../common/loading_label/loading_state.dart';
@@ -79,7 +80,11 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   }
 
   Widget _buildSpeedTestRow() {
-    final scheme = Theme.of(context).colorScheme;
+    final backgroundColor = ReadableThemeColors.resolveBackground(context);
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
+    final secondaryForeground = foregroundColor.withValues(alpha: 0.75);
+
     return ValueListenableBuilder(
       valueListenable: _vm.speedTestState,
       builder: (_, state, __) {
@@ -128,6 +133,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                 builder: (_, selectedIteration, __) {
                   return DropdownButton<int>(
                     value: selectedIteration,
+                    dropdownColor: backgroundColor,
+                    style: TextStyle(color: foregroundColor),
                     icon: const Icon(Icons.arrow_drop_down),
                     onChanged: (value) {
                       if (value != null) {
@@ -150,7 +157,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                                 iteration.toString(),
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: scheme.onSurfaceVariant,
+                                  color: secondaryForeground,
                                   fontSize: 12,
                                 ),
                               ),
@@ -167,6 +174,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                 builder: (_, selectedFile, __) {
                   return DropdownButton<SpeedTestFile>(
                     value: selectedFile,
+                    dropdownColor: backgroundColor,
+                    style: TextStyle(color: foregroundColor),
                     icon: const Icon(Icons.arrow_drop_down),
                     onChanged: (value) {
                       if (value != null) {
@@ -189,7 +198,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                                 file.urlString,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: scheme.onSurfaceVariant,
+                                  color: secondaryForeground,
                                   fontSize: 12,
                                 ),
                               ),
@@ -256,6 +265,10 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
   Widget _buildPingRow() {
     final scheme = Theme.of(context).colorScheme;
+    final backgroundColor = ReadableThemeColors.resolveBackground(context);
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
+    final secondaryForeground = foregroundColor.withValues(alpha: 0.75);
     return ValueListenableBuilder(
       valueListenable: _vm.pingState,
       builder: (_, state, __) {
@@ -302,6 +315,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                           value: selected,
                           hint: const Text('Select from recent URLs'),
                           isExpanded: true,
+                          dropdownColor: backgroundColor,
+                          style: TextStyle(color: foregroundColor),
                           icon: const Icon(Icons.arrow_drop_down),
                           onChanged: (value) {
                             if (value != null) {
@@ -326,9 +341,18 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                 valueListenable: _vm.selectedPingUrl,
                 builder: (_, selectedUrl, __) {
                   return TextField(
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: foregroundColor),
+                    cursorColor: foregroundColor,
+                    decoration: InputDecoration(
                       hintText: 'Enter host to ping (e.g., google.com)',
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: secondaryForeground),
+                      border: const OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: secondaryForeground),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: foregroundColor),
+                      ),
                       isDense: true,
                     ),
                     controller: TextEditingController(text: selectedUrl)
@@ -375,6 +399,9 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
   }
 
   Widget _buildPostmanExportRow() {
+    final backgroundColor = ReadableThemeColors.resolveBackground(context);
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
     return ValueListenableBuilder(
       valueListenable: _vm.exportCollectionState,
       builder: (_, state, __) {
@@ -419,6 +446,8 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                           value: selected,
                           hint: const Text('Select from recent URLs'),
                           isExpanded: true,
+                          dropdownColor: backgroundColor,
+                          style: TextStyle(color: foregroundColor),
                           icon: const Icon(Icons.arrow_drop_down),
                           onChanged: (value) {
                             if (value != null) {
@@ -449,27 +478,32 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Debug Tools'),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            spacing: 16,
-            children: [
-              _buildSpeedTestRow(),
-              Divider(height: 1),
-              _buildExternalIpRow(),
-              Divider(height: 1),
-              _buildPingRow(),
-              Divider(height: 1),
-              _buildPostmanExportRow(),
-            ],
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    final backgroundColor = screenTheme.scaffoldBackgroundColor;
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Debug Tools'),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+        ),
+        backgroundColor: backgroundColor,
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 16,
+              children: [
+                _buildSpeedTestRow(),
+                Divider(height: 1),
+                _buildExternalIpRow(),
+                Divider(height: 1),
+                _buildPingRow(),
+                Divider(height: 1),
+                _buildPostmanExportRow(),
+              ],
+            ),
           ),
         ),
       ),

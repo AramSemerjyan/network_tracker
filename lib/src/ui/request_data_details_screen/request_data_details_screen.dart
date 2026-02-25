@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_view/json_view.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/common/request_actions_botton.dart';
 import 'package:network_tracker/src/ui/common/requiest_badge_row.dart';
 
@@ -36,87 +37,91 @@ class _RequestDataDetailsScreenState extends State<RequestDataDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          '${widget.request.method.value} - ${widget.request.startDate}',
-          style: const TextStyle(fontSize: 14),
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        backgroundColor: screenTheme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          title: Text(
+            '${widget.request.method.value} - ${widget.request.startDate}',
+            style: const TextStyle(fontSize: 14),
+          ),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          actions: [
+            RequestActionsButton(request: widget.request),
+          ],
         ),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          RequestActionsButton(request: widget.request),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 16),
-                child: RequestBadgeRow(request: widget.request),
-              ),
-              if (widget.request.requestData != null)
-                ListTile(
-                  title: const Text('Request Data:'),
-                  subtitle: JsonView(
-                    json: widget.request.requestData,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 16),
+                  child: RequestBadgeRow(request: widget.request),
+                ),
+                if (widget.request.requestData != null)
+                  ListTile(
+                    title: const Text('Request Data:'),
+                    subtitle: JsonView(
+                      json: widget.request.requestData,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
                   ),
-                ),
-              if (widget.request.queryParameters?.isNotEmpty ?? false)
-                ListTile(
-                  title: const Text('Request Parameters:'),
-                  subtitle: JsonView(
-                    json: widget.request.queryParameters,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                if (widget.request.queryParameters?.isNotEmpty ?? false)
+                  ListTile(
+                    title: const Text('Request Parameters:'),
+                    subtitle: JsonView(
+                      json: widget.request.queryParameters,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
                   ),
-                ),
-              if (widget.request.headers?.isNotEmpty ?? false)
-                ListTile(
-                  title: const Text('Request Headers:'),
-                  subtitle: JsonView(
-                    json: widget.request.headers,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                if (widget.request.headers?.isNotEmpty ?? false)
+                  ListTile(
+                    title: const Text('Request Headers:'),
+                    subtitle: JsonView(
+                      json: widget.request.headers,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
                   ),
-                ),
-              if (widget.request.duration != null)
-                ListTile(
-                  title: const Text('Duration:'),
-                  subtitle: Text(
-                    '${widget.request.duration?.inMilliseconds}ms',
+                if (widget.request.duration != null)
+                  ListTile(
+                    title: const Text('Duration:'),
+                    subtitle: Text(
+                      '${widget.request.duration?.inMilliseconds}ms',
+                    ),
                   ),
-                ),
-              if (widget.request.dioError?.error != null)
-                ListTile(
-                  title: const Text('Error:'),
-                  subtitle: Text('${widget.request.dioError?.error}'),
-                ),
-              if (widget.request.dioError?.message != null)
-                ListTile(
-                  title: const Text('Error message:'),
-                  subtitle: Text('${widget.request.dioError?.message}'),
-                ),
-              if (widget.request.responseData != null)
-                ListTile(
-                  title: Row(
-                    children: [
-                      const Text('Response data:'),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: _vm.shareRequest,
-                        icon: const Icon(Icons.save_alt),
-                      )
-                    ],
+                if (widget.request.dioError?.error != null)
+                  ListTile(
+                    title: const Text('Error:'),
+                    subtitle: Text('${widget.request.dioError?.error}'),
                   ),
-                  subtitle: _buildBody(),
-                ),
-            ],
+                if (widget.request.dioError?.message != null)
+                  ListTile(
+                    title: const Text('Error message:'),
+                    subtitle: Text('${widget.request.dioError?.message}'),
+                  ),
+                if (widget.request.responseData != null)
+                  ListTile(
+                    title: Row(
+                      children: [
+                        const Text('Response data:'),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: _vm.shareRequest,
+                          icon: const Icon(Icons.save_alt),
+                        )
+                      ],
+                    ),
+                    subtitle: _buildBody(),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

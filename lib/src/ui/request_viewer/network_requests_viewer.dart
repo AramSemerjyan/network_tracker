@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/network_request.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/debug_tools/debug_tools_screen.dart';
 import 'package:network_tracker/src/ui/filter/filter_bar.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/network_repeat_request_screen.dart';
@@ -28,6 +29,7 @@ class NetworkRequestsViewer extends StatefulWidget {
       barrierColor: scheme.scrim.withValues(alpha: 0.5),
       backgroundColor: Colors.transparent,
       builder: (c) {
+        final backgroundColor = ReadableThemeColors.resolveBackground(c);
         return ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 90 / 100,
@@ -40,7 +42,7 @@ class NetworkRequestsViewer extends StatefulWidget {
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: backgroundColor,
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(16),
                 topLeft: Radius.circular(16),
@@ -229,12 +231,23 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
       itemCount: list.length,
       separatorBuilder: (_, __) => const Divider(),
       itemBuilder: (context, index) {
+        final backgroundColor = ReadableThemeColors.resolveBackground(context);
+        final foregroundColor =
+            ReadableThemeColors.resolveForeground(context, backgroundColor);
+        final secondaryColor =
+            ReadableThemeColors.resolveMutedForeground(foregroundColor);
         final requests = list[index];
         final path = requests.first.path;
 
         return ListTile(
-          title: Text(path),
-          trailing: Text('${requests.length} requests'),
+          title: Text(
+            path,
+            style: TextStyle(color: foregroundColor),
+          ),
+          trailing: Text(
+            '${requests.length} requests',
+            style: TextStyle(color: secondaryColor),
+          ),
           onTap: () => _moveToDetails(path),
         );
       },
@@ -259,6 +272,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
   }
 
   Widget _buildBaseUrlRow() {
+    final backgroundColor = ReadableThemeColors.resolveBackground(context);
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
+
     return ValueListenableBuilder<String>(
       valueListenable: _vm.selectedBaseUrl,
       builder: (context, selected, _) {
@@ -290,6 +307,8 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: selected,
+                    dropdownColor: backgroundColor,
+                    style: TextStyle(color: foregroundColor),
                     icon: const Icon(Icons.arrow_drop_down),
                     onChanged: (value) {
                       if (value != null) {
@@ -302,7 +321,10 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
                         child: Text(
                           url,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: foregroundColor,
+                          ),
                         ),
                       );
                     }).toList(),
@@ -318,75 +340,80 @@ class _NetworkRequestsViewerState extends State<NetworkRequestsViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Center(child: const Text('Requests')),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        leading: CloseButton(),
-        actions: [
-          PopupMenuButton<_RequestsMenuAction>(
-            onSelected: _onMenuAction,
-            itemBuilder: (context) {
-              final showSearch = _showSearchBar.value;
-              final showFilter = _showFilterBar.value;
-              return [
-                _buildMenuItem(
-                  value: _RequestsMenuAction.debugTools,
-                  icon: Icons.bug_report,
-                  label: 'Debug tools',
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    final backgroundColor = screenTheme.scaffoldBackgroundColor;
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          title: Center(child: const Text('Requests')),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          leading: CloseButton(),
+          actions: [
+            PopupMenuButton<_RequestsMenuAction>(
+              onSelected: _onMenuAction,
+              itemBuilder: (context) {
+                final showSearch = _showSearchBar.value;
+                final showFilter = _showFilterBar.value;
+                return [
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.debugTools,
+                    icon: Icons.bug_report,
+                    label: 'Debug tools',
+                  ),
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.repeatRequest,
+                    icon: Icons.repeat,
+                    label: 'Repeat request',
+                  ),
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.toggleSearch,
+                    icon: showSearch ? Icons.close : Icons.search,
+                    label: showSearch ? 'Hide search' : 'Show search',
+                  ),
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.toggleFilter,
+                    icon: showFilter ? Icons.filter_alt_off : Icons.filter_alt,
+                    label: showFilter ? 'Hide filters' : 'Show filters',
+                  ),
+                  _buildMenuItem(
+                    value: _RequestsMenuAction.clearAll,
+                    icon: Icons.delete_forever,
+                    label: 'Clear requests',
+                  ),
+                ];
+              },
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                const SizedBox(height: 8),
+                _buildBaseUrlRow(),
+                _buildSearchBar(),
+                _buildFilterBar(),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ValueListenableBuilder(
+                    valueListenable: _vm.filteredRequestsNotifier,
+                    builder: (c, f, w) {
+                      return f.isEmpty ? _buildEmptyState() : _buildList(f);
+                    },
+                  ),
                 ),
-                _buildMenuItem(
-                  value: _RequestsMenuAction.repeatRequest,
-                  icon: Icons.repeat,
-                  label: 'Repeat request',
-                ),
-                _buildMenuItem(
-                  value: _RequestsMenuAction.toggleSearch,
-                  icon: showSearch ? Icons.close : Icons.search,
-                  label: showSearch ? 'Hide search' : 'Show search',
-                ),
-                _buildMenuItem(
-                  value: _RequestsMenuAction.toggleFilter,
-                  icon: showFilter ? Icons.filter_alt_off : Icons.filter_alt,
-                  label: showFilter ? 'Hide filters' : 'Show filters',
-                ),
-                _buildMenuItem(
-                  value: _RequestsMenuAction.clearAll,
-                  icon: Icons.delete_forever,
-                  label: 'Clear requests',
-                ),
-              ];
-            },
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              const SizedBox(height: 8),
-              _buildBaseUrlRow(),
-              _buildSearchBar(),
-              _buildFilterBar(),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: _vm.filteredRequestsNotifier,
-                  builder: (c, f, w) {
-                    return f.isEmpty ? _buildEmptyState() : _buildList(f);
-                  },
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 8,
-            right: 8,
-            child: ConnectionStatusView(),
-          ),
-        ],
+              ],
+            ),
+            Positioned(
+              bottom: 8,
+              right: 8,
+              child: ConnectionStatusView(),
+            ),
+          ],
+        ),
       ),
     );
   }

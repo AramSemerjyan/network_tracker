@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:network_tracker/src/model/response_modification.dart';
 import 'package:network_tracker/src/services/network_request_service.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 
 import '../../model/network_request.dart';
 import '../repeat_request_screen/edit_request_screen/network_edit_request_screen.dart';
@@ -96,11 +97,19 @@ class _RequestActionsButtonState extends State<RequestActionsButton> {
             i.runtimeType.toString() ==
             'NetworkTrackerRequestModifierInterceptor') ??
         false;
+    final backgroundColor = ReadableThemeColors.resolveBackground(context);
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
 
     return PopupMenuButton<_ActionType>(
+      color: backgroundColor,
       icon: Container(
         padding: const EdgeInsets.only(left: 8),
-        child: Icon(Icons.more_vert, size: 25),
+        child: Icon(
+          Icons.more_vert,
+          size: 25,
+          color: foregroundColor,
+        ),
       ),
       onSelected: (action) {
         switch (action) {
@@ -127,20 +136,26 @@ class _RequestActionsButtonState extends State<RequestActionsButton> {
           PopupMenuItem(
             value: _ActionType.repeat,
             child: Row(
-              children: const [
-                Icon(Icons.repeat, size: 20),
-                SizedBox(width: 8),
-                Text('Repeat Request'),
+              children: [
+                Icon(Icons.repeat, size: 20, color: foregroundColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Repeat Request',
+                  style: TextStyle(color: foregroundColor),
+                ),
               ],
             ),
           ),
           PopupMenuItem(
             value: _ActionType.editRequest,
             child: Row(
-              children: const [
-                Icon(Icons.edit, size: 20),
-                SizedBox(width: 8),
-                Text('Edit Request'),
+              children: [
+                Icon(Icons.edit, size: 20, color: foregroundColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Edit Request',
+                  style: TextStyle(color: foregroundColor),
+                ),
               ],
             ),
           ),
@@ -150,10 +165,13 @@ class _RequestActionsButtonState extends State<RequestActionsButton> {
             PopupMenuItem(
               value: _ActionType.modifyResponse,
               child: Row(
-                children: const [
-                  Icon(Icons.edit_note, size: 20),
-                  SizedBox(width: 8),
-                  Text('Intercept Response'),
+                children: [
+                  Icon(Icons.edit_note, size: 20, color: foregroundColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Intercept Response',
+                    style: TextStyle(color: foregroundColor),
+                  ),
                 ],
               ),
             ),
@@ -163,10 +181,13 @@ class _RequestActionsButtonState extends State<RequestActionsButton> {
           PopupMenuItem(
             value: _ActionType.copyCurl,
             child: Row(
-              children: const [
-                Icon(Icons.terminal, size: 20),
-                SizedBox(width: 8),
-                Text('Copy cURL'),
+              children: [
+                Icon(Icons.terminal, size: 20, color: foregroundColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Copy cURL',
+                  style: TextStyle(color: foregroundColor),
+                ),
               ],
             ),
           ),

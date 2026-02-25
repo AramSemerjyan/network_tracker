@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:network_tracker/src/ui/common/readable_theme_colors.dart';
 import 'package:network_tracker/src/ui/repeat_request_screen/edit_request_screen/network_edit_request_screen_vm.dart';
 
 import '../../../model/network_request.dart';
@@ -145,74 +146,83 @@ class _NetworkEditRequestScreenState extends State<NetworkEditRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text("Edit & Repeat"),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            // Path
-            TextFormField(
-              controller: _pathController,
-              decoration: const InputDecoration(labelText: "Path"),
-            ),
-            const SizedBox(height: 12),
-
-            // Method dropdown
-            DropdownButtonFormField<NetworkRequestMethod>(
-              initialValue: _method,
-              items: NetworkRequestMethod.values
-                  .map((m) => DropdownMenuItem(
-                        value: m,
-                        child: Text(m.value),
-                      ))
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) setState(() => _method = val);
-              },
-              decoration: const InputDecoration(labelText: "Method"),
-            ),
-
-            const SizedBox(height: 16),
-
-            _buildKeyValueEditor(
-              _queryParams,
-              setState,
-              label: "Query Parameters",
-            ),
-
-            const SizedBox(height: 16),
-
-            _buildKeyValueEditor(
-              _headers,
-              setState,
-              label: "Headers",
-            ),
-
-            const SizedBox(height: 16),
-
-            // Body
-            TextFormField(
-              controller: _bodyController,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                labelText: "Body (raw)",
-                border: OutlineInputBorder(),
+    final screenTheme = ReadableThemeColors.screenTheme(context);
+    final backgroundColor = screenTheme.scaffoldBackgroundColor;
+    final foregroundColor =
+        ReadableThemeColors.resolveForeground(context, backgroundColor);
+    return Theme(
+      data: screenTheme,
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          title: const Text("Edit & Repeat"),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            children: [
+              // Path
+              TextFormField(
+                controller: _pathController,
+                decoration: const InputDecoration(labelText: "Path"),
               ),
-            ),
+              const SizedBox(height: 12),
 
-            const SizedBox(height: 24),
-            GradientButton.icon(
-              onPressed: _sendRequest,
-              icon: Icons.send,
-              label: const Text("Send"),
-            )
-          ],
+              // Method dropdown
+              DropdownButtonFormField<NetworkRequestMethod>(
+                initialValue: _method,
+                dropdownColor: backgroundColor,
+                style: TextStyle(color: foregroundColor),
+                items: NetworkRequestMethod.values
+                    .map((m) => DropdownMenuItem(
+                          value: m,
+                          child: Text(m.value),
+                        ))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => _method = val);
+                },
+                decoration: const InputDecoration(labelText: "Method"),
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildKeyValueEditor(
+                _queryParams,
+                setState,
+                label: "Query Parameters",
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildKeyValueEditor(
+                _headers,
+                setState,
+                label: "Headers",
+              ),
+
+              const SizedBox(height: 16),
+
+              // Body
+              TextFormField(
+                controller: _bodyController,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  labelText: "Body (raw)",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+              GradientButton.icon(
+                onPressed: _sendRequest,
+                icon: Icons.send,
+                label: const Text("Send"),
+              )
+            ],
+          ),
         ),
       ),
     );
