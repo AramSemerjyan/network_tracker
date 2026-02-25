@@ -97,3 +97,8 @@
   * Add comprehensive documentation comments across all service classes
   * Improve API documentation for better developer experience
   * Add usage examples in doc comments
+
+## 0.8.0
+* Introduced Postman Collection export (`.json`) for captured requests, making it easier to share and replay API flows in Postman.
+* Refined viewer and tooling UI to align with host app theme color schemes and improve visual consistency across light/dark variants.
+* Added response interception support, enabling route-level response overrides (status, body, headers, and delay) for in-app scenario testing.
