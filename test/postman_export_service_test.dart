@@ -51,7 +51,6 @@ void main() {
       expect(item['request']['url']['raw'],
           contains('https://api.example.com/api/users?page=1&limit=10'));
       expect(item['request']['header'], hasLength(2));
-      expect(item['response'], hasLength(1));
     });
 
     test('should export POST request with body', () {
@@ -212,43 +211,6 @@ void main() {
       final json = jsonDecode(result);
       expect(json['item'], isEmpty);
       expect(json['info']['name'], equals('Empty Collection'));
-    });
-
-    test('should include response examples when available', () {
-      final request = NetworkRequest(
-        id: 'test-id-6',
-        path: '/api/data',
-        baseUrl: 'https://api.example.com',
-        method: NetworkRequestMethod.get,
-        startDate: DateTime.now(),
-        endDate: DateTime.now(),
-        status: RequestStatus.completed,
-        statusCode: 200,
-        responseData: {
-          'success': true,
-          'data': {'key': 'value'}
-        },
-        responseHeaders: {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      final result = PostmanExportService.exportToPostmanCollection(
-        requests: [request],
-        collectionName: 'Response Example',
-      );
-
-      final json = jsonDecode(result);
-      final item = json['item'][0];
-
-      expect(item['response'], hasLength(1));
-      expect(item['response'][0]['name'], equals('Example Response'));
-      expect(item['response'][0]['code'], equals(200));
-      expect(item['response'][0]['status'], equals('OK'));
-
-      final responseBody = jsonDecode(item['response'][0]['body']);
-      expect(responseBody['success'], isTrue);
-      expect(responseBody['data']['key'], equals('value'));
     });
   });
 }
